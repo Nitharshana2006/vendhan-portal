@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vendhan InfoTech — Login</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    body{font-family:'DM Sans',sans-serif;}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(-16px);}to{opacity:1;transform:translateY(0);}}
+    .fade-in{animation:fadeIn 0.5s ease forwards;}
+    input:focus{outline:none;border-color:#4f46e5;box-shadow:0 0 0 3px rgba(99,102,241,0.12);}
+  </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-indigo-100 flex items-center justify-center px-4">
+
+  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-10 fade-in">
+
+    <!-- LOGO -->
+    <div class="text-center mb-8">
+      <div class="w-16 h-16 bg-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+        <span class="text-white text-2xl font-bold" style="font-family:'Plus Jakarta Sans',sans-serif;">V</span>
+      </div>
+      <h1 class="text-2xl font-bold text-gray-800" style="font-family:'Plus Jakarta Sans',sans-serif;">Vendhan InfoTech</h1>
+      <p class="text-gray-500 mt-1 text-sm">Employee Management Portal</p>
+    </div>
+
+    <!-- FORM -->
+    <div>
+      <div class="mb-5">
+        <label class="block text-sm font-semibold text-gray-700 mb-2">Email Address</label>
+        <input id="emailInput" type="email" placeholder="Enter your email"
+          class="w-full border border-gray-300 rounded-xl px-4 py-3 text-gray-800 text-sm transition duration-200">
+      </div>
+
+      <div class="mb-5">
+        <label class="block text-sm font-semibold text-gray-700 mb-2">Password</label>
+        <div style="position:relative;">
+          <input id="passwordInput" type="password" placeholder="Enter your password"
+            class="w-full border border-gray-300 rounded-xl px-4 py-3 text-gray-800 text-sm transition duration-200">
+          <button onclick="togglePwd()" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:18px;color:#9ca3af;" id="eyeBtn">👁</button>
+        </div>
+      </div>
+
+      <!-- Error message -->
+      <div id="errorMessage" class="hidden mb-4 bg-red-50 border border-red-200 text-red-600 text-sm px-4 py-3 rounded-xl">
+        ❌ Invalid email or password. Please try again.
+      </div>
+
+      <!-- Login Button -->
+      <button onclick="handleLogin()"
+        class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-xl transition duration-200 text-sm mt-1">
+        Sign In to Portal
+      </button>
+
+      <p class="text-center text-xs text-gray-400 mt-6">
+        © 2025 Vendhan InfoTech Pvt. Ltd. All rights reserved.
+      </p>
+    </div>
+  </div>
+
+  <script>
+    function handleLogin() {
+      const email    = document.getElementById('emailInput').value.trim();
+      const password = document.getElementById('passwordInput').value.trim();
+      const errorBox = document.getElementById('errorMessage');
+
+      if (email === '' || password === '') {
+        errorBox.textContent = '⚠️ Please enter both email and password.';
+        errorBox.classList.remove('hidden');
+        return;
+      }
+
+      if (email === 'admin@vendhan.com' && password === 'admin123') {
+        localStorage.setItem('userRole', 'admin');
+        localStorage.setItem('userName', 'Admin User');
+        window.location.href = 'admin/dashboard.html';
+        return;
+      }
+
+      if (email === 'employee@vendhan.com' && password === 'emp123') {
+        localStorage.setItem('userRole', 'employee');
+        localStorage.setItem('userName', 'Arjun Kumar');
+        window.location.href = 'employee/emp_dashboard.html';
+        return;
+      }
+
+      errorBox.textContent = '❌ Invalid email or password. Please try again.';
+      errorBox.classList.remove('hidden');
+    }
+
+    function togglePwd() {
+      const input = document.getElementById('passwordInput');
+      const btn   = document.getElementById('eyeBtn');
+      if (input.type === 'password') {
+        input.type = 'text';
+        btn.textContent = '🙈';
+      } else {
+        input.type = 'password';
+        btn.textContent = '👁';
+      }
+    }
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') handleLogin();
+    });
+  </script>
+</body>
+</html>

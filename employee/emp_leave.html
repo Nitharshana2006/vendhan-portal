@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Leave — Vendhan InfoTech</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{--sidebar-w:240px;--topbar-h:64px;--accent:#4f46e5;--accent-light:#eef2ff;--surface:#fff;--bg:#f4f6fb;--border:#e5e7eb;--text-primary:#111827;--text-secondary:#6b7280;--text-muted:#9ca3af;--success:#059669;--success-bg:#ecfdf5;--warning:#d97706;--warning-bg:#fffbeb;--danger:#dc2626;--danger-bg:#fef2f2;--info:#2563eb;--info-bg:#eff6ff;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text-primary);display:flex;min-height:100vh;}
+  .sidebar{width:var(--sidebar-w);background:linear-gradient(180deg,#1e1b4b,#312e81);position:fixed;top:0;left:0;height:100vh;display:flex;flex-direction:column;z-index:100;transition:width .3s;overflow:hidden;}
+  .sidebar.collapsed{width:68px;}
+  .sidebar-logo{padding:20px 18px 16px;display:flex;align-items:center;gap:12px;border-bottom:1px solid rgba(255,255,255,.08);min-height:var(--topbar-h);}
+  .logo-icon{width:36px;height:36px;background:linear-gradient(135deg,#818cf8,#6366f1);border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;color:#fff;flex-shrink:0;}
+  .logo-text{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:14px;color:#fff;white-space:nowrap;}
+  .logo-sub{font-size:10.5px;color:rgba(255,255,255,.4);}
+  .sidebar-nav{flex:1;padding:14px 10px;overflow-y:auto;overflow-x:hidden;}
+  .nav-section-label{font-size:10px;font-weight:600;letter-spacing:.09em;color:rgba(255,255,255,.3);text-transform:uppercase;padding:12px 10px 6px;white-space:nowrap;}
+  .sidebar.collapsed .nav-section-label{opacity:0;}
+  .nav-item{display:flex;align-items:center;gap:11px;padding:10px;border-radius:9px;cursor:pointer;color:rgba(255,255,255,.6);font-size:13.5px;font-weight:500;transition:all .15s;white-space:nowrap;text-decoration:none;margin-bottom:3px;}
+  .nav-item:hover{background:rgba(255,255,255,.08);color:rgba(255,255,255,.95);}
+  .nav-item.active{background:rgba(129,140,248,.25);color:#c7d2fe;border-left:3px solid #818cf8;padding-left:7px;}
+  .nav-icon{font-size:18px;flex-shrink:0;width:20px;text-align:center;}
+  .nav-badge{margin-left:auto;background:#dc2626;color:#fff;font-size:10px;font-weight:700;padding:2px 6px;border-radius:10px;}
+  .sidebar-footer{padding:14px 10px;border-top:1px solid rgba(255,255,255,.08);}
+  .user-card{display:flex;align-items:center;gap:10px;padding:10px;border-radius:9px;background:rgba(255,255,255,.07);overflow:hidden;}
+  .user-avatar-lg{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#818cf8,#6366f1);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;flex-shrink:0;}
+  .user-name{font-size:13px;font-weight:600;color:#fff;white-space:nowrap;}
+  .user-role-s{font-size:11px;color:rgba(255,255,255,.4);}
+  .topbar{position:fixed;top:0;left:var(--sidebar-w);right:0;height:var(--topbar-h);background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:16px;z-index:90;transition:left .3s;}
+  .topbar.collapsed{left:68px;}
+  .toggle-btn{width:36px;height:36px;border-radius:8px;background:none;border:1px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-secondary);font-size:18px;}
+  .page-title{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:17px;}
+  .page-breadcrumb{font-size:12px;color:var(--text-muted);}
+  .topbar-right{margin-left:auto;display:flex;align-items:center;gap:10px;}
+  .topbar-avatar{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#818cf8,#6366f1);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;cursor:pointer;}
+  .main{margin-left:var(--sidebar-w);margin-top:var(--topbar-h);padding:26px;transition:margin-left .3s;min-height:calc(100vh - var(--topbar-h));}
+  .main.collapsed{margin-left:68px;}
+  .btn-primary{background:var(--accent);color:#fff;border:none;border-radius:9px;padding:9px 18px;font-size:13.5px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:7px;font-family:'DM Sans',sans-serif;transition:all .15s;}
+  .btn-primary:hover{background:#4338ca;}
+  .btn-outline{background:#fff;color:var(--text-secondary);border:1px solid var(--border);border-radius:9px;padding:9px 16px;font-size:13.5px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;display:inline-flex;align-items:center;gap:7px;}
+  .btn-outline:hover{border-color:var(--accent);color:var(--accent);}
+
+  .bal-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px;}
+  .bal-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px;text-align:center;transition:all .2s;}
+  .bal-card:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(0,0,0,.07);}
+  .bal-num{font-family:'Plus Jakarta Sans',sans-serif;font-size:34px;font-weight:700;margin:8px 0 4px;}
+  .bal-label{font-size:12.5px;color:var(--text-secondary);}
+  .bal-used{font-size:11.5px;color:var(--text-muted);margin-top:4px;}
+  .bal-bar{height:5px;background:#e5e7eb;border-radius:10px;overflow:hidden;margin-top:10px;}
+  .bal-fill{height:100%;border-radius:10px;}
+
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;}
+  .card-title{font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;font-size:15px;margin-bottom:14px;}
+
+  /* APPLY FORM */
+  .apply-form{display:flex;flex-direction:column;gap:14px;}
+  .form-group{display:flex;flex-direction:column;gap:6px;}
+  .form-label{font-size:13px;font-weight:600;}
+  .form-input{height:40px;border:1px solid var(--border);border-radius:9px;padding:0 14px;font-size:13.5px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .15s;}
+  .form-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(99,102,241,.12);}
+  .form-select{height:40px;border:1px solid var(--border);border-radius:9px;padding:0 14px;font-size:13.5px;font-family:'DM Sans',sans-serif;outline:none;background:#fff;cursor:pointer;}
+  .form-select:focus{border-color:var(--accent);}
+  .form-textarea{border:1px solid var(--border);border-radius:9px;padding:10px 14px;font-size:13.5px;font-family:'DM Sans',sans-serif;outline:none;resize:vertical;min-height:80px;width:100%;}
+  .form-textarea:focus{border-color:var(--accent);}
+  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+
+  /* HISTORY TABLE */
+  .table-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;}
+  .table-header-row{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+  .table-title-s{font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;font-size:15px;}
+  .data-table{width:100%;border-collapse:collapse;font-size:13.5px;}
+  .data-table th{text-align:left;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);padding:12px 16px;border-bottom:1px solid var(--border);background:var(--bg);}
+  .data-table td{padding:12px 16px;border-bottom:1px solid var(--bg);vertical-align:middle;}
+  .data-table tbody tr:last-child td{border-bottom:none;}
+  .data-table tbody tr:hover td{background:#fafbff;}
+  .badge{display:inline-flex;align-items:center;font-size:11.5px;font-weight:600;padding:3px 10px;border-radius:6px;white-space:nowrap;}
+  .badge-success{background:var(--success-bg);color:var(--success);}
+  .badge-warning{background:var(--warning-bg);color:var(--warning);}
+  .badge-danger{background:var(--danger-bg);color:var(--danger);}
+  .badge-info{background:var(--info-bg);color:var(--info);}
+
+  .toast{position:fixed;bottom:28px;right:28px;background:#0f172a;color:#fff;padding:13px 20px;border-radius:12px;font-size:13.5px;font-weight:500;z-index:600;display:flex;align-items:center;gap:10px;box-shadow:0 8px 24px rgba(0,0,0,.2);transform:translateY(80px);opacity:0;transition:all .3s ease;}
+  .toast.show{transform:translateY(0);opacity:1;}
+  ::-webkit-scrollbar{width:5px;}
+  ::-webkit-scrollbar-thumb{background:var(--border);border-radius:10px;}
+</style>
+</head>
+<body>
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">V</div>
+    <div><div class="logo-text">Vendhan InfoTech</div><div class="logo-sub">Employee Portal</div></div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">My Workspace</div>
+    <a href="emp_dashboard.html" class="nav-item"><span class="nav-icon">⊞</span> Dashboard</a>
+    <a href="emp_attendance.html" class="nav-item"><span class="nav-icon">🕐</span> My Attendance</a>
+    <a href="emp_leave.html" class="nav-item active"><span class="nav-icon">📅</span> My Leave<span class="nav-badge">1</span></a>
+    <a href="emp_salary.html" class="nav-item"><span class="nav-icon">💰</span> My Salary</a>
+    <a href="emp_tasks.html" class="nav-item"><span class="nav-icon">✅</span> My Tasks<span class="nav-badge">3</span></a>
+    <div class="nav-section-label">Communication</div>
+    <a href="emp_chat.html" class="nav-item"><span class="nav-icon">💬</span> Chat<span class="nav-badge">2</span></a>
+    <a href="emp_notifications.html" class="nav-item"><span class="nav-icon">🔔</span> Notifications</a>
+    <div class="nav-section-label">Account</div>
+    <a href="emp_profile.html" class="nav-item"><span class="nav-icon">👤</span> My Profile</a>
+    <a href="emp_settings.html" class="nav-item"><span class="nav-icon">⚙️</span> Settings</a>
+    <a href="../index.html" class="nav-item"><span class="nav-icon">🚪</span> Logout</a>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="user-card">
+      <div class="user-avatar-lg">AK</div>
+      <div><div class="user-name">Arjun Kumar</div><div class="user-role-s">Senior Developer</div></div>
+    </div>
+  </div>
+</aside>
+
+<header class="topbar" id="topbar">
+  <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
+  <div>
+    <div class="page-title">My Leave</div>
+    <div class="page-breadcrumb">Employee Portal › Leave</div>
+  </div>
+  <div class="topbar-right">
+    <div class="topbar-avatar">AK</div>
+  </div>
+</header>
+
+<main class="main" id="mainContent">
+
+  <!-- BALANCE CARDS -->
+  <div class="bal-grid">
+    <div class="bal-card">
+      <div style="font-size:24px;">🤒</div>
+      <div class="bal-num" style="color:var(--danger);">10</div>
+      <div class="bal-label">Sick Leave Remaining</div>
+      <div class="bal-used">2 used of 12</div>
+      <div class="bal-bar"><div class="bal-fill" style="width:83%;background:var(--danger);"></div></div>
+    </div>
+    <div class="bal-card">
+      <div style="font-size:24px;">☀️</div>
+      <div class="bal-num" style="color:var(--info);">9</div>
+      <div class="bal-label">Casual Leave Remaining</div>
+      <div class="bal-used">3 used of 12</div>
+      <div class="bal-bar"><div class="bal-fill" style="width:75%;background:var(--info);"></div></div>
+    </div>
+    <div class="bal-card">
+      <div style="font-size:24px;">🏖️</div>
+      <div class="bal-num" style="color:var(--success);">16</div>
+      <div class="bal-label">Annual Leave Remaining</div>
+      <div class="bal-used">5 used of 21</div>
+      <div class="bal-bar"><div class="bal-fill" style="width:76%;background:var(--success);"></div></div>
+    </div>
+    <div class="bal-card">
+      <div style="font-size:24px;">🚨</div>
+      <div class="bal-num" style="color:var(--warning);">6</div>
+      <div class="bal-label">Emergency Leave Remaining</div>
+      <div class="bal-used">0 used of 6</div>
+      <div class="bal-bar"><div class="bal-fill" style="width:100%;background:var(--warning);"></div></div>
+    </div>
+  </div>
+
+  <!-- APPLY + PENDING -->
+  <div class="two-col">
+
+    <!-- APPLY FORM -->
+    <div class="card">
+      <div class="card-title">📅 Apply for Leave</div>
+      <div class="apply-form">
+        <div class="form-group">
+          <label class="form-label">Leave Type *</label>
+          <select class="form-select" id="applyType">
+            <option value="">Select Type</option>
+            <option>Sick Leave</option><option>Casual Leave</option>
+            <option>Annual Leave</option><option>Emergency Leave</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">From Date *</label>
+            <input class="form-input" type="date" id="applyFrom" onchange="previewDays()">
+          </div>
+          <div class="form-group">
+            <label class="form-label">To Date *</label>
+            <input class="form-input" type="date" id="applyTo" onchange="previewDays()">
+          </div>
+        </div>
+        <div id="daysPreview" style="display:none;background:var(--accent-light);border-radius:9px;padding:10px 14px;font-size:13px;color:var(--accent);font-weight:600;"></div>
+        <div class="form-group">
+          <label class="form-label">Reason *</label>
+          <textarea class="form-textarea" id="applyReason" placeholder="Briefly describe your reason..."></textarea>
+        </div>
+        <button class="btn-primary" style="justify-content:center;" onclick="submitLeave()">📅 Submit Leave Request</button>
+      </div>
+    </div>
+
+    <!-- PENDING REQUESTS -->
+    <div class="card">
+      <div class="card-title">⏳ My Pending Requests</div>
+      <div id="pendingList"></div>
+    </div>
+  </div>
+
+  <!-- HISTORY TABLE -->
+  <div class="table-card">
+    <div class="table-header-row">
+      <div class="table-title-s">My Leave History</div>
+      <button class="btn-outline" style="font-size:12px;padding:6px 12px;" onclick="showToast('📥 Leave history exported!')">📥 Export</button>
+    </div>
+    <div style="overflow-x:auto;">
+      <table class="data-table">
+        <thead><tr>
+          <th>Leave Type</th><th>From</th><th>To</th><th>Days</th>
+          <th>Applied On</th><th>Status</th><th>Remarks</th><th style="text-align:center;">Action</th>
+        </tr></thead>
+        <tbody id="histBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+</main>
+<div class="toast" id="toast"></div>
+<script>
+let pendingLeaves=[
+  {id:1,type:'Sick Leave',from:'2025-06-15',to:'2025-06-17',days:3,applied:'2025-06-13',reason:'Fever and doctor rest advised'}
+];
+const histLeaves=[
+  {type:'Casual Leave',from:'2025-05-10',to:'2025-05-10',days:1,applied:'2025-05-08',status:'Approved',remark:'Approved by HR'},
+  {type:'Annual Leave',from:'2025-04-21',to:'2025-04-25',days:5,applied:'2025-04-18',status:'Approved',remark:'Pre-planned vacation'},
+  {type:'Sick Leave', from:'2025-03-05',to:'2025-03-06',days:2,applied:'2025-03-05',status:'Approved',remark:'Medical certificate submitted'},
+  {type:'Casual Leave',from:'2025-02-14',to:'2025-02-14',days:1,applied:'2025-02-12',status:'Rejected',remark:'Team crunch period'},
+];
+
+function renderPending(){
+  if(!pendingLeaves.length){
+    document.getElementById('pendingList').innerHTML=`<div style="text-align:center;padding:32px;color:var(--text-muted);"><div style="font-size:28px;margin-bottom:8px;">🎉</div><div style="font-weight:600;">No pending requests!</div></div>`;
+    return;
+  }
+  document.getElementById('pendingList').innerHTML=pendingLeaves.map(l=>`
+    <div style="background:var(--warning-bg);border:1px solid #fde68a;border-radius:12px;padding:14px 16px;margin-bottom:10px;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
+        <div style="font-size:13.5px;font-weight:700;">${l.type}</div>
+        <span class="badge badge-warning">⏳ Pending</span>
+      </div>
+      <div style="font-size:12.5px;color:var(--text-secondary);margin-bottom:6px;">📅 ${new Date(l.from).toLocaleDateString('en-IN',{day:'2-digit',month:'short'})} → ${new Date(l.to).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})} · ${l.days} day${l.days>1?'s':''}</div>
+      <div style="font-size:12.5px;color:var(--text-secondary);margin-bottom:10px;">💬 "${l.reason}"</div>
+      <button onclick="cancelLeave(${l.id})" style="font-size:12px;padding:5px 12px;border-radius:7px;border:1px solid #dc2626;background:var(--danger-bg);color:#dc2626;cursor:pointer;font-weight:600;">✕ Cancel Request</button>
+    </div>`).join('');
+}
+
+function renderHistory(){
+  document.getElementById('histBody').innerHTML=histLeaves.map(h=>{
+    const sb=h.status==='Approved'?'badge-success':'badge-danger';
+    return`<tr>
+      <td><span style="font-size:13px;font-weight:600;">${h.type}</span></td>
+      <td style="font-size:13px;">${new Date(h.from).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})}</td>
+      <td style="font-size:13px;">${new Date(h.to).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})}</td>
+      <td style="font-weight:700;">${h.days}d</td>
+      <td style="font-size:12px;color:var(--text-muted);">${new Date(h.applied).toLocaleDateString('en-IN',{day:'2-digit',month:'short'})}</td>
+      <td><span class="badge ${sb}">${h.status}</span></td>
+      <td style="font-size:12px;color:var(--text-muted);">${h.remark}</td>
+      <td style="text-align:center;"><button style="font-size:12px;padding:4px 10px;border-radius:7px;border:1px solid var(--border);background:none;cursor:pointer;" onclick="showToast('📋 Leave details viewed')">View</button></td>
+    </tr>`;
+  }).join('');
+}
+
+function previewDays(){
+  const f=document.getElementById('applyFrom').value;
+  const t=document.getElementById('applyTo').value;
+  const p=document.getElementById('daysPreview');
+  if(f&&t&&new Date(t)>=new Date(f)){
+    const d=Math.round((new Date(t)-new Date(f))/(86400000))+1;
+    p.style.display='block';
+    p.textContent=`📅 ${d} day${d>1?'s':''} of leave will be requested`;
+  } else p.style.display='none';
+}
+
+function submitLeave(){
+  const type=document.getElementById('applyType').value;
+  const from=document.getElementById('applyFrom').value;
+  const to=document.getElementById('applyTo').value;
+  const reason=document.getElementById('applyReason').value.trim();
+  if(!type||!from||!to||!reason){showToast('⚠️ Please fill all fields');return;}
+  const days=Math.round((new Date(to)-new Date(from))/86400000)+1;
+  pendingLeaves.push({id:Date.now(),type,from,to,days,applied:new Date().toISOString().split('T')[0],reason});
+  document.getElementById('applyType').value='';
+  document.getElementById('applyFrom').value='';
+  document.getElementById('applyTo').value='';
+  document.getElementById('applyReason').value='';
+  document.getElementById('daysPreview').style.display='none';
+  renderPending();
+  showToast('📅 Leave request submitted! Awaiting admin approval.');
+}
+
+function cancelLeave(id){
+  if(!confirm('Cancel this leave request?')) return;
+  pendingLeaves=pendingLeaves.filter(l=>l.id!==id);
+  renderPending();
+  showToast('✅ Leave request cancelled.');
+}
+
+function toggleSidebar(){
+  document.getElementById('sidebar').classList.toggle('collapsed');
+  document.getElementById('topbar').classList.toggle('collapsed');
+  document.getElementById('mainContent').classList.toggle('collapsed');
+}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3500);}
+
+renderPending(); renderHistory();
+</script>
+</body>
+</html>

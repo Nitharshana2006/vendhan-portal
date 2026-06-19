@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notifications — Vendhan InfoTech Admin</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{--sidebar-w:260px;--topbar-h:64px;--accent:#4f46e5;--accent-light:#eef2ff;--surface:#fff;--bg:#f4f6fb;--border:#e5e7eb;--text-primary:#111827;--text-secondary:#6b7280;--text-muted:#9ca3af;--success:#059669;--success-bg:#ecfdf5;--warning:#d97706;--warning-bg:#fffbeb;--danger:#dc2626;--danger-bg:#fef2f2;--info:#2563eb;--info-bg:#eff6ff;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text-primary);display:flex;min-height:100vh;}
+  .sidebar{width:var(--sidebar-w);background:#0f172a;position:fixed;top:0;left:0;height:100vh;display:flex;flex-direction:column;z-index:100;transition:width .3s;overflow:hidden;}
+  .sidebar.collapsed{width:68px;}
+  .sidebar-logo{padding:20px 20px 16px;display:flex;align-items:center;gap:12px;border-bottom:1px solid rgba(255,255,255,.06);min-height:var(--topbar-h);}
+  .logo-icon{width:36px;height:36px;background:linear-gradient(135deg,#6366f1,#4f46e5);border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;color:#fff;flex-shrink:0;}
+  .logo-text{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:15px;color:#fff;white-space:nowrap;}
+  .logo-sub{font-size:11px;color:rgba(255,255,255,.4);}
+  .sidebar-nav{flex:1;padding:12px 10px;overflow-y:auto;overflow-x:hidden;}
+  .nav-section-label{font-size:10px;font-weight:600;letter-spacing:.08em;color:rgba(255,255,255,.25);text-transform:uppercase;padding:12px 10px 6px;white-space:nowrap;}
+  .sidebar.collapsed .nav-section-label{opacity:0;}
+  .nav-item{display:flex;align-items:center;gap:12px;padding:10px;border-radius:8px;cursor:pointer;color:rgba(255,255,255,.55);font-size:13.5px;font-weight:500;transition:all .15s;white-space:nowrap;text-decoration:none;margin-bottom:2px;}
+  .nav-item:hover{background:rgba(255,255,255,.07);color:rgba(255,255,255,.9);}
+  .nav-item.active{background:rgba(99,102,241,.18);color:#a5b4fc;}
+  .nav-icon{font-size:18px;flex-shrink:0;width:20px;text-align:center;}
+  .nav-badge{margin-left:auto;background:#dc2626;color:#fff;font-size:10px;font-weight:700;padding:2px 6px;border-radius:10px;}
+  .sidebar-footer{padding:12px 10px;border-top:1px solid rgba(255,255,255,.06);}
+  .user-card{display:flex;align-items:center;gap:10px;padding:10px;border-radius:8px;background:rgba(255,255,255,.05);overflow:hidden;}
+  .user-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0;}
+  .user-name{font-size:13px;font-weight:600;color:#fff;white-space:nowrap;}
+  .user-role{font-size:11px;color:rgba(255,255,255,.4);}
+  .topbar{position:fixed;top:0;left:var(--sidebar-w);right:0;height:var(--topbar-h);background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:16px;z-index:90;transition:left .3s;}
+  .topbar.collapsed{left:68px;}
+  .toggle-btn{width:36px;height:36px;border-radius:8px;background:none;border:1px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-secondary);font-size:18px;}
+  .toggle-btn:hover{background:var(--bg);}
+  .page-title{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:17px;}
+  .page-breadcrumb{font-size:12px;color:var(--text-muted);}
+  .topbar-right{margin-left:auto;display:flex;align-items:center;gap:8px;}
+  .topbar-avatar{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;}
+  .main{margin-left:var(--sidebar-w);margin-top:var(--topbar-h);padding:28px;transition:margin-left .3s;}
+  .main.collapsed{margin-left:68px;}
+  .btn-primary{background:var(--accent);color:#fff;border:none;border-radius:9px;padding:9px 18px;font-size:13.5px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:7px;font-family:'DM Sans',sans-serif;transition:all .15s;}
+  .btn-primary:hover{background:#4338ca;}
+  .btn-outline{background:#fff;color:var(--text-secondary);border:1px solid var(--border);border-radius:9px;padding:9px 16px;font-size:13.5px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;display:inline-flex;align-items:center;gap:7px;}
+  .btn-outline:hover{border-color:var(--accent);color:var(--accent);}
+
+  .page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;}
+  .page-title-lg{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:20px;}
+  .page-sub{font-size:13px;color:var(--text-muted);margin-top:3px;}
+
+  .filter-bar{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;}
+  .filter-chip{padding:7px 16px;border-radius:20px;border:1px solid var(--border);background:#fff;font-size:13px;font-weight:500;cursor:pointer;color:var(--text-secondary);transition:all .15s;display:flex;align-items:center;gap:6px;}
+  .filter-chip:hover{border-color:var(--accent);color:var(--accent);}
+  .filter-chip.active{background:var(--accent);color:#fff;border-color:var(--accent);}
+  .chip-count{background:rgba(255,255,255,.25);font-size:11px;font-weight:700;padding:1px 6px;border-radius:10px;}
+  .filter-chip:not(.active) .chip-count{background:var(--bg);color:var(--text-muted);}
+
+  .notif-group{margin-bottom:24px;}
+  .notif-group-label{font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px;padding:0 4px;}
+  .notif-card{background:var(--surface);border:1px solid var(--border);border-radius:13px;padding:16px 18px;display:flex;align-items:flex-start;gap:14px;margin-bottom:8px;cursor:pointer;transition:all .15s;position:relative;}
+  .notif-card:hover{box-shadow:0 4px 16px rgba(0,0,0,.07);transform:translateY(-1px);}
+  .notif-card.unread{border-left:3px solid var(--accent);background:#fefeff;}
+  .notif-card.unread::before{content:'';position:absolute;top:18px;left:-7px;width:8px;height:8px;background:var(--accent);border-radius:50%;border:2px solid #fff;}
+  .notif-icon-wrap{width:42px;height:42px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+  .notif-title{font-size:14px;font-weight:600;margin-bottom:3px;}
+  .notif-body{font-size:13px;color:var(--text-secondary);line-height:1.5;}
+  .notif-time{font-size:12px;color:var(--text-muted);margin-top:5px;}
+  .notif-actions{margin-left:auto;display:flex;gap:6px;flex-shrink:0;}
+  .notif-action-btn{font-size:12px;padding:5px 12px;border-radius:7px;border:1px solid var(--border);background:none;cursor:pointer;font-weight:600;transition:all .15s;}
+  .notif-action-btn.approve{color:var(--success);border-color:#a7f3d0;}
+  .notif-action-btn.approve:hover{background:var(--success);color:#fff;}
+  .notif-action-btn.reject{color:var(--danger);border-color:#fecaca;}
+  .notif-action-btn.reject:hover{background:var(--danger);color:#fff;}
+  .notif-action-btn.view{color:var(--accent);border-color:#c7d2fe;}
+  .notif-action-btn.view:hover{background:var(--accent);color:#fff;}
+  .dismiss-btn{width:28px;height:28px;border-radius:6px;border:none;background:none;cursor:pointer;color:var(--text-muted);font-size:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;}
+  .dismiss-btn:hover{background:var(--danger-bg);color:var(--danger);}
+
+  .toast{position:fixed;bottom:28px;right:28px;background:#0f172a;color:#fff;padding:13px 20px;border-radius:12px;font-size:13.5px;font-weight:500;z-index:600;display:flex;align-items:center;gap:10px;box-shadow:0 8px 24px rgba(0,0,0,.2);transform:translateY(80px);opacity:0;transition:all .3s ease;}
+  .toast.show{transform:translateY(0);opacity:1;}
+  ::-webkit-scrollbar{width:5px;}
+  ::-webkit-scrollbar-thumb{background:var(--border);border-radius:10px;}
+</style>
+</head>
+<body>
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">V</div>
+    <div><div class="logo-text">Vendhan InfoTech</div><div class="logo-sub">Admin Portal</div></div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Main</div>
+    <a href="dashboard.html" class="nav-item"><span class="nav-icon">⊞</span> Dashboard</a>
+    <a href="employees.html" class="nav-item"><span class="nav-icon">👥</span> Employee Management</a>
+    <a href="attendance.html" class="nav-item"><span class="nav-icon">🕐</span> Attendance</a>
+    <a href="leave.html" class="nav-item"><span class="nav-icon">📅</span> Leave Management<span class="nav-badge">7</span></a>
+    <a href="payroll.html" class="nav-item"><span class="nav-icon">💰</span> Payroll</a>
+    <div class="nav-section-label">Analytics</div>
+    <a href="reports.html" class="nav-item"><span class="nav-icon">📊</span> Reports & Analytics</a>
+    <a href="projects.html" class="nav-item"><span class="nav-icon">📁</span> Projects & Tasks</a>
+    <a href="departments.html" class="nav-item"><span class="nav-icon">🏢</span> Departments</a>
+    <div class="nav-section-label">Communication</div>
+    <a href="chat.html" class="nav-item"><span class="nav-icon">💬</span> Chat System</a>
+    <a href="notifications.html" class="nav-item active"><span class="nav-icon">🔔</span> Notifications</a>
+    <div class="nav-section-label">System</div>
+    <a href="settings.html" class="nav-item"><span class="nav-icon">⚙️</span> Settings</a>
+    <a href="security.html" class="nav-item"><span class="nav-icon">🔒</span> Security</a>
+    <a href="logs.html" class="nav-item"><span class="nav-icon">📋</span> Activity Logs</a>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="user-card">
+      <div class="user-avatar">A</div>
+      <div><div class="user-name">Admin User</div><div class="user-role">Super Administrator</div></div>
+    </div>
+  </div>
+</aside>
+<header class="topbar" id="topbar">
+  <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
+  <div><div class="page-title">Notifications</div><div class="page-breadcrumb">Admin Portal › Notifications</div></div>
+  <div class="topbar-right"><div class="topbar-avatar">A</div></div>
+</header>
+<main class="main" id="mainContent">
+  <div class="page-header">
+    <div><div class="page-title-lg">Notifications</div><div class="page-sub" id="unreadLabel"></div></div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn-outline" onclick="markAllRead()">✓ Mark All Read</button>
+      <button class="btn-outline" onclick="clearAll()">🗑 Clear All</button>
+    </div>
+  </div>
+
+  <div class="filter-bar">
+    <div class="filter-chip active" onclick="filterNotifs('all',this)">All <span class="chip-count" id="cnt-all"></span></div>
+    <div class="filter-chip" onclick="filterNotifs('leave',this)">📅 Leave <span class="chip-count" id="cnt-leave"></span></div>
+    <div class="filter-chip" onclick="filterNotifs('payroll',this)">💰 Payroll <span class="chip-count" id="cnt-payroll"></span></div>
+    <div class="filter-chip" onclick="filterNotifs('attendance',this)">🕐 Attendance <span class="chip-count" id="cnt-attendance"></span></div>
+    <div class="filter-chip" onclick="filterNotifs('employee',this)">👥 Employee <span class="chip-count" id="cnt-employee"></span></div>
+    <div class="filter-chip" onclick="filterNotifs('system',this)">⚙️ System <span class="chip-count" id="cnt-system"></span></div>
+  </div>
+
+  <div id="notifContainer"></div>
+</main>
+<div class="toast" id="toast"></div>
+<script>
+let notifications = [
+  {id:1,cat:'leave',icon:'📅',iconBg:'#fffbeb',iconColor:'#d97706',title:'Leave Request — Priya Sharma',body:'Priya Sharma has applied for Sick Leave from Jun 15–17 (3 days). Reason: Fever and throat infection.',time:'2 minutes ago',group:'Today',unread:true,hasActions:true},
+  {id:2,cat:'leave',icon:'📅',iconBg:'#fffbeb',iconColor:'#d97706',title:'Leave Request — Arjun Kumar',body:'Arjun Kumar has applied for Casual Leave on Jun 20 (1 day). Reason: Personal work.',time:'1 hour ago',group:'Today',unread:true,hasActions:true},
+  {id:3,cat:'attendance',icon:'⚠️',iconBg:'#fef2f2',iconColor:'#dc2626',title:'Late Arrival Alert — Rahul Verma',body:'Rahul Verma checked in at 09:52 AM — 52 minutes late. This is the 3rd late arrival this month.',time:'3 hours ago',group:'Today',unread:true,hasActions:false},
+  {id:4,cat:'employee',icon:'👤',iconBg:'#eef2ff',iconColor:'#6366f1',title:'New Employee Onboarded',body:'Kavya Reddy (E010) has been successfully onboarded to the Design team. Profile setup complete.',time:'5 hours ago',group:'Today',unread:false,hasActions:false},
+  {id:5,cat:'payroll',icon:'💰',iconBg:'#ecfdf5',iconColor:'#059669',title:'Payroll Processed — June 2025',body:'Payroll for June 2025 has been successfully processed for 124 employees. Total: ₹42.8L.',time:'Yesterday, 6:00 PM',group:'Yesterday',unread:false,hasActions:false},
+  {id:6,cat:'leave',icon:'✅',iconBg:'#ecfdf5',iconColor:'#059669',title:'Leave Approved — Vikram Nair',body:'You approved 5 days of Annual Leave for Vikram Nair (Jun 22–26). Notification sent to employee.',time:'Yesterday, 2:30 PM',group:'Yesterday',unread:false,hasActions:false},
+  {id:7,cat:'system',icon:'🔒',iconBg:'#f5f3ff',iconColor:'#7c3aed',title:'Security Alert — New Login',body:'A new login was detected from Chrome on Windows 11. Location: Coimbatore, Tamil Nadu. If this was you, no action needed.',time:'Yesterday, 9:15 AM',group:'Yesterday',unread:false,hasActions:false},
+  {id:8,cat:'attendance',icon:'📊',iconBg:'#eff6ff',iconColor:'#2563eb',title:'Monthly Attendance Report Ready',body:'The attendance report for May 2025 is ready. Average attendance rate: 87.3%. Click to view and download.',time:'Jun 11, 2025',group:'This Week',unread:false,hasActions:false},
+  {id:9,cat:'employee',icon:'📝',iconBg:'#fffbeb',iconColor:'#d97706',title:'Employee Document Uploaded',body:'Arjun Kumar uploaded a new document: "Experience Certificate.pdf". Awaiting admin verification.',time:'Jun 10, 2025',group:'This Week',unread:false,hasActions:false},
+  {id:10,cat:'system',icon:'⚙️',iconBg:'#f3f4f6',iconColor:'#6b7280',title:'System Backup Completed',body:'Automatic system backup completed successfully at 2:00 AM. All data secured. Next backup: Jun 22.',time:'Jun 9, 2025',group:'This Week',unread:false,hasActions:false},
+];
+
+let activeFilter='all';
+
+function renderNotifs(list){
+  const unread = list.filter(n=>n.unread).length;
+  document.getElementById('unreadLabel').textContent = unread>0?`${unread} unread notification${unread>1?'s':''}` : 'All caught up!';
+
+  const groups=['Today','Yesterday','This Week'];
+  let html='';
+  groups.forEach(g=>{
+    const items=list.filter(n=>n.group===g);
+    if(!items.length) return;
+    html+=`<div class="notif-group"><div class="notif-group-label">${g}</div>`;
+    items.forEach(n=>{
+      html+=`<div class="notif-card ${n.unread?'unread':''}" id="notif-${n.id}">
+        <div class="notif-icon-wrap" style="background:${n.iconBg};color:${n.iconColor};">${n.icon}</div>
+        <div style="flex:1;">
+          <div class="notif-title">${n.unread?'<span style="color:var(--accent);">●</span> ':''} ${n.title}</div>
+          <div class="notif-body">${n.body}</div>
+          <div class="notif-time">${n.time}</div>
+        </div>
+        <div class="notif-actions">
+          ${n.hasActions?`<button class="notif-action-btn approve" onclick="event.stopPropagation();approveFromNotif(${n.id})">✓ Approve</button><button class="notif-action-btn reject" onclick="event.stopPropagation();dismissNotif(${n.id})">✗ Reject</button>`:''}
+          <button class="notif-action-btn view" onclick="event.stopPropagation();markRead(${n.id})">View</button>
+          <button class="dismiss-btn" onclick="event.stopPropagation();dismissNotif(${n.id})" title="Dismiss">✕</button>
+        </div>
+      </div>`;
+    });
+    html+='</div>';
+  });
+  if(!list.length) html=`<div style="text-align:center;padding:60px;color:var(--text-muted);"><div style="font-size:40px;margin-bottom:12px;">🎉</div><div style="font-weight:600;font-size:16px;margin-bottom:6px;">All clear!</div><div style="font-size:13px;">No notifications to show.</div></div>`;
+  document.getElementById('notifContainer').innerHTML=html;
+
+  // update counts
+  ['leave','payroll','attendance','employee','system'].forEach(cat=>{
+    document.getElementById('cnt-'+cat).textContent=notifications.filter(n=>n.cat===cat).length;
+  });
+  document.getElementById('cnt-all').textContent=notifications.length;
+}
+
+function filterNotifs(cat,el){
+  document.querySelectorAll('.filter-chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  activeFilter=cat;
+  const filtered=cat==='all'?notifications:notifications.filter(n=>n.cat===cat);
+  renderNotifs(filtered);
+}
+
+function markRead(id){
+  const n=notifications.find(x=>x.id===id);
+  if(n){n.unread=false;}
+  const filtered=activeFilter==='all'?notifications:notifications.filter(n=>n.cat===activeFilter);
+  renderNotifs(filtered);
+  showToast('✓ Notification marked as read');
+}
+
+function approveFromNotif(id){
+  dismissNotif(id);
+  showToast('✅ Leave request approved!');
+}
+
+function dismissNotif(id){
+  const card=document.getElementById('notif-'+id);
+  if(card){card.style.transition='all .3s';card.style.opacity='0';card.style.transform='translateX(20px)';}
+  setTimeout(()=>{
+    notifications=notifications.filter(n=>n.id!==id);
+    const filtered=activeFilter==='all'?notifications:notifications.filter(n=>n.cat===activeFilter);
+    renderNotifs(filtered);
+  },300);
+}
+
+function markAllRead(){
+  notifications.forEach(n=>n.unread=false);
+  const filtered=activeFilter==='all'?notifications:notifications.filter(n=>n.cat===activeFilter);
+  renderNotifs(filtered);
+  showToast('✓ All notifications marked as read');
+}
+
+function clearAll(){
+  if(!confirm('Clear all notifications?')) return;
+  notifications=[];
+  renderNotifs([]);
+  showToast('🗑 All notifications cleared');
+}
+
+function toggleSidebar(){document.getElementById('sidebar').classList.toggle('collapsed');document.getElementById('topbar').classList.toggle('collapsed');document.getElementById('mainContent').classList.toggle('collapsed');}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3500);}
+
+renderNotifs(notifications);
+</script>
+</body>
+</html>

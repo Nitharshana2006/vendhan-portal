@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Employee Management — Vendhan InfoTech</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sidebar-w: 260px;
+    --topbar-h: 64px;
+    --accent: #4f46e5;
+    --accent-light: #eef2ff;
+    --surface: #ffffff;
+    --bg: #f4f6fb;
+    --border: #e5e7eb;
+    --text-primary: #111827;
+    --text-secondary: #6b7280;
+    --text-muted: #9ca3af;
+    --success: #059669;
+    --success-bg: #ecfdf5;
+    --warning: #d97706;
+    --warning-bg: #fffbeb;
+    --danger: #dc2626;
+    --danger-bg: #fef2f2;
+    --info: #2563eb;
+    --info-bg: #eff6ff;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text-primary); display:flex; min-height:100vh; }
+
+  /* SIDEBAR */
+  .sidebar { width:var(--sidebar-w); background:#0f172a; position:fixed; top:0; left:0; height:100vh; display:flex; flex-direction:column; z-index:100; transition:width 0.3s; overflow:hidden; }
+  .sidebar.collapsed { width:68px; }
+  .sidebar-logo { padding:20px 20px 16px; display:flex; align-items:center; gap:12px; border-bottom:1px solid rgba(255,255,255,0.06); min-height:var(--topbar-h); }
+  .logo-icon { width:36px; height:36px; background:linear-gradient(135deg,#6366f1,#4f46e5); border-radius:10px; display:flex; align-items:center; justify-content:center; font-family:'Plus Jakarta Sans',sans-serif; font-weight:700; font-size:16px; color:white; flex-shrink:0; }
+  .logo-text { font-family:'Plus Jakarta Sans',sans-serif; font-weight:700; font-size:15px; color:white; white-space:nowrap; }
+  .logo-sub { font-size:11px; color:rgba(255,255,255,0.4); }
+  .sidebar-nav { flex:1; padding:12px 10px; overflow-y:auto; overflow-x:hidden; }
+  .nav-section-label { font-size:10px; font-weight:600; letter-spacing:0.08em; color:rgba(255,255,255,0.25); text-transform:uppercase; padding:12px 10px 6px; white-space:nowrap; transition:opacity 0.2s; }
+  .sidebar.collapsed .nav-section-label { opacity:0; }
+  .nav-item { display:flex; align-items:center; gap:12px; padding:10px 10px; border-radius:8px; cursor:pointer; color:rgba(255,255,255,0.55); font-size:13.5px; font-weight:500; transition:all 0.15s; white-space:nowrap; text-decoration:none; margin-bottom:2px; }
+  .nav-item:hover { background:rgba(255,255,255,0.07); color:rgba(255,255,255,0.9); }
+  .nav-item.active { background:rgba(99,102,241,0.18); color:#a5b4fc; }
+  .nav-icon { font-size:18px; flex-shrink:0; width:20px; text-align:center; }
+  .nav-badge { margin-left:auto; background:#dc2626; color:white; font-size:10px; font-weight:700; padding:2px 6px; border-radius:10px; flex-shrink:0; }
+  .sidebar-footer { padding:12px 10px; border-top:1px solid rgba(255,255,255,0.06); }
+  .user-card { display:flex; align-items:center; gap:10px; padding:10px; border-radius:8px; background:rgba(255,255,255,0.05); cursor:pointer; overflow:hidden; }
+  .user-avatar { width:32px; height:32px; border-radius:50%; background:linear-gradient(135deg,#6366f1,#8b5cf6); display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; color:white; flex-shrink:0; }
+  .user-name { font-size:13px; font-weight:600; color:white; white-space:nowrap; }
+  .user-role { font-size:11px; color:rgba(255,255,255,0.4); }
+
+  /* TOPBAR */
+  .topbar { position:fixed; top:0; left:var(--sidebar-w); right:0; height:var(--topbar-h); background:var(--surface); border-bottom:1px solid var(--border); display:flex; align-items:center; padding:0 24px; gap:16px; z-index:90; transition:left 0.3s; }
+  .topbar.collapsed { left:68px; }
+  .toggle-btn { width:36px; height:36px; border-radius:8px; background:none; border:1px solid var(--border); cursor:pointer; display:flex; align-items:center; justify-content:center; color:var(--text-secondary); font-size:18px; flex-shrink:0; transition:all 0.15s; }
+  .toggle-btn:hover { background:var(--bg); }
+  .page-title { font-family:'Plus Jakarta Sans',sans-serif; font-weight:700; font-size:17px; }
+  .page-breadcrumb { font-size:12px; color:var(--text-muted); }
+  .topbar-actions { margin-left:auto; display:flex; align-items:center; gap:8px; }
+  .icon-btn { width:38px; height:38px; border-radius:9px; background:none; border:1px solid var(--border); cursor:pointer; display:flex; align-items:center; justify-content:center; color:var(--text-secondary); font-size:18px; transition:all 0.15s; }
+  .icon-btn:hover { background:var(--bg); }
+  .topbar-avatar { width:36px; height:36px; border-radius:10px; background:linear-gradient(135deg,#6366f1,#8b5cf6); display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; color:white; cursor:pointer; }
+
+  /* MAIN */
+  .main { margin-left:var(--sidebar-w); margin-top:var(--topbar-h); padding:28px; transition:margin-left 0.3s; min-height:calc(100vh - var(--topbar-h)); }
+  .main.collapsed { margin-left:68px; }
+
+  /* BUTTONS */
+  .btn-primary { background:var(--accent); color:white; border:none; border-radius:9px; padding:9px 18px; font-size:13.5px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; gap:7px; font-family:'DM Sans',sans-serif; transition:all 0.15s; }
+  .btn-primary:hover { background:#4338ca; transform:translateY(-1px); }
+  .btn-outline { background:white; color:var(--text-secondary); border:1px solid var(--border); border-radius:9px; padding:9px 16px; font-size:13.5px; font-weight:500; cursor:pointer; font-family:'DM Sans',sans-serif; transition:all 0.15s; display:inline-flex; align-items:center; gap:7px; }
+  .btn-outline:hover { border-color:var(--accent); color:var(--accent); }
+
+  /* STAT CARDS */
+  .stats-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:24px; }
+  .stat-card { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:18px 20px; display:flex; align-items:center; gap:16px; transition:all 0.2s; }
+  .stat-card:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,0,0,0.07); }
+  .stat-icon { width:46px; height:46px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; }
+  .stat-value { font-family:'Plus Jakarta Sans',sans-serif; font-size:24px; font-weight:700; }
+  .stat-label { font-size:12.5px; color:var(--text-secondary); margin-top:2px; }
+
+  /* TOOLBAR */
+  .toolbar { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:16px 20px; display:flex; align-items:center; gap:12px; margin-bottom:16px; flex-wrap:wrap; }
+  .search-input { display:flex; align-items:center; gap:8px; background:var(--bg); border:1px solid var(--border); border-radius:9px; padding:0 14px; height:38px; flex:1; min-width:220px; }
+  .search-input input { border:none; background:none; outline:none; font-size:13.5px; color:var(--text-primary); width:100%; font-family:'DM Sans',sans-serif; }
+  .search-input input::placeholder { color:var(--text-muted); }
+  .filter-select { height:38px; border:1px solid var(--border); border-radius:9px; padding:0 12px; font-size:13px; color:var(--text-secondary); background:white; cursor:pointer; font-family:'DM Sans',sans-serif; outline:none; }
+  .filter-select:focus { border-color:var(--accent); }
+
+  /* TABLE */
+  .table-card { background:var(--surface); border:1px solid var(--border); border-radius:14px; overflow:hidden; }
+  .table-header { padding:16px 20px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+  .table-title { font-family:'Plus Jakarta Sans',sans-serif; font-weight:600; font-size:15px; }
+  .table-count { font-size:13px; color:var(--text-muted); }
+  .data-table { width:100%; border-collapse:collapse; font-size:13.5px; }
+  .data-table th { text-align:left; font-size:11.5px; font-weight:600; text-transform:uppercase; letter-spacing:0.06em; color:var(--text-muted); padding:12px 16px; border-bottom:1px solid var(--border); background:var(--bg); white-space:nowrap; }
+  .data-table td { padding:13px 16px; border-bottom:1px solid var(--bg); vertical-align:middle; }
+  .data-table tbody tr:last-child td { border-bottom:none; }
+  .data-table tbody tr:hover td { background:#fafbff; cursor:pointer; }
+
+  .emp-info { display:flex; align-items:center; gap:12px; }
+  .emp-avatar { width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; flex-shrink:0; }
+  .emp-name { font-size:13.5px; font-weight:600; color:var(--text-primary); }
+  .emp-id { font-size:12px; color:var(--text-muted); }
+
+  .badge { display:inline-flex; align-items:center; font-size:11.5px; font-weight:600; padding:3px 10px; border-radius:6px; white-space:nowrap; }
+  .badge-success { background:var(--success-bg); color:var(--success); }
+  .badge-warning { background:var(--warning-bg); color:var(--warning); }
+  .badge-danger  { background:var(--danger-bg);  color:var(--danger); }
+  .badge-info    { background:var(--info-bg);    color:var(--info); }
+  .badge-gray    { background:#f3f4f6; color:#6b7280; }
+
+  .action-btn { width:30px; height:30px; border-radius:7px; border:1px solid var(--border); background:none; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; font-size:14px; transition:all 0.15s; margin:0 2px; }
+  .action-btn:hover { background:var(--bg); border-color:var(--accent); }
+  .action-btn.danger:hover { background:var(--danger-bg); border-color:var(--danger); }
+
+  /* PAGINATION */
+  .pagination { display:flex; align-items:center; justify-content:space-between; padding:14px 20px; border-top:1px solid var(--border); }
+  .pagination-info { font-size:13px; color:var(--text-muted); }
+  .pagination-btns { display:flex; gap:4px; }
+  .page-btn { width:32px; height:32px; border-radius:7px; border:1px solid var(--border); background:none; cursor:pointer; font-size:13px; font-family:'DM Sans',sans-serif; color:var(--text-secondary); transition:all 0.15s; }
+  .page-btn:hover { border-color:var(--accent); color:var(--accent); }
+  .page-btn.active { background:var(--accent); color:white; border-color:var(--accent); }
+
+  /* MODAL OVERLAY */
+  .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:500; display:none; align-items:center; justify-content:center; }
+  .modal-overlay.open { display:flex; }
+  .modal { background:white; border-radius:18px; width:640px; max-width:95vw; max-height:90vh; overflow-y:auto; box-shadow:0 24px 64px rgba(0,0,0,0.18); animation:modalIn 0.25s ease; }
+  @keyframes modalIn { from { opacity:0; transform:scale(0.95) translateY(10px); } to { opacity:1; transform:scale(1) translateY(0); } }
+  .modal-header { padding:22px 24px 18px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+  .modal-title { font-family:'Plus Jakarta Sans',sans-serif; font-weight:700; font-size:18px; }
+  .modal-sub { font-size:13px; color:var(--text-muted); margin-top:3px; }
+  .modal-close { width:34px; height:34px; border-radius:8px; border:1px solid var(--border); background:none; cursor:pointer; font-size:18px; color:var(--text-secondary); display:flex; align-items:center; justify-content:center; transition:all 0.15s; }
+  .modal-close:hover { background:var(--danger-bg); color:var(--danger); border-color:var(--danger); }
+  .modal-body { padding:24px; }
+  .modal-footer { padding:16px 24px; border-top:1px solid var(--border); display:flex; justify-content:flex-end; gap:10px; }
+
+  /* FORM */
+  .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  .form-group { display:flex; flex-direction:column; gap:6px; }
+  .form-group.full { grid-column:1/-1; }
+  .form-label { font-size:13px; font-weight:600; color:var(--text-primary); }
+  .form-input { height:40px; border:1px solid var(--border); border-radius:9px; padding:0 14px; font-size:13.5px; color:var(--text-primary); font-family:'DM Sans',sans-serif; outline:none; transition:border-color 0.15s; }
+  .form-input:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(99,102,241,0.12); }
+  .form-select { height:40px; border:1px solid var(--border); border-radius:9px; padding:0 14px; font-size:13.5px; color:var(--text-primary); font-family:'DM Sans',sans-serif; outline:none; background:white; cursor:pointer; transition:border-color 0.15s; }
+  .form-select:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(99,102,241,0.12); }
+  .form-section { font-family:'Plus Jakarta Sans',sans-serif; font-weight:600; font-size:13px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; margin:20px 0 12px; padding-bottom:8px; border-bottom:1px solid var(--border); }
+
+  /* PROFILE DRAWER */
+  .drawer-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.35); z-index:400; display:none; }
+  .drawer-overlay.open { display:block; }
+  .drawer { position:fixed; top:0; right:-500px; width:480px; height:100vh; background:white; z-index:401; transition:right 0.3s ease; overflow-y:auto; box-shadow:-8px 0 32px rgba(0,0,0,0.12); }
+  .drawer.open { right:0; }
+  .drawer-header { padding:20px 24px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+  .drawer-title { font-family:'Plus Jakarta Sans',sans-serif; font-weight:700; font-size:16px; }
+  .drawer-body { padding:24px; }
+  .profile-hero { display:flex; align-items:center; gap:16px; margin-bottom:24px; padding:20px; background:var(--bg); border-radius:12px; }
+  .profile-avatar-lg { width:64px; height:64px; border-radius:16px; display:flex; align-items:center; justify-content:center; font-size:22px; font-weight:700; flex-shrink:0; }
+  .profile-name { font-family:'Plus Jakarta Sans',sans-serif; font-weight:700; font-size:18px; }
+  .profile-role { font-size:13px; color:var(--text-secondary); margin-top:3px; }
+  .info-row { display:flex; justify-content:space-between; padding:11px 0; border-bottom:1px solid var(--bg); font-size:13.5px; }
+  .info-row:last-child { border-bottom:none; }
+  .info-label { color:var(--text-muted); font-size:13px; }
+  .info-value { font-weight:500; color:var(--text-primary); }
+  .drawer-section { font-family:'Plus Jakarta Sans',sans-serif; font-weight:600; font-size:12px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.07em; margin:20px 0 12px; }
+
+  /* TOAST */
+  .toast { position:fixed; bottom:28px; right:28px; background:#0f172a; color:white; padding:13px 20px; border-radius:12px; font-size:13.5px; font-weight:500; z-index:600; display:flex; align-items:center; gap:10px; box-shadow:0 8px 24px rgba(0,0,0,0.2); transform:translateY(80px); opacity:0; transition:all 0.3s ease; }
+  .toast.show { transform:translateY(0); opacity:1; }
+
+  ::-webkit-scrollbar { width:5px; }
+  ::-webkit-scrollbar-thumb { background:var(--border); border-radius:10px; }
+
+  @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+  .table-card { animation:fadeUp 0.4s ease forwards; }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">V</div>
+    <div>
+      <div class="logo-text">Vendhan InfoTech</div>
+      <div class="logo-sub">Admin Portal</div>
+    </div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Main</div>
+    <a href="dashboard.html" class="nav-item"><span class="nav-icon">⊞</span> Dashboard</a>
+    <a href="employees.html" class="nav-item active"><span class="nav-icon">👥</span> Employee Management</a>
+    <a href="attendance.html" class="nav-item"><span class="nav-icon">🕐</span> Attendance</a>
+    <a href="leave.html" class="nav-item"><span class="nav-icon">📅</span> Leave Management<span class="nav-badge">7</span></a>
+    <a href="payroll.html" class="nav-item"><span class="nav-icon">💰</span> Payroll</a>
+    <div class="nav-section-label">Analytics</div>
+    <a href="reports.html" class="nav-item"><span class="nav-icon">📊</span> Reports & Analytics</a>
+    <a href="projects.html" class="nav-item"><span class="nav-icon">📁</span> Projects & Tasks</a>
+    <a href="departments.html" class="nav-item"><span class="nav-icon">🏢</span> Departments</a>
+    <div class="nav-section-label">Communication</div>
+    <a href="chat.html" class="nav-item"><span class="nav-icon">💬</span> Chat System<span class="nav-badge">3</span></a>
+    <a href="notifications.html" class="nav-item"><span class="nav-icon">🔔</span> Notifications</a>
+    <div class="nav-section-label">System</div>
+    <a href="settings.html" class="nav-item"><span class="nav-icon">⚙️</span> Settings</a>
+    <a href="security.html" class="nav-item"><span class="nav-icon">🔒</span> Security</a>
+    <a href="logs.html" class="nav-item"><span class="nav-icon">📋</span> Activity Logs</a>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="user-card">
+      <div class="user-avatar">A</div>
+      <div><div class="user-name">Admin User</div><div class="user-role">Super Administrator</div></div>
+    </div>
+  </div>
+</aside>
+
+<!-- TOPBAR -->
+<header class="topbar" id="topbar">
+  <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
+  <div>
+    <div class="page-title">Employee Management</div>
+    <div class="page-breadcrumb">Admin Portal › Employees</div>
+  </div>
+  <div class="topbar-actions">
+    <button class="btn-outline" onclick="exportCSV()">📥 Export CSV</button>
+    <button class="btn-primary" onclick="openAddModal()">＋ Add Employee</button>
+    <button class="icon-btn">🔔</button>
+    <div class="topbar-avatar">A</div>
+  </div>
+</header>
+
+<!-- MAIN -->
+<main class="main" id="mainContent">
+
+  <!-- Stat Cards -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon" style="background:#eef2ff;color:#6366f1;">👥</div>
+      <div><div class="stat-value">124</div><div class="stat-label">Total Employees</div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background:#ecfdf5;color:#059669;">✅</div>
+      <div><div class="stat-value">112</div><div class="stat-label">Active Employees</div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background:#fffbeb;color:#d97706;">📅</div>
+      <div><div class="stat-value">8</div><div class="stat-label">On Leave Today</div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background:#fef2f2;color:#dc2626;">⛔</div>
+      <div><div class="stat-value">4</div><div class="stat-label">Inactive / Resigned</div></div>
+    </div>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <div class="search-input">
+      <span style="color:#9ca3af;font-size:15px;">🔍</span>
+      <input type="text" id="searchInput" placeholder="Search by name, ID, department, role..." oninput="filterTable()">
+    </div>
+    <select class="filter-select" id="deptFilter" onchange="filterTable()">
+      <option value="">All Departments</option>
+      <option>Engineering</option>
+      <option>Human Resources</option>
+      <option>Finance</option>
+      <option>Marketing</option>
+      <option>Design</option>
+      <option>Operations</option>
+    </select>
+    <select class="filter-select" id="statusFilter" onchange="filterTable()">
+      <option value="">All Status</option>
+      <option>Active</option>
+      <option>On Leave</option>
+      <option>Inactive</option>
+    </select>
+    <select class="filter-select" id="roleFilter" onchange="filterTable()">
+      <option value="">All Roles</option>
+      <option>Developer</option>
+      <option>Designer</option>
+      <option>Manager</option>
+      <option>Analyst</option>
+      <option>HR Executive</option>
+    </select>
+    <button class="btn-outline" onclick="resetFilters()">✕ Clear</button>
+  </div>
+
+  <!-- Table -->
+  <div class="table-card">
+    <div class="table-header">
+      <div>
+        <span class="table-title">All Employees</span>
+        <span class="table-count" id="tableCount" style="margin-left:10px;"></span>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn-outline" style="font-size:12px;padding:6px 12px;" onclick="selectAll()">☑ Select All</button>
+      </div>
+    </div>
+
+    <div style="overflow-x:auto;">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th style="width:40px;"><input type="checkbox" id="masterCheck" onchange="toggleAll(this)" style="cursor:pointer;"></th>
+            <th>Employee</th>
+            <th>Department</th>
+            <th>Role</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Joined</th>
+            <th>Status</th>
+            <th style="text-align:center;">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="empTableBody"></tbody>
+      </table>
+    </div>
+
+    <div class="pagination">
+      <div class="pagination-info" id="pageInfo"></div>
+      <div class="pagination-btns" id="pageBtns"></div>
+    </div>
+  </div>
+</main>
+
+<!-- ══ ADD EMPLOYEE MODAL ══ -->
+<div class="modal-overlay" id="addModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title">Add New Employee</div>
+        <div class="modal-sub">Fill in the details to onboard a new employee</div>
+      </div>
+      <button class="modal-close" onclick="closeAddModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-section">Personal Information</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">First Name *</label>
+          <input class="form-input" id="fName" placeholder="e.g. Arjun">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Last Name *</label>
+          <input class="form-input" id="lName" placeholder="e.g. Kumar">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email Address *</label>
+          <input class="form-input" id="empEmail" type="email" placeholder="arjun@vendhan.com">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Phone Number *</label>
+          <input class="form-input" id="empPhone" placeholder="9876543210">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Date of Birth</label>
+          <input class="form-input" id="empDob" type="date">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Gender</label>
+          <select class="form-select" id="empGender">
+            <option value="">Select Gender</option>
+            <option>Male</option>
+            <option>Female</option>
+            <option>Other</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-section">Work Information</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">Department *</label>
+          <select class="form-select" id="empDept">
+            <option value="">Select Department</option>
+            <option>Engineering</option>
+            <option>Human Resources</option>
+            <option>Finance</option>
+            <option>Marketing</option>
+            <option>Design</option>
+            <option>Operations</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Role / Designation *</label>
+          <input class="form-input" id="empRole" placeholder="e.g. Senior Developer">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Date of Joining *</label>
+          <input class="form-input" id="empJoin" type="date">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Employee Type</label>
+          <select class="form-select" id="empType">
+            <option>Full Time</option>
+            <option>Part Time</option>
+            <option>Contract</option>
+            <option>Intern</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Basic Salary (₹)</label>
+          <input class="form-input" id="empSalary" type="number" placeholder="50000">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Work Location</label>
+          <select class="form-select" id="empLocation">
+            <option>Office - Coimbatore</option>
+            <option>Remote</option>
+            <option>Hybrid</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-outline" onclick="closeAddModal()">Cancel</button>
+      <button class="btn-primary" onclick="saveEmployee()">✓ Save Employee</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ EMPLOYEE PROFILE DRAWER ══ -->
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+<div class="drawer" id="profileDrawer">
+  <div class="drawer-header">
+    <div class="drawer-title">Employee Profile</div>
+    <button class="modal-close" onclick="closeDrawer()">✕</button>
+  </div>
+  <div class="drawer-body" id="drawerBody"></div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── Data
+let employees = [
+  { id:'E001', first:'Arjun',   last:'Kumar',   dept:'Engineering',     role:'Senior Developer',  email:'arjun@vendhan.com',   phone:'9876543210', joined:'2024-01-15', status:'Active',   type:'Full Time',  salary:75000, color:'#eef2ff', textColor:'#6366f1' },
+  { id:'E002', first:'Priya',   last:'Sharma',  dept:'Human Resources', role:'HR Manager',        email:'priya@vendhan.com',   phone:'9123456780', joined:'2023-06-01', status:'Active',   type:'Full Time',  salary:60000, color:'#ecfdf5', textColor:'#059669' },
+  { id:'E003', first:'Rahul',   last:'Verma',   dept:'Finance',         role:'Accountant',        email:'rahul@vendhan.com',   phone:'9012345678', joined:'2023-03-20', status:'On Leave', type:'Full Time',  salary:55000, color:'#fffbeb', textColor:'#d97706' },
+  { id:'E004', first:'Kavya',   last:'Reddy',   dept:'Design',          role:'UI/UX Designer',    email:'kavya@vendhan.com',   phone:'9988776655', joined:'2024-05-10', status:'Active',   type:'Full Time',  salary:58000, color:'#fef2f2', textColor:'#dc2626' },
+  { id:'E005', first:'Vikram',  last:'Nair',    dept:'Engineering',     role:'Backend Developer', email:'vikram@vendhan.com',  phone:'9776655443', joined:'2023-09-01', status:'Active',   type:'Full Time',  salary:70000, color:'#eff6ff', textColor:'#2563eb' },
+  { id:'E006', first:'Nisha',   last:'Menon',   dept:'Marketing',       role:'Marketing Manager', email:'nisha@vendhan.com',   phone:'9654321087', joined:'2022-11-15', status:'Active',   type:'Full Time',  salary:62000, color:'#f5f3ff', textColor:'#7c3aed' },
+  { id:'E007', first:'Suresh',  last:'Babu',    dept:'Operations',      role:'Operations Lead',   email:'suresh@vendhan.com',  phone:'9543210876', joined:'2022-04-01', status:'Active',   type:'Full Time',  salary:65000, color:'#ecfdf5', textColor:'#059669' },
+  { id:'E008', first:'Deepa',   last:'Thomas',  dept:'Finance',         role:'Finance Analyst',   email:'deepa@vendhan.com',   phone:'9432109765', joined:'2023-12-01', status:'Active',   type:'Full Time',  salary:52000, color:'#fffbeb', textColor:'#d97706' },
+  { id:'E009', first:'Karthik', last:'Raj',     dept:'Engineering',     role:'DevOps Engineer',   email:'karthik@vendhan.com', phone:'9321098654', joined:'2024-02-14', status:'Active',   type:'Full Time',  salary:80000, color:'#eef2ff', textColor:'#6366f1' },
+  { id:'E010', first:'Ananya',  last:'Krishnan',dept:'Design',          role:'Graphic Designer',  email:'ananya@vendhan.com',  phone:'9210987543', joined:'2024-03-22', status:'Inactive', type:'Contract',   salary:40000, color:'#fef2f2', textColor:'#dc2626' },
+  { id:'E011', first:'Mohan',   last:'Das',     dept:'Marketing',       role:'SEO Specialist',    email:'mohan@vendhan.com',   phone:'9109876432', joined:'2023-07-11', status:'Active',   type:'Full Time',  salary:48000, color:'#f5f3ff', textColor:'#7c3aed' },
+  { id:'E012', first:'Sruthi',  last:'Pillai',  dept:'Human Resources', role:'HR Executive',      email:'sruthi@vendhan.com',  phone:'9098765321', joined:'2023-10-05', status:'On Leave', type:'Full Time',  salary:45000, color:'#ecfdf5', textColor:'#059669' },
+];
+
+let filtered = [...employees];
+let currentPage = 1;
+const perPage = 8;
+let nextId = 13;
+
+// ── Render Table
+function renderTable() {
+  const start = (currentPage - 1) * perPage;
+  const pageData = filtered.slice(start, start + perPage);
+  const tbody = document.getElementById('empTableBody');
+
+  document.getElementById('tableCount').textContent = `— ${filtered.length} records`;
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:40px;color:var(--text-muted);">
+      <div style="font-size:32px;margin-bottom:8px;">🔍</div>
+      <div style="font-weight:600;margin-bottom:4px;">No employees found</div>
+      <div style="font-size:13px;">Try adjusting your search or filters</div>
+    </td></tr>`;
+    renderPagination();
+    return;
+  }
+
+  tbody.innerHTML = pageData.map(e => {
+    const initials = e.first[0] + e.last[0];
+    const statusBadge = e.status === 'Active'
+      ? '<span class="badge badge-success">● Active</span>'
+      : e.status === 'On Leave'
+      ? '<span class="badge badge-warning">● On Leave</span>'
+      : '<span class="badge badge-gray">● Inactive</span>';
+    const joinDate = new Date(e.joined).toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' });
+    return `
+      <tr onclick="openProfile('${e.id}')">
+        <td onclick="event.stopPropagation()"><input type="checkbox" class="row-check" style="cursor:pointer;"></td>
+        <td>
+          <div class="emp-info">
+            <div class="emp-avatar" style="background:${e.color};color:${e.textColor};">${initials}</div>
+            <div>
+              <div class="emp-name">${e.first} ${e.last}</div>
+              <div class="emp-id">${e.id}</div>
+            </div>
+          </div>
+        </td>
+        <td style="font-size:13px;color:var(--text-secondary);">${e.dept}</td>
+        <td style="font-size:13px;color:var(--text-secondary);">${e.role}</td>
+        <td style="font-size:13px;color:var(--text-secondary);">${e.email}</td>
+        <td style="font-size:13px;color:var(--text-secondary);">${e.phone}</td>
+        <td style="font-size:12.5px;color:var(--text-muted);">${joinDate}</td>
+        <td>${statusBadge}</td>
+        <td style="text-align:center;" onclick="event.stopPropagation()">
+          <button class="action-btn" title="View Profile" onclick="openProfile('${e.id}')">👁</button>
+          <button class="action-btn" title="Edit" onclick="editEmployee('${e.id}')">✏️</button>
+          <button class="action-btn danger" title="Delete" onclick="deleteEmployee('${e.id}')">🗑</button>
+        </td>
+      </tr>`;
+  }).join('');
+
+  renderPagination();
+}
+
+// ── Pagination
+function renderPagination() {
+  const totalPages = Math.ceil(filtered.length / perPage);
+  const start = filtered.length === 0 ? 0 : (currentPage - 1) * perPage + 1;
+  const end = Math.min(currentPage * perPage, filtered.length);
+  document.getElementById('pageInfo').textContent = `Showing ${start}–${end} of ${filtered.length} employees`;
+
+  const btns = document.getElementById('pageBtns');
+  btns.innerHTML = '';
+
+  const prev = document.createElement('button');
+  prev.className = 'page-btn';
+  prev.textContent = '‹';
+  prev.disabled = currentPage === 1;
+  prev.onclick = () => { if (currentPage > 1) { currentPage--; renderTable(); } };
+  btns.appendChild(prev);
+
+  for (let i = 1; i <= totalPages; i++) {
+    const btn = document.createElement('button');
+    btn.className = 'page-btn' + (i === currentPage ? ' active' : '');
+    btn.textContent = i;
+    btn.onclick = () => { currentPage = i; renderTable(); };
+    btns.appendChild(btn);
+  }
+
+  const next = document.createElement('button');
+  next.className = 'page-btn';
+  next.textContent = '›';
+  next.disabled = currentPage === totalPages || totalPages === 0;
+  next.onclick = () => { if (currentPage < totalPages) { currentPage++; renderTable(); } };
+  btns.appendChild(next);
+}
+
+// ── Filters
+function filterTable() {
+  const search = document.getElementById('searchInput').value.toLowerCase();
+  const dept   = document.getElementById('deptFilter').value;
+  const status = document.getElementById('statusFilter').value;
+  const role   = document.getElementById('roleFilter').value;
+
+  filtered = employees.filter(e => {
+    const name = (e.first + ' ' + e.last).toLowerCase();
+    const matchSearch = !search || name.includes(search) || e.id.toLowerCase().includes(search) || e.dept.toLowerCase().includes(search) || e.role.toLowerCase().includes(search) || e.email.toLowerCase().includes(search);
+    const matchDept   = !dept   || e.dept === dept;
+    const matchStatus = !status || e.status === status;
+    const matchRole   = !role   || e.role.includes(role);
+    return matchSearch && matchDept && matchStatus && matchRole;
+  });
+  currentPage = 1;
+  renderTable();
+}
+
+function resetFilters() {
+  document.getElementById('searchInput').value = '';
+  document.getElementById('deptFilter').value = '';
+  document.getElementById('statusFilter').value = '';
+  document.getElementById('roleFilter').value = '';
+  filtered = [...employees];
+  currentPage = 1;
+  renderTable();
+}
+
+// ── Select All
+function toggleAll(master) {
+  document.querySelectorAll('.row-check').forEach(cb => cb.checked = master.checked);
+}
+function selectAll() {
+  document.getElementById('masterCheck').checked = true;
+  document.querySelectorAll('.row-check').forEach(cb => cb.checked = true);
+}
+
+// ── Add Modal
+function openAddModal() {
+  document.getElementById('addModal').classList.add('open');
+}
+function closeAddModal() {
+  document.getElementById('addModal').classList.remove('open');
+  clearForm();
+}
+function clearForm() {
+  ['fName','lName','empEmail','empPhone','empDob','empGender','empDept','empRole','empJoin','empType','empSalary','empLocation']
+    .forEach(id => { const el = document.getElementById(id); if (el) el.value = el.tagName === 'SELECT' ? '' : ''; });
+}
+function saveEmployee() {
+  const first = document.getElementById('fName').value.trim();
+  const last  = document.getElementById('lName').value.trim();
+  const email = document.getElementById('empEmail').value.trim();
+  const phone = document.getElementById('empPhone').value.trim();
+  const dept  = document.getElementById('empDept').value;
+  const role  = document.getElementById('empRole').value.trim();
+  const join  = document.getElementById('empJoin').value;
+
+  if (!first || !last || !email || !phone || !dept || !role || !join) {
+    showToast('⚠️ Please fill all required fields');
+    return;
+  }
+
+  const colors = [
+    { color:'#eef2ff', textColor:'#6366f1' },
+    { color:'#ecfdf5', textColor:'#059669' },
+    { color:'#fffbeb', textColor:'#d97706' },
+    { color:'#fef2f2', textColor:'#dc2626' },
+    { color:'#eff6ff', textColor:'#2563eb' },
+  ];
+  const c = colors[nextId % colors.length];
+
+  const newEmp = {
+    id: 'E' + String(nextId).padStart(3,'0'),
+    first, last, dept, role, email, phone,
+    joined: join,
+    status: 'Active',
+    type: document.getElementById('empType').value,
+    salary: parseInt(document.getElementById('empSalary').value) || 0,
+    ...c
+  };
+
+  employees.unshift(newEmp);
+  filtered = [...employees];
+  nextId++;
+  currentPage = 1;
+  renderTable();
+  closeAddModal();
+  showToast('✅ Employee added successfully!');
+}
+
+// ── Profile Drawer
+function openProfile(id) {
+  const e = employees.find(x => x.id === id);
+  if (!e) return;
+  const initials = e.first[0] + e.last[0];
+  const joinDate = new Date(e.joined).toLocaleDateString('en-IN', { day:'2-digit', month:'long', year:'numeric' });
+  const statusBadge = e.status === 'Active'
+    ? '<span class="badge badge-success">● Active</span>'
+    : e.status === 'On Leave'
+    ? '<span class="badge badge-warning">● On Leave</span>'
+    : '<span class="badge badge-gray">● Inactive</span>';
+
+  document.getElementById('drawerBody').innerHTML = `
+    <div class="profile-hero">
+      <div class="profile-avatar-lg" style="background:${e.color};color:${e.textColor};">${initials}</div>
+      <div>
+        <div class="profile-name">${e.first} ${e.last}</div>
+        <div class="profile-role">${e.role} · ${e.dept}</div>
+        <div style="margin-top:8px;">${statusBadge}</div>
+      </div>
+    </div>
+
+    <div class="drawer-section">Personal Details</div>
+    <div class="info-row"><span class="info-label">Employee ID</span><span class="info-value">${e.id}</span></div>
+    <div class="info-row"><span class="info-label">Full Name</span><span class="info-value">${e.first} ${e.last}</span></div>
+    <div class="info-row"><span class="info-label">Email</span><span class="info-value">${e.email}</span></div>
+    <div class="info-row"><span class="info-label">Phone</span><span class="info-value">${e.phone}</span></div>
+
+    <div class="drawer-section">Work Details</div>
+    <div class="info-row"><span class="info-label">Department</span><span class="info-value">${e.dept}</span></div>
+    <div class="info-row"><span class="info-label">Role</span><span class="info-value">${e.role}</span></div>
+    <div class="info-row"><span class="info-label">Employment Type</span><span class="info-value">${e.type}</span></div>
+    <div class="info-row"><span class="info-label">Date of Joining</span><span class="info-value">${joinDate}</span></div>
+
+    <div class="drawer-section">Salary</div>
+    <div class="info-row"><span class="info-label">Basic Salary</span><span class="info-value" style="color:#059669;font-weight:700;">₹${e.salary.toLocaleString('en-IN')}/month</span></div>
+
+    <div style="display:flex;gap:10px;margin-top:20px;">
+      <button class="btn-primary" style="flex:1;justify-content:center;" onclick="closeDrawer()">✏️ Edit Profile</button>
+      <button class="btn-outline" style="flex:1;justify-content:center;" onclick="closeDrawer()">📊 View Analytics</button>
+    </div>
+  `;
+
+  document.getElementById('drawerOverlay').classList.add('open');
+  document.getElementById('profileDrawer').classList.add('open');
+}
+function closeDrawer() {
+  document.getElementById('drawerOverlay').classList.remove('open');
+  document.getElementById('profileDrawer').classList.remove('open');
+}
+
+// ── Edit / Delete
+function editEmployee(id) {
+  showToast('✏️ Edit mode — feature in settings page');
+}
+function deleteEmployee(id) {
+  if (!confirm('Are you sure you want to remove this employee?')) return;
+  employees = employees.filter(e => e.id !== id);
+  filtered  = filtered.filter(e => e.id !== id);
+  if ((currentPage - 1) * perPage >= filtered.length && currentPage > 1) currentPage--;
+  renderTable();
+  showToast('🗑 Employee removed successfully');
+}
+
+// ── Export CSV
+function exportCSV() {
+  const headers = ['ID,First Name,Last Name,Department,Role,Email,Phone,Joined,Status'];
+  const rows = employees.map(e => `${e.id},${e.first},${e.last},${e.dept},${e.role},${e.email},${e.phone},${e.joined},${e.status}`);
+  const csv = [...headers, ...rows].join('\n');
+  const blob = new Blob([csv], { type:'text/csv' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'vendhan_employees.csv';
+  a.click();
+  showToast('📥 CSV exported successfully!');
+}
+
+// ── Toast
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ── Sidebar Toggle
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('collapsed');
+  document.getElementById('topbar').classList.toggle('collapsed');
+  document.getElementById('mainContent').classList.toggle('collapsed');
+}
+
+// ── Init
+renderTable();
+</script>
+</body>
+</html>

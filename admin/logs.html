@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Activity Logs — Vendhan InfoTech</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{--sidebar-w:260px;--topbar-h:64px;--accent:#4f46e5;--accent-light:#eef2ff;--surface:#fff;--bg:#f4f6fb;--border:#e5e7eb;--text-primary:#111827;--text-secondary:#6b7280;--text-muted:#9ca3af;--success:#059669;--success-bg:#ecfdf5;--warning:#d97706;--warning-bg:#fffbeb;--danger:#dc2626;--danger-bg:#fef2f2;--info:#2563eb;--info-bg:#eff6ff;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text-primary);display:flex;min-height:100vh;}
+  .sidebar{width:var(--sidebar-w);background:#0f172a;position:fixed;top:0;left:0;height:100vh;display:flex;flex-direction:column;z-index:100;transition:width .3s;overflow:hidden;}
+  .sidebar.collapsed{width:68px;}
+  .sidebar-logo{padding:20px 20px 16px;display:flex;align-items:center;gap:12px;border-bottom:1px solid rgba(255,255,255,.06);min-height:var(--topbar-h);}
+  .logo-icon{width:36px;height:36px;background:linear-gradient(135deg,#6366f1,#4f46e5);border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;color:#fff;flex-shrink:0;}
+  .logo-text{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:15px;color:#fff;white-space:nowrap;}
+  .logo-sub{font-size:11px;color:rgba(255,255,255,.4);}
+  .sidebar-nav{flex:1;min-height:0;padding:12px 10px;overflow-y:auto;overflow-x:hidden;}
+  .nav-section-label{font-size:10px;font-weight:600;letter-spacing:.08em;color:rgba(255,255,255,.25);text-transform:uppercase;padding:12px 10px 6px;white-space:nowrap;}
+  .sidebar.collapsed .nav-section-label{opacity:0;}
+  .nav-item{display:flex;align-items:center;gap:12px;padding:10px;border-radius:8px;cursor:pointer;color:rgba(255,255,255,.55);font-size:13.5px;font-weight:500;transition:all .15s;white-space:nowrap;text-decoration:none;margin-bottom:2px;}
+  .nav-item:hover{background:rgba(255,255,255,.07);color:rgba(255,255,255,.9);}
+  .nav-item.active{background:rgba(99,102,241,.18);color:#a5b4fc;}
+  .nav-icon{font-size:18px;flex-shrink:0;width:20px;text-align:center;}
+  .nav-badge{margin-left:auto;background:#dc2626;color:#fff;font-size:10px;font-weight:700;padding:2px 6px;border-radius:10px;}
+  .sidebar-footer{padding:12px 10px;border-top:1px solid rgba(255,255,255,.06);}
+  .user-card{display:flex;align-items:center;gap:10px;padding:10px;border-radius:8px;background:rgba(255,255,255,.05);cursor:pointer;overflow:hidden;}
+  .user-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0;}
+  .user-name{font-size:13px;font-weight:600;color:#fff;white-space:nowrap;}
+  .user-role{font-size:11px;color:rgba(255,255,255,.4);}
+  .topbar{position:fixed;top:0;left:var(--sidebar-w);right:0;height:var(--topbar-h);background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:16px;z-index:90;transition:left .3s;}
+  .topbar.collapsed{left:68px;}
+  .toggle-btn{width:36px;height:36px;border-radius:8px;background:none;border:1px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-secondary);font-size:18px;}
+  .page-title{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:17px;}
+  .page-breadcrumb{font-size:12px;color:var(--text-muted);}
+  .topbar-right{margin-left:auto;display:flex;align-items:center;gap:8px;}
+  .topbar-avatar{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;cursor:pointer;}
+  .main{margin-left:var(--sidebar-w);margin-top:var(--topbar-h);padding:28px;transition:margin-left .3s;}
+  .main.collapsed{margin-left:68px;}
+  .btn-outline{background:#fff;color:var(--text-secondary);border:1px solid var(--border);border-radius:9px;padding:9px 16px;font-size:13.5px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;display:inline-flex;align-items:center;gap:7px;}
+  .btn-outline:hover{border-color:var(--accent);color:var(--accent);}
+  .toolbar{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px 18px;display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap;}
+  .search-input{display:flex;align-items:center;gap:8px;background:var(--bg);border:1px solid var(--border);border-radius:9px;padding:0 14px;height:38px;flex:1;min-width:200px;}
+  .search-input input{border:none;background:none;outline:none;font-size:13.5px;color:var(--text-primary);width:100%;font-family:'DM Sans',sans-serif;}
+  .filter-select{height:38px;border:1px solid var(--border);border-radius:9px;padding:0 12px;font-size:13px;color:var(--text-secondary);background:#fff;cursor:pointer;font-family:'DM Sans',sans-serif;outline:none;}
+  .table-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;}
+  .table-header-row{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+  .table-title{font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;font-size:15px;}
+  .data-table{width:100%;border-collapse:collapse;font-size:13.5px;}
+  .data-table th{text-align:left;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);padding:12px 16px;border-bottom:1px solid var(--border);background:var(--bg);}
+  .data-table td{padding:12px 16px;border-bottom:1px solid var(--bg);vertical-align:middle;}
+  .data-table tbody tr:last-child td{border-bottom:none;}
+  .data-table tbody tr:hover td{background:#fafbff;}
+  .badge{display:inline-flex;font-size:11px;font-weight:600;padding:3px 9px;border-radius:5px;}
+  .badge-success{background:var(--success-bg);color:var(--success);}
+  .badge-danger{background:var(--danger-bg);color:var(--danger);}
+  .badge-warning{background:var(--warning-bg);color:var(--warning);}
+  .badge-info{background:var(--info-bg);color:var(--info);}
+  .badge-gray{background:#f3f4f6;color:#6b7280;}
+  .log-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
+  .toast{position:fixed;bottom:28px;right:28px;background:#0f172a;color:#fff;padding:13px 20px;border-radius:12px;font-size:13.5px;font-weight:500;z-index:600;display:flex;align-items:center;gap:10px;box-shadow:0 8px 24px rgba(0,0,0,.2);transform:translateY(80px);opacity:0;transition:all .3s ease;}
+  .toast.show{transform:translateY(0);opacity:1;}
+  ::-webkit-scrollbar{width:5px;}
+  ::-webkit-scrollbar-thumb{background:var(--border);border-radius:10px;}
+</style>
+</head>
+<body>
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo"><div class="logo-icon">V</div><div><div class="logo-text">Vendhan InfoTech</div><div class="logo-sub">Admin Portal</div></div></div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Main</div>
+    <a href="dashboard.html" class="nav-item"><span class="nav-icon">⊞</span> Dashboard</a>
+    <a href="employees.html" class="nav-item"><span class="nav-icon">👥</span> Employee Management</a>
+    <a href="attendance.html" class="nav-item"><span class="nav-icon">🕐</span> Attendance</a>
+    <a href="leave.html" class="nav-item"><span class="nav-icon">📅</span> Leave Management<span class="nav-badge">7</span></a>
+    <a href="payroll.html" class="nav-item"><span class="nav-icon">💰</span> Payroll</a>
+    <div class="nav-section-label">Analytics</div>
+    <a href="reports.html" class="nav-item"><span class="nav-icon">📊</span> Reports &amp; Analytics</a>
+    <a href="projects.html" class="nav-item"><span class="nav-icon">📁</span> Projects &amp; Tasks</a>
+    <a href="departments.html" class="nav-item"><span class="nav-icon">🏢</span> Departments</a>
+    <div class="nav-section-label">Communication</div>
+    <a href="chat.html" class="nav-item"><span class="nav-icon">💬</span> Chat System<span class="nav-badge">3</span></a>
+    <a href="notifications.html" class="nav-item"><span class="nav-icon">🔔</span> Notifications</a>
+    <div class="nav-section-label">System</div>
+    <a href="settings.html" class="nav-item"><span class="nav-icon">⚙️</span> Settings</a>
+    <a href="security.html" class="nav-item"><span class="nav-icon">🔒</span> Security</a>
+    <a href="logs.html" class="nav-item active"><span class="nav-icon">📋</span> Activity Logs</a>
+    <a href="admin_profile.html" class="nav-item"><span class="nav-icon">👤</span> My Profile</a>
+    <a href="../index.html" class="nav-item"><span class="nav-icon">🚪</span> Logout</a>
+  </nav>
+  <div class="sidebar-footer"><div class="user-card" onclick="window.location.href='admin_profile.html'"><div class="user-avatar">A</div><div><div class="user-name">Admin User</div><div class="user-role">Super Administrator</div></div></div></div>
+</aside>
+<header class="topbar" id="topbar">
+  <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
+  <div><div class="page-title">Activity Logs</div><div class="page-breadcrumb">Admin Portal › Activity Logs</div></div>
+  <div class="topbar-right">
+    <button class="btn-outline" onclick="showToast('📥 Logs exported!')">📥 Export CSV</button>
+    <div class="topbar-avatar" onclick="window.location.href='admin_profile.html'">A</div>
+  </div>
+</header>
+<main class="main" id="mainContent">
+  <div class="toolbar">
+    <div class="search-input"><span style="color:#9ca3af;font-size:15px;">🔍</span><input type="text" id="logSearch" placeholder="Search logs..." oninput="filterLogs()"></div>
+    <select class="filter-select" id="logType" onchange="filterLogs()">
+      <option value="">All Types</option>
+      <option>Login</option><option>Employee</option><option>Leave</option>
+      <option>Payroll</option><option>Settings</option><option>Security</option>
+    </select>
+    <select class="filter-select" id="logUser" onchange="filterLogs()">
+      <option value="">All Users</option>
+      <option>Admin</option><option>Arjun Kumar</option><option>Priya Sharma</option><option>System</option>
+    </select>
+    <input type="date" class="filter-select" id="logDate">
+    <button class="btn-outline" onclick="resetFilters()">✕ Clear</button>
+  </div>
+  <div class="table-card">
+    <div class="table-header-row">
+      <div class="table-title">System Activity Logs</div>
+      <div style="font-size:13px;color:var(--text-muted);" id="logCount"></div>
+    </div>
+    <div style="overflow-x:auto;">
+      <table class="data-table">
+        <thead><tr><th>Event</th><th>User</th><th>Type</th><th>IP Address</th><th>Date & Time</th><th>Status</th></tr></thead>
+        <tbody id="logBody"></tbody>
+      </table>
+    </div>
+  </div>
+</main>
+<div class="toast" id="toast"></div>
+<script>
+const logs=[
+  {event:'Admin logged in successfully',user:'Admin',type:'Login',ip:'192.168.1.10',datetime:'2025-06-13 09:01:42',status:'Success',icon:'🔐',ibg:'#eef2ff',ic:'#6366f1'},
+  {event:'Approved leave for Priya Sharma',user:'Admin',type:'Leave',ip:'192.168.1.10',datetime:'2025-06-13 09:15:30',status:'Success',icon:'✅',ibg:'#ecfdf5',ic:'#059669'},
+  {event:'Added new employee: Kavya Reddy',user:'Admin',type:'Employee',ip:'192.168.1.10',datetime:'2025-06-13 10:02:14',status:'Success',icon:'👤',ibg:'#eef2ff',ic:'#6366f1'},
+  {event:'Payroll generated for June 2025',user:'Admin',type:'Payroll',ip:'192.168.1.10',datetime:'2025-06-12 18:00:05',status:'Success',icon:'💰',ibg:'#ecfdf5',ic:'#059669'},
+  {event:'Failed login attempt',user:'Unknown',type:'Security',ip:'203.145.22.88',datetime:'2025-06-12 14:33:19',status:'Failed',icon:'⚠️',ibg:'#fef2f2',ic:'#dc2626'},
+  {event:'Employee Arjun Kumar checked in',user:'Arjun Kumar',type:'Employee',ip:'192.168.1.14',datetime:'2025-06-12 08:52:00',status:'Success',icon:'🕐',ibg:'#eff6ff',ic:'#2563eb'},
+  {event:'Leave request by Arjun Kumar',user:'Arjun Kumar',type:'Leave',ip:'192.168.1.14',datetime:'2025-06-11 11:20:45',status:'Pending',icon:'📅',ibg:'#fffbeb',ic:'#d97706'},
+  {event:'Password changed by Admin',user:'Admin',type:'Security',ip:'192.168.1.10',datetime:'2025-06-11 09:05:00',status:'Success',icon:'🔒',ibg:'#ecfdf5',ic:'#059669'},
+  {event:'Settings updated: Leave Policy',user:'Admin',type:'Settings',ip:'192.168.1.10',datetime:'2025-06-10 16:45:22',status:'Success',icon:'⚙️',ibg:'#f5f3ff',ic:'#7c3aed'},
+  {event:'Salary slip downloaded — Priya Sharma',user:'Priya Sharma',type:'Payroll',ip:'192.168.1.22',datetime:'2025-06-10 12:30:11',status:'Success',icon:'💰',ibg:'#ecfdf5',ic:'#059669'},
+  {event:'Employee deleted: John Doe',user:'Admin',type:'Employee',ip:'192.168.1.10',datetime:'2025-06-09 15:00:00',status:'Success',icon:'🗑️',ibg:'#fef2f2',ic:'#dc2626'},
+  {event:'System backup completed',user:'System',type:'Settings',ip:'127.0.0.1',datetime:'2025-06-09 02:00:00',status:'Success',icon:'💾',ibg:'#f3f4f6',ic:'#6b7280'},
+];
+let filtered=[...logs];
+function renderLogs(data){
+  document.getElementById('logCount').textContent=data.length+' records';
+  const statusBadge={Success:'badge-success',Failed:'badge-danger',Pending:'badge-warning'};
+  document.getElementById('logBody').innerHTML=data.map(l=>`<tr>
+    <td><div style="display:flex;align-items:center;gap:10px;">
+      <div class="log-icon" style="background:${l.ibg};color:${l.ic};">${l.icon}</div>
+      <span style="font-size:13.5px;font-weight:500;">${l.event}</span>
+    </div></td>
+    <td style="font-size:13px;font-weight:600;">${l.user}</td>
+    <td><span class="badge badge-gray">${l.type}</span></td>
+    <td style="font-size:12.5px;color:var(--text-muted);font-family:monospace;">${l.ip}</td>
+    <td style="font-size:12.5px;color:var(--text-muted);">${l.datetime}</td>
+    <td><span class="badge ${statusBadge[l.status]||'badge-gray'}">${l.status}</span></td>
+  </tr>`).join('');
+}
+function filterLogs(){
+  const s=document.getElementById('logSearch').value.toLowerCase();
+  const t=document.getElementById('logType').value;
+  const u=document.getElementById('logUser').value;
+  filtered=logs.filter(l=>
+    (!s||l.event.toLowerCase().includes(s)||l.user.toLowerCase().includes(s))&&
+    (!t||l.type===t)&&(!u||l.user===u)
+  );
+  renderLogs(filtered);
+}
+function resetFilters(){
+  document.getElementById('logSearch').value='';
+  document.getElementById('logType').value='';
+  document.getElementById('logUser').value='';
+  document.getElementById('logDate').value='';
+  renderLogs(logs);
+}
+function toggleSidebar(){document.getElementById('sidebar').classList.toggle('collapsed');document.getElementById('topbar').classList.toggle('collapsed');document.getElementById('mainContent').classList.toggle('collapsed');}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3500);}
+renderLogs(logs);
+</script>
+</body>
+</html>

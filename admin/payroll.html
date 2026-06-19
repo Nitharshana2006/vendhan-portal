@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Payroll Management — Vendhan InfoTech</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --sidebar-w:260px;--topbar-h:64px;
+    --accent:#4f46e5;--accent-light:#eef2ff;
+    --surface:#fff;--bg:#f4f6fb;--border:#e5e7eb;
+    --text-primary:#111827;--text-secondary:#6b7280;--text-muted:#9ca3af;
+    --success:#059669;--success-bg:#ecfdf5;
+    --warning:#d97706;--warning-bg:#fffbeb;
+    --danger:#dc2626;--danger-bg:#fef2f2;
+    --info:#2563eb;--info-bg:#eff6ff;
+    --purple:#7c3aed;--purple-bg:#f5f3ff;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text-primary);display:flex;min-height:100vh;}
+
+  .sidebar{width:var(--sidebar-w);background:#0f172a;position:fixed;top:0;left:0;height:100vh;display:flex;flex-direction:column;z-index:100;transition:width .3s;overflow:hidden;}
+  .sidebar.collapsed{width:68px;}
+  .sidebar-logo{padding:20px 20px 16px;display:flex;align-items:center;gap:12px;border-bottom:1px solid rgba(255,255,255,.06);min-height:var(--topbar-h);}
+  .logo-icon{width:36px;height:36px;background:linear-gradient(135deg,#6366f1,#4f46e5);border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:16px;color:#fff;flex-shrink:0;}
+  .logo-text{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:15px;color:#fff;white-space:nowrap;}
+  .logo-sub{font-size:11px;color:rgba(255,255,255,.4);}
+  .sidebar-nav{flex:1;padding:12px 10px;overflow-y:auto;overflow-x:hidden;}
+  .nav-section-label{font-size:10px;font-weight:600;letter-spacing:.08em;color:rgba(255,255,255,.25);text-transform:uppercase;padding:12px 10px 6px;white-space:nowrap;transition:opacity .2s;}
+  .sidebar.collapsed .nav-section-label{opacity:0;}
+  .nav-item{display:flex;align-items:center;gap:12px;padding:10px;border-radius:8px;cursor:pointer;color:rgba(255,255,255,.55);font-size:13.5px;font-weight:500;transition:all .15s;white-space:nowrap;text-decoration:none;margin-bottom:2px;}
+  .nav-item:hover{background:rgba(255,255,255,.07);color:rgba(255,255,255,.9);}
+  .nav-item.active{background:rgba(99,102,241,.18);color:#a5b4fc;}
+  .nav-icon{font-size:18px;flex-shrink:0;width:20px;text-align:center;}
+  .nav-badge{margin-left:auto;background:#dc2626;color:#fff;font-size:10px;font-weight:700;padding:2px 6px;border-radius:10px;flex-shrink:0;}
+  .sidebar-footer{padding:12px 10px;border-top:1px solid rgba(255,255,255,.06);}
+  .user-card{display:flex;align-items:center;gap:10px;padding:10px;border-radius:8px;background:rgba(255,255,255,.05);cursor:pointer;overflow:hidden;}
+  .user-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0;}
+  .user-name{font-size:13px;font-weight:600;color:#fff;white-space:nowrap;}
+  .user-role{font-size:11px;color:rgba(255,255,255,.4);}
+
+  .topbar{position:fixed;top:0;left:var(--sidebar-w);right:0;height:var(--topbar-h);background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:16px;z-index:90;transition:left .3s;}
+  .topbar.collapsed{left:68px;}
+  .toggle-btn{width:36px;height:36px;border-radius:8px;background:none;border:1px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-secondary);font-size:18px;transition:all .15s;}
+  .toggle-btn:hover{background:var(--bg);}
+  .page-title{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:17px;}
+  .page-breadcrumb{font-size:12px;color:var(--text-muted);}
+  .topbar-actions{margin-left:auto;display:flex;align-items:center;gap:8px;}
+  .icon-btn{width:38px;height:38px;border-radius:9px;background:none;border:1px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-secondary);font-size:18px;}
+  .topbar-avatar{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;cursor:pointer;}
+
+  .main{margin-left:var(--sidebar-w);margin-top:var(--topbar-h);padding:28px;transition:margin-left .3s;min-height:calc(100vh - var(--topbar-h));}
+  .main.collapsed{margin-left:68px;}
+
+  .btn-primary{background:var(--accent);color:#fff;border:none;border-radius:9px;padding:9px 18px;font-size:13.5px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:7px;font-family:'DM Sans',sans-serif;transition:all .15s;}
+  .btn-primary:hover{background:#4338ca;transform:translateY(-1px);}
+  .btn-outline{background:#fff;color:var(--text-secondary);border:1px solid var(--border);border-radius:9px;padding:9px 16px;font-size:13.5px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;display:inline-flex;align-items:center;gap:7px;}
+  .btn-outline:hover{border-color:var(--accent);color:var(--accent);}
+  .btn-success{background:var(--success);color:#fff;border:none;border-radius:9px;padding:9px 16px;font-size:13.5px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:7px;font-family:'DM Sans',sans-serif;transition:all .15s;}
+  .btn-success:hover{background:#047857;}
+
+  .stats-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:24px;}
+  .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px;transition:all .2s;position:relative;overflow:hidden;}
+  .stat-card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.07);}
+  .stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+  .stat-card.c-green::before{background:linear-gradient(90deg,#059669,#34d399);}
+  .stat-card.c-blue::before{background:linear-gradient(90deg,#4f46e5,#818cf8);}
+  .stat-card.c-amber::before{background:linear-gradient(90deg,#d97706,#fbbf24);}
+  .stat-card.c-red::before{background:linear-gradient(90deg,#dc2626,#f87171);}
+  .stat-card.c-purple::before{background:linear-gradient(90deg,#7c3aed,#a78bfa);}
+  .stat-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:12px;}
+  .stat-value{font-family:'Plus Jakarta Sans',sans-serif;font-size:22px;font-weight:700;}
+  .stat-label{font-size:12.5px;color:var(--text-secondary);margin-top:3px;}
+  .stat-sub{font-size:11.5px;color:var(--text-muted);margin-top:6px;}
+
+  .tab-bar{display:flex;gap:4px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:5px;margin-bottom:20px;width:fit-content;}
+  .tab-btn{padding:8px 20px;border-radius:8px;border:none;background:none;font-size:13.5px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--text-secondary);transition:all .15s;}
+  .tab-btn.active{background:var(--accent);color:#fff;font-weight:600;}
+  .tab-btn:hover:not(.active){background:var(--bg);}
+  .tab-content{display:none;}
+  .tab-content.active{display:block;}
+
+  .toolbar{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px 18px;display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap;}
+  .search-input{display:flex;align-items:center;gap:8px;background:var(--bg);border:1px solid var(--border);border-radius:9px;padding:0 14px;height:38px;flex:1;min-width:200px;}
+  .search-input input{border:none;background:none;outline:none;font-size:13.5px;color:var(--text-primary);width:100%;font-family:'DM Sans',sans-serif;}
+  .search-input input::placeholder{color:var(--text-muted);}
+  .filter-select{height:38px;border:1px solid var(--border);border-radius:9px;padding:0 12px;font-size:13px;color:var(--text-secondary);background:#fff;cursor:pointer;font-family:'DM Sans',sans-serif;outline:none;}
+
+  .table-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;}
+  .table-header-row{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+  .table-title{font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;font-size:15px;}
+  .data-table{width:100%;border-collapse:collapse;font-size:13.5px;}
+  .data-table th{text-align:left;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);padding:12px 16px;border-bottom:1px solid var(--border);background:var(--bg);white-space:nowrap;}
+  .data-table td{padding:13px 16px;border-bottom:1px solid var(--bg);vertical-align:middle;}
+  .data-table tbody tr:last-child td{border-bottom:none;}
+  .data-table tbody tr:hover td{background:#fafbff;}
+  .emp-info{display:flex;align-items:center;gap:10px;}
+  .emp-avatar{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;}
+  .emp-name{font-size:13.5px;font-weight:600;}
+  .emp-sub{font-size:12px;color:var(--text-muted);}
+  .badge{display:inline-flex;align-items:center;font-size:11.5px;font-weight:600;padding:3px 10px;border-radius:6px;white-space:nowrap;}
+  .badge-success{background:var(--success-bg);color:var(--success);}
+  .badge-warning{background:var(--warning-bg);color:var(--warning);}
+  .badge-danger{background:var(--danger-bg);color:var(--danger);}
+  .badge-info{background:var(--info-bg);color:var(--info);}
+  .badge-gray{background:#f3f4f6;color:#6b7280;}
+  .action-btn{width:30px;height:30px;border-radius:7px;border:1px solid var(--border);background:none;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;font-size:14px;transition:all .15s;margin:0 2px;}
+  .action-btn:hover{background:var(--bg);border-color:var(--accent);}
+
+  .charts-row{display:grid;grid-template-columns:1.4fr 1fr;gap:16px;margin-bottom:24px;}
+  .chart-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;}
+  .chart-title{font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;font-size:15px;margin-bottom:4px;}
+  .chart-sub{font-size:12px;color:var(--text-muted);margin-bottom:16px;}
+
+  /* PAYSLIP MODAL */
+  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;display:none;align-items:center;justify-content:center;}
+  .modal-overlay.open{display:flex;}
+  .modal{background:#fff;border-radius:18px;width:600px;max-width:95vw;max-height:92vh;overflow-y:auto;box-shadow:0 24px 64px rgba(0,0,0,.2);animation:modalIn .25s ease;}
+  @keyframes modalIn{from{opacity:0;transform:scale(.95) translateY(10px);}to{opacity:1;transform:scale(1) translateY(0);}}
+  .modal-header{padding:22px 24px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+  .modal-title{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:18px;}
+  .modal-sub{font-size:13px;color:var(--text-muted);margin-top:3px;}
+  .modal-close{width:34px;height:34px;border-radius:8px;border:1px solid var(--border);background:none;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+  .modal-close:hover{background:var(--danger-bg);color:var(--danger);border-color:var(--danger);}
+  .modal-body{padding:24px;}
+  .modal-footer{padding:16px 24px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px;}
+  .form-group{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;}
+  .form-label{font-size:13px;font-weight:600;}
+  .form-input{height:40px;border:1px solid var(--border);border-radius:9px;padding:0 14px;font-size:13.5px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .15s;}
+  .form-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(99,102,241,.12);}
+  .form-select{height:40px;border:1px solid var(--border);border-radius:9px;padding:0 14px;font-size:13.5px;font-family:'DM Sans',sans-serif;outline:none;background:#fff;cursor:pointer;}
+  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+
+  /* PAYSLIP PREVIEW */
+  .payslip{background:#fff;border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+  .payslip-header{background:linear-gradient(135deg,#0f172a,#1e293b);padding:24px;color:#fff;}
+  .payslip-company{font-family:'Plus Jakarta Sans',sans-serif;font-size:20px;font-weight:700;margin-bottom:4px;}
+  .payslip-tagline{font-size:12px;color:rgba(255,255,255,.5);}
+  .payslip-title{font-size:13px;font-weight:600;color:#a5b4fc;margin-top:12px;letter-spacing:.05em;text-transform:uppercase;}
+  .payslip-body{padding:20px;}
+  .payslip-emp-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--bg);}
+  .ps-label{font-size:11.5px;color:var(--text-muted);margin-bottom:3px;}
+  .ps-value{font-size:13.5px;font-weight:600;}
+  .payslip-table{width:100%;border-collapse:collapse;margin-bottom:16px;}
+  .payslip-table th{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);padding:8px 0;border-bottom:1px solid var(--border);text-align:left;}
+  .payslip-table td{padding:9px 0;border-bottom:1px solid var(--bg);font-size:13px;}
+  .payslip-table td:last-child{text-align:right;font-weight:600;}
+  .payslip-net{background:linear-gradient(135deg,#eef2ff,#e0e7ff);border-radius:10px;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;margin-top:4px;}
+  .net-label{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:15px;}
+  .net-value{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:22px;color:var(--accent);}
+  .payslip-footer{padding:14px 20px;background:var(--bg);font-size:11.5px;color:var(--text-muted);text-align:center;border-top:1px solid var(--border);}
+
+  /* GENERATE MODAL */
+  .gen-modal{width:520px;}
+  .summary-box{background:var(--bg);border-radius:10px;padding:14px 16px;margin-bottom:14px;}
+  .summary-row{display:flex;justify-content:space-between;font-size:13px;padding:5px 0;border-bottom:1px solid rgba(0,0,0,.04);}
+  .summary-row:last-child{border-bottom:none;font-weight:700;font-size:14px;padding-top:10px;margin-top:4px;}
+
+  .toast{position:fixed;bottom:28px;right:28px;background:#0f172a;color:#fff;padding:13px 20px;border-radius:12px;font-size:13.5px;font-weight:500;z-index:600;display:flex;align-items:center;gap:10px;box-shadow:0 8px 24px rgba(0,0,0,.2);transform:translateY(80px);opacity:0;transition:all .3s ease;}
+  .toast.show{transform:translateY(0);opacity:1;}
+  ::-webkit-scrollbar{width:5px;}
+  ::-webkit-scrollbar-thumb{background:var(--border);border-radius:10px;}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">V</div>
+    <div><div class="logo-text">Vendhan InfoTech</div><div class="logo-sub">Admin Portal</div></div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Main</div>
+    <a href="dashboard.html" class="nav-item"><span class="nav-icon">⊞</span> Dashboard</a>
+    <a href="employees.html" class="nav-item"><span class="nav-icon">👥</span> Employee Management</a>
+    <a href="attendance.html" class="nav-item"><span class="nav-icon">🕐</span> Attendance</a>
+    <a href="leave.html" class="nav-item"><span class="nav-icon">📅</span> Leave Management<span class="nav-badge">7</span></a>
+    <a href="payroll.html" class="nav-item active"><span class="nav-icon">💰</span> Payroll</a>
+    <div class="nav-section-label">Analytics</div>
+    <a href="reports.html" class="nav-item"><span class="nav-icon">📊</span> Reports & Analytics</a>
+    <a href="projects.html" class="nav-item"><span class="nav-icon">📁</span> Projects & Tasks</a>
+    <a href="departments.html" class="nav-item"><span class="nav-icon">🏢</span> Departments</a>
+    <div class="nav-section-label">Communication</div>
+    <a href="chat.html" class="nav-item"><span class="nav-icon">💬</span> Chat System<span class="nav-badge">3</span></a>
+    <a href="notifications.html" class="nav-item"><span class="nav-icon">🔔</span> Notifications</a>
+    <div class="nav-section-label">System</div>
+    <a href="settings.html" class="nav-item"><span class="nav-icon">⚙️</span> Settings</a>
+    <a href="security.html" class="nav-item"><span class="nav-icon">🔒</span> Security</a>
+    <a href="logs.html" class="nav-item"><span class="nav-icon">📋</span> Activity Logs</a>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="user-card">
+      <div class="user-avatar">A</div>
+      <div><div class="user-name">Admin User</div><div class="user-role">Super Administrator</div></div>
+    </div>
+  </div>
+</aside>
+
+<!-- TOPBAR -->
+<header class="topbar" id="topbar">
+  <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
+  <div>
+    <div class="page-title">Payroll Management</div>
+    <div class="page-breadcrumb">Admin Portal › Payroll</div>
+  </div>
+  <div class="topbar-actions">
+    <button class="btn-outline" onclick="exportCSV()">📥 Export Report</button>
+    <button class="btn-success" onclick="openGenerateModal()">⚡ Generate Payroll</button>
+    <button class="icon-btn">🔔</button>
+    <div class="topbar-avatar">A</div>
+  </div>
+</header>
+
+<!-- MAIN -->
+<main class="main" id="mainContent">
+
+  <!-- STAT CARDS -->
+  <div class="stats-grid">
+    <div class="stat-card c-green">
+      <div class="stat-icon" style="background:var(--success-bg);color:var(--success);">💰</div>
+      <div class="stat-value">₹42.8L</div>
+      <div class="stat-label">Total Payroll — June</div>
+      <div class="stat-sub">↑ 6.3% from last month</div>
+    </div>
+    <div class="stat-card c-blue">
+      <div class="stat-icon" style="background:var(--accent-light);color:var(--accent);">👥</div>
+      <div class="stat-value">124</div>
+      <div class="stat-label">Employees Paid</div>
+      <div class="stat-sub">All processed successfully</div>
+    </div>
+    <div class="stat-card c-amber">
+      <div class="stat-icon" style="background:var(--warning-bg);color:var(--warning);">🎁</div>
+      <div class="stat-value">₹3.2L</div>
+      <div class="stat-label">Total Bonuses</div>
+      <div class="stat-sub">Performance bonuses</div>
+    </div>
+    <div class="stat-card c-red">
+      <div class="stat-icon" style="background:var(--danger-bg);color:var(--danger);">📉</div>
+      <div class="stat-value">₹4.1L</div>
+      <div class="stat-label">Total Deductions</div>
+      <div class="stat-sub">PF + Tax + Advances</div>
+    </div>
+    <div class="stat-card c-purple">
+      <div class="stat-icon" style="background:var(--purple-bg);color:var(--purple);">📅</div>
+      <div class="stat-value">June 30</div>
+      <div class="stat-label">Next Payout Date</div>
+      <div class="stat-sub">9 days remaining</div>
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab('overview',this)">💼 Payroll Overview</button>
+    <button class="tab-btn" onclick="switchTab('history',this)">📂 Salary History</button>
+    <button class="tab-btn" onclick="switchTab('bonuses',this)">🎁 Bonuses & Deductions</button>
+    <button class="tab-btn" onclick="switchTab('analytics',this)">📊 Analytics</button>
+  </div>
+
+  <!-- TAB 1: OVERVIEW -->
+  <div class="tab-content active" id="tab-overview">
+    <div class="toolbar">
+      <div class="search-input">
+        <span style="color:#9ca3af;font-size:15px;">🔍</span>
+        <input type="text" id="paySearch" placeholder="Search employee..." oninput="filterPayroll()">
+      </div>
+      <select class="filter-select" id="payDept" onchange="filterPayroll()">
+        <option value="">All Departments</option>
+        <option>Engineering</option><option>Human Resources</option>
+        <option>Finance</option><option>Marketing</option><option>Design</option><option>Operations</option>
+      </select>
+      <select class="filter-select" id="payMonth" onchange="filterPayroll()">
+        <option value="June 2025">June 2025</option>
+        <option value="May 2025">May 2025</option>
+        <option value="April 2025">April 2025</option>
+      </select>
+      <select class="filter-select" id="payStatus" onchange="filterPayroll()">
+        <option value="">All Status</option>
+        <option>Paid</option><option>Pending</option><option>On Hold</option>
+      </select>
+    </div>
+    <div class="table-card">
+      <div class="table-header-row">
+        <div class="table-title">Employee Salary — <span id="payMonthLabel">June 2025</span></div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn-outline" style="font-size:12px;padding:6px 12px;" onclick="exportCSV()">📥 Export</button>
+          <button class="btn-primary" style="font-size:12px;padding:6px 14px;" onclick="openGenerateModal()">⚡ Generate All</button>
+        </div>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="data-table">
+          <thead><tr>
+            <th>Employee</th><th>Department</th>
+            <th>Basic Salary</th><th>HRA</th><th>Allowances</th>
+            <th>Bonus</th><th>Gross</th>
+            <th>PF</th><th>Tax</th><th>Deductions</th>
+            <th>Net Pay</th><th>Status</th>
+            <th style="text-align:center;">Payslip</th>
+          </tr></thead>
+          <tbody id="payTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 2: HISTORY -->
+  <div class="tab-content" id="tab-history">
+    <div class="toolbar">
+      <div class="search-input">
+        <span style="color:#9ca3af;font-size:15px;">🔍</span>
+        <input type="text" placeholder="Search employee..." oninput="filterSalaryHistory(this.value)">
+      </div>
+      <select class="filter-select" id="histMonth" onchange="filterSalaryHistory('')">
+        <option value="">All Months</option>
+        <option>June 2025</option><option>May 2025</option>
+        <option>April 2025</option><option>March 2025</option>
+      </select>
+    </div>
+    <div class="table-card">
+      <div class="table-header-row">
+        <div class="table-title">Salary Payment History</div>
+        <button class="btn-outline" style="font-size:12px;padding:6px 12px;" onclick="exportCSV()">📥 Export</button>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="data-table">
+          <thead><tr>
+            <th>Employee</th><th>Month</th><th>Basic</th>
+            <th>Gross</th><th>Deductions</th><th>Net Pay</th>
+            <th>Paid On</th><th>Status</th><th style="text-align:center;">View</th>
+          </tr></thead>
+          <tbody id="histTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 3: BONUSES & DEDUCTIONS -->
+  <div class="tab-content" id="tab-bonuses">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+      <!-- Bonuses -->
+      <div class="table-card">
+        <div class="table-header-row">
+          <div class="table-title">🎁 Bonus Allocations — June</div>
+          <button class="btn-primary" style="font-size:12px;padding:6px 14px;" onclick="showToast('✅ Bonus panel — add via payroll settings')">+ Add Bonus</button>
+        </div>
+        <table class="data-table">
+          <thead><tr><th>Employee</th><th>Bonus Type</th><th>Amount</th><th>Status</th></tr></thead>
+          <tbody id="bonusBody"></tbody>
+        </table>
+      </div>
+      <!-- Deductions -->
+      <div class="table-card">
+        <div class="table-header-row">
+          <div class="table-title">📉 Deductions — June</div>
+          <button class="btn-outline" style="font-size:12px;padding:6px 12px;" onclick="showToast('📋 Deduction report exported')">📥 Export</button>
+        </div>
+        <table class="data-table">
+          <thead><tr><th>Employee</th><th>Type</th><th>Amount</th><th>Reason</th></tr></thead>
+          <tbody id="deductBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 4: ANALYTICS -->
+  <div class="tab-content" id="tab-analytics">
+    <div class="charts-row">
+      <div class="chart-card">
+        <div class="chart-title">Monthly Payroll Trend</div>
+        <div class="chart-sub">Total payroll expenses — Jan to Jun 2025</div>
+        <canvas id="trendChart" height="140"></canvas>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Salary by Department</div>
+        <div class="chart-sub">Average salary per department</div>
+        <canvas id="deptChart" height="140"></canvas>
+      </div>
+    </div>
+    <div class="charts-row">
+      <div class="chart-card">
+        <div class="chart-title">Payroll Breakdown</div>
+        <div class="chart-sub">Components of June payroll</div>
+        <canvas id="breakChart" height="140"></canvas>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Salary Distribution</div>
+        <div class="chart-sub">Employees by salary range</div>
+        <canvas id="distChart" height="140"></canvas>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- PAYSLIP MODAL -->
+<div class="modal-overlay" id="payslipModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div><div class="modal-title">Payslip Preview</div><div class="modal-sub" id="payslipSubtitle"></div></div>
+      <button class="modal-close" onclick="closePayslipModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="payslip" id="payslipContent"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-outline" onclick="closePayslipModal()">Close</button>
+      <button class="btn-outline" onclick="showToast('🖨️ Printing payslip...')">🖨️ Print</button>
+      <button class="btn-primary" onclick="downloadPayslip()">📥 Download PDF</button>
+    </div>
+  </div>
+</div>
+
+<!-- GENERATE PAYROLL MODAL -->
+<div class="modal-overlay" id="generateModal">
+  <div class="modal gen-modal">
+    <div class="modal-header">
+      <div><div class="modal-title">⚡ Generate Payroll</div><div class="modal-sub">Process salary for all employees</div></div>
+      <button class="modal-close" onclick="closeGenerateModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row" style="margin-bottom:14px;">
+        <div class="form-group">
+          <label class="form-label">Payroll Month *</label>
+          <select class="form-select" id="genMonth">
+            <option>June 2025</option><option>July 2025</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Pay Date *</label>
+          <input class="form-input" type="date" id="genDate" value="2025-06-30">
+        </div>
+      </div>
+      <div class="form-group" style="margin-bottom:16px;">
+        <label class="form-label">Department (leave blank for all)</label>
+        <select class="form-select" id="genDept">
+          <option value="">All Departments</option>
+          <option>Engineering</option><option>Human Resources</option>
+          <option>Finance</option><option>Marketing</option><option>Design</option>
+        </select>
+      </div>
+      <div class="summary-box">
+        <div style="font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;">Payroll Summary</div>
+        <div class="summary-row"><span>Total Employees</span><span style="font-weight:600;">124</span></div>
+        <div class="summary-row"><span>Total Basic Salary</span><span style="font-weight:600;">₹32,40,000</span></div>
+        <div class="summary-row"><span>Total Allowances</span><span style="font-weight:600;">₹7,20,000</span></div>
+        <div class="summary-row"><span>Total Bonuses</span><span style="font-weight:600;">₹3,20,000</span></div>
+        <div class="summary-row"><span>Total Deductions</span><span style="color:#dc2626;font-weight:600;">- ₹4,10,000</span></div>
+        <div class="summary-row"><span>Net Payroll</span><span style="color:#059669;font-size:16px;">₹38,70,000</span></div>
+      </div>
+      <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:9px;padding:12px 14px;font-size:13px;color:#92400e;">
+        ⚠️ This will mark all June 2025 salaries as <strong>Paid</strong> and generate payslips for all 124 employees.
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-outline" onclick="closeGenerateModal()">Cancel</button>
+      <button class="btn-success" onclick="confirmGenerate()">✓ Confirm & Process</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── DATA
+const payrollData = [
+  { id:'E001', name:'Arjun Kumar',     dept:'Engineering',     color:'#eef2ff', tc:'#6366f1', basic:75000, hra:15000, allow:8000, bonus:5000, pf:9000, tax:7500, extra:0, status:'Paid' },
+  { id:'E002', name:'Priya Sharma',    dept:'Human Resources', color:'#ecfdf5', tc:'#059669', basic:60000, hra:12000, allow:6000, bonus:3000, pf:7200, tax:5000, extra:0, status:'Paid' },
+  { id:'E003', name:'Rahul Verma',     dept:'Finance',         color:'#fffbeb', tc:'#d97706', basic:55000, hra:11000, allow:5500, bonus:0,    pf:6600, tax:4000, extra:2000, status:'Pending' },
+  { id:'E004', name:'Kavya Reddy',     dept:'Design',          color:'#fef2f2', tc:'#dc2626', basic:58000, hra:11600, allow:5800, bonus:2000, pf:6960, tax:4200, extra:0, status:'Paid' },
+  { id:'E005', name:'Vikram Nair',     dept:'Engineering',     color:'#eff6ff', tc:'#2563eb', basic:80000, hra:16000, allow:9000, bonus:8000, pf:9600, tax:9000, extra:0, status:'Paid' },
+  { id:'E006', name:'Nisha Menon',     dept:'Marketing',       color:'#f5f3ff', tc:'#7c3aed', basic:62000, hra:12400, allow:6200, bonus:4000, pf:7440, tax:5500, extra:0, status:'Paid' },
+  { id:'E007', name:'Suresh Babu',     dept:'Operations',      color:'#ecfdf5', tc:'#059669', basic:65000, hra:13000, allow:6500, bonus:0,    pf:7800, tax:6000, extra:1000, status:'On Hold' },
+  { id:'E008', name:'Deepa Thomas',    dept:'Finance',         color:'#fffbeb', tc:'#d97706', basic:52000, hra:10400, allow:5200, bonus:2000, pf:6240, tax:3500, extra:0, status:'Paid' },
+  { id:'E009', name:'Karthik Raj',     dept:'Engineering',     color:'#eef2ff', tc:'#6366f1', basic:80000, hra:16000, allow:9000, bonus:10000,pf:9600, tax:9500, extra:0, status:'Paid' },
+  { id:'E010', name:'Ananya Krishnan', dept:'Design',          color:'#fef2f2', tc:'#dc2626', basic:40000, hra:8000,  allow:4000, bonus:0,    pf:4800, tax:2000, extra:0, status:'Pending' },
+];
+
+const salaryHistory = [
+  { name:'Arjun Kumar',  month:'May 2025',   basic:75000, gross:98000, ded:16500, net:81500, paidOn:'2025-05-31', status:'Paid' },
+  { name:'Priya Sharma', month:'May 2025',   basic:60000, gross:78000, ded:12200, net:65800, paidOn:'2025-05-31', status:'Paid' },
+  { name:'Rahul Verma',  month:'April 2025', basic:55000, gross:71500, ded:10600, net:60900, paidOn:'2025-04-30', status:'Paid' },
+  { name:'Kavya Reddy',  month:'May 2025',   basic:58000, gross:75400, ded:11160, net:64240, paidOn:'2025-05-31', status:'Paid' },
+  { name:'Vikram Nair',  month:'April 2025', basic:80000, gross:105000,ded:18600, net:86400, paidOn:'2025-04-30', status:'Paid' },
+  { name:'Nisha Menon',  month:'March 2025', basic:62000, gross:80600, ded:12940, net:67660, paidOn:'2025-03-31', status:'Paid' },
+  { name:'Suresh Babu',  month:'May 2025',   basic:65000, gross:84500, ded:14800, net:69700, paidOn:'2025-05-31', status:'Paid' },
+  { name:'Deepa Thomas', month:'April 2025', basic:52000, gross:67600, ded:9740,  net:57860, paidOn:'2025-04-30', status:'Paid' },
+];
+
+const bonuses = [
+  { name:'Arjun Kumar',  type:'Performance Bonus', amount:5000,  status:'Paid' },
+  { name:'Vikram Nair',  type:'Performance Bonus', amount:8000,  status:'Paid' },
+  { name:'Karthik Raj',  type:'Retention Bonus',   amount:10000, status:'Paid' },
+  { name:'Priya Sharma', type:'Festival Bonus',     amount:3000,  status:'Paid' },
+  { name:'Nisha Menon',  type:'Target Bonus',       amount:4000,  status:'Paid' },
+  { name:'Kavya Reddy',  type:'Project Bonus',      amount:2000,  status:'Paid' },
+  { name:'Deepa Thomas', type:'Festival Bonus',     amount:2000,  status:'Paid' },
+];
+
+const deductions = [
+  { name:'Rahul Verma', type:'Salary Advance',  amount:2000, reason:'Advance taken Mar 2025' },
+  { name:'Suresh Babu', type:'Late Penalty',     amount:1000, reason:'3 late arrivals in June' },
+  { name:'All Staff',   type:'Provident Fund',   amount:'As per slab', reason:'12% of basic — statutory' },
+  { name:'All Staff',   type:'Income Tax (TDS)', amount:'As per slab', reason:'As per IT slab' },
+];
+
+// ── HELPERS
+function gross(e){ return e.basic + e.hra + e.allow + e.bonus; }
+function deduct(e){ return e.pf + e.tax + e.extra; }
+function net(e){ return gross(e) - deduct(e); }
+function fmt(n){ return '₹'+Number(n).toLocaleString('en-IN'); }
+
+// ── RENDER PAYROLL TABLE
+function renderPayroll(data){
+  document.getElementById('payTableBody').innerHTML = data.map(e => {
+    const sb = e.status==='Paid'?'badge-success':e.status==='Pending'?'badge-warning':'badge-danger';
+    return `<tr>
+      <td><div class="emp-info">
+        <div class="emp-avatar" style="background:${e.color};color:${e.tc};">${e.name.split(' ').map(n=>n[0]).join('')}</div>
+        <div><div class="emp-name">${e.name}</div><div class="emp-sub">${e.id}</div></div>
+      </div></td>
+      <td style="font-size:13px;color:var(--text-secondary);">${e.dept}</td>
+      <td style="font-size:13px;font-weight:600;">${fmt(e.basic)}</td>
+      <td style="font-size:13px;color:var(--text-secondary);">${fmt(e.hra)}</td>
+      <td style="font-size:13px;color:var(--text-secondary);">${fmt(e.allow)}</td>
+      <td style="font-size:13px;color:#7c3aed;font-weight:600;">${e.bonus?fmt(e.bonus):'—'}</td>
+      <td style="font-size:13px;font-weight:700;">${fmt(gross(e))}</td>
+      <td style="font-size:13px;color:#dc2626;">-${fmt(e.pf)}</td>
+      <td style="font-size:13px;color:#dc2626;">-${fmt(e.tax)}</td>
+      <td style="font-size:13px;color:#dc2626;">-${fmt(deduct(e))}</td>
+      <td style="font-size:13.5px;font-weight:700;color:#059669;">${fmt(net(e))}</td>
+      <td><span class="badge ${sb}">${e.status}</span></td>
+      <td style="text-align:center;">
+        <button class="action-btn" title="View Payslip" onclick="openPayslip('${e.id}')">📄</button>
+        <button class="action-btn" title="Download" onclick="showToast('📥 Downloading payslip for ${e.name}...')">⬇️</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function filterPayroll(){
+  const s  = document.getElementById('paySearch').value.toLowerCase();
+  const d  = document.getElementById('payDept').value;
+  const st = document.getElementById('payStatus').value;
+  const m  = document.getElementById('payMonth').value;
+  document.getElementById('payMonthLabel').textContent = m;
+  const filtered = payrollData.filter(e=>
+    (!s||e.name.toLowerCase().includes(s)||e.id.toLowerCase().includes(s)) &&
+    (!d||e.dept===d) && (!st||e.status===st)
+  );
+  renderPayroll(filtered);
+}
+
+// ── SALARY HISTORY
+function renderHistory(data){
+  document.getElementById('histTableBody').innerHTML = data.map(h=>`<tr>
+    <td><div class="emp-info">
+      <div class="emp-avatar" style="background:#eef2ff;color:#6366f1;">${h.name.split(' ').map(n=>n[0]).join('')}</div>
+      <div><div class="emp-name">${h.name}</div></div>
+    </div></td>
+    <td style="font-size:13px;color:var(--text-secondary);">${h.month}</td>
+    <td style="font-size:13px;">${fmt(h.basic)}</td>
+    <td style="font-size:13px;font-weight:600;">${fmt(h.gross)}</td>
+    <td style="font-size:13px;color:#dc2626;">-${fmt(h.ded)}</td>
+    <td style="font-size:13.5px;font-weight:700;color:#059669;">${fmt(h.net)}</td>
+    <td style="font-size:12px;color:var(--text-muted);">${new Date(h.paidOn).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})}</td>
+    <td><span class="badge badge-success">${h.status}</span></td>
+    <td style="text-align:center;"><button class="action-btn" onclick="showToast('📄 Opening salary slip...')">📄</button></td>
+  </tr>`).join('');
+}
+
+function filterSalaryHistory(s){
+  const search = s.toLowerCase();
+  const month  = document.getElementById('histMonth').value;
+  const filtered = salaryHistory.filter(h=>
+    (!search||h.name.toLowerCase().includes(search)) &&
+    (!month||h.month===month)
+  );
+  renderHistory(filtered);
+}
+
+// ── BONUSES & DEDUCTIONS
+function renderBonusDeduct(){
+  document.getElementById('bonusBody').innerHTML = bonuses.map(b=>`<tr>
+    <td><div class="emp-info">
+      <div class="emp-avatar" style="background:#f5f3ff;color:#7c3aed;">${b.name.split(' ').map(n=>n[0]).join('')}</div>
+      <div class="emp-name">${b.name}</div>
+    </div></td>
+    <td style="font-size:13px;color:var(--text-secondary);">${b.type}</td>
+    <td style="font-size:13.5px;font-weight:700;color:#7c3aed;">+${fmt(b.amount)}</td>
+    <td><span class="badge badge-success">${b.status}</span></td>
+  </tr>`).join('');
+
+  document.getElementById('deductBody').innerHTML = deductions.map(d=>`<tr>
+    <td><div class="emp-info">
+      <div class="emp-avatar" style="background:#fef2f2;color:#dc2626;">${d.name[0]}</div>
+      <div class="emp-name">${d.name}</div>
+    </div></td>
+    <td style="font-size:13px;color:var(--text-secondary);">${d.type}</td>
+    <td style="font-size:13.5px;font-weight:700;color:#dc2626;">-${typeof d.amount==='number'?fmt(d.amount):d.amount}</td>
+    <td style="font-size:12px;color:var(--text-muted);">${d.reason}</td>
+  </tr>`).join('');
+}
+
+// ── PAYSLIP MODAL
+function openPayslip(id){
+  const e = payrollData.find(x=>x.id===id);
+  if(!e) return;
+  const g = gross(e), dd = deduct(e), n = net(e);
+  document.getElementById('payslipSubtitle').textContent = `${e.name} — June 2025`;
+  document.getElementById('payslipContent').innerHTML = `
+    <div class="payslip-header">
+      <div class="payslip-company">Vendhan InfoTech Pvt. Ltd.</div>
+      <div class="payslip-tagline">Enterprise Solutions · Coimbatore, Tamil Nadu</div>
+      <div class="payslip-title">Salary Slip — June 2025</div>
+    </div>
+    <div class="payslip-body">
+      <div class="payslip-emp-row">
+        <div><div class="ps-label">Employee Name</div><div class="ps-value">${e.name}</div></div>
+        <div><div class="ps-label">Employee ID</div><div class="ps-value">${e.id}</div></div>
+        <div><div class="ps-label">Department</div><div class="ps-value">${e.dept}</div></div>
+        <div><div class="ps-label">Pay Period</div><div class="ps-value">June 1 – June 30, 2025</div></div>
+        <div><div class="ps-label">Pay Date</div><div class="ps-value">June 30, 2025</div></div>
+        <div><div class="ps-label">Bank Account</div><div class="ps-value">XXXX XXXX 4521</div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        <div>
+          <div style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">Earnings</div>
+          <table class="payslip-table">
+            <thead><tr><th>Component</th><th style="text-align:right;">Amount</th></tr></thead>
+            <tbody>
+              <tr><td>Basic Salary</td><td>${fmt(e.basic)}</td></tr>
+              <tr><td>House Rent Allowance</td><td>${fmt(e.hra)}</td></tr>
+              <tr><td>Other Allowances</td><td>${fmt(e.allow)}</td></tr>
+              ${e.bonus?`<tr><td>Performance Bonus</td><td style="color:#7c3aed;">${fmt(e.bonus)}</td></tr>`:''}
+              <tr style="font-weight:700;border-top:1px solid var(--border);"><td style="padding-top:10px;">Gross Earnings</td><td style="padding-top:10px;color:#059669;">${fmt(g)}</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div>
+          <div style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">Deductions</div>
+          <table class="payslip-table">
+            <thead><tr><th>Component</th><th style="text-align:right;">Amount</th></tr></thead>
+            <tbody>
+              <tr><td>Provident Fund (12%)</td><td style="color:#dc2626;">-${fmt(e.pf)}</td></tr>
+              <tr><td>Income Tax (TDS)</td><td style="color:#dc2626;">-${fmt(e.tax)}</td></tr>
+              ${e.extra?`<tr><td>Other Deductions</td><td style="color:#dc2626;">-${fmt(e.extra)}</td></tr>`:''}
+              <tr style="font-weight:700;border-top:1px solid var(--border);"><td style="padding-top:10px;">Total Deductions</td><td style="padding-top:10px;color:#dc2626;">-${fmt(dd)}</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="payslip-net">
+        <div class="net-label">💰 Net Pay (Take Home)</div>
+        <div class="net-value">${fmt(n)}</div>
+      </div>
+    </div>
+    <div class="payslip-footer">This is a computer-generated payslip. No signature required. · Vendhan InfoTech Pvt. Ltd.</div>`;
+  document.getElementById('payslipModal').classList.add('open');
+}
+function closePayslipModal(){ document.getElementById('payslipModal').classList.remove('open'); }
+function downloadPayslip(){ showToast('📥 Payslip downloaded as PDF!'); closePayslipModal(); }
+
+// ── GENERATE MODAL
+function openGenerateModal(){ document.getElementById('generateModal').classList.add('open'); }
+function closeGenerateModal(){ document.getElementById('generateModal').classList.remove('open'); }
+function confirmGenerate(){
+  closeGenerateModal();
+  showToast('⚡ Payroll processed! 124 payslips generated.');
+  payrollData.forEach(e=>{ if(e.status==='Pending') e.status='Paid'; });
+  filterPayroll();
+}
+
+// ── ANALYTICS
+let chartsInit=false;
+function initCharts(){
+  if(chartsInit) return; chartsInit=true;
+  new Chart(document.getElementById('trendChart'),{type:'line',data:{labels:['Jan','Feb','Mar','Apr','May','Jun'],datasets:[{label:'Payroll (₹L)',data:[38.2,38.5,39.1,40.3,41.2,42.8],fill:true,backgroundColor:'rgba(99,102,241,.08)',borderColor:'#6366f1',borderWidth:2,tension:.4,pointBackgroundColor:'#6366f1',pointRadius:5}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:'#9ca3af',font:{size:12}}},y:{grid:{color:'rgba(0,0,0,.04)'},ticks:{color:'#9ca3af',font:{size:12},callback:v=>'₹'+v+'L'}}}}});
+  new Chart(document.getElementById('deptChart'),{type:'bar',data:{labels:['Engineering','HR','Finance','Marketing','Design','Ops'],datasets:[{label:'Avg Salary',data:[76000,58000,53000,60000,49000,62000],backgroundColor:'rgba(99,102,241,.12)',borderColor:'#6366f1',borderWidth:2,borderRadius:6}]},options:{responsive:true,indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{grid:{color:'rgba(0,0,0,.04)'},ticks:{color:'#9ca3af',font:{size:12},callback:v=>'₹'+v.toLocaleString('en-IN')}},y:{grid:{display:false},ticks:{color:'#6b7280',font:{size:12}}}}}});
+  new Chart(document.getElementById('breakChart'),{type:'doughnut',data:{labels:['Basic Salary','HRA','Allowances','Bonuses','Deductions'],datasets:[{data:[32.4,6.5,3.8,3.2,-4.1].map(Math.abs),backgroundColor:['#6366f1','#059669','#2563eb','#7c3aed','#dc2626'],borderWidth:0,hoverOffset:6}]},options:{cutout:'62%',responsive:true,plugins:{legend:{position:'right',labels:{font:{size:12},color:'#6b7280',padding:12,usePointStyle:true,pointStyleWidth:8}}}}});
+  new Chart(document.getElementById('distChart'),{type:'bar',data:{labels:['<₹40k','₹40-50k','₹50-60k','₹60-70k','₹70-80k','>₹80k'],datasets:[{label:'Employees',data:[8,22,35,28,18,13],backgroundColor:['rgba(99,102,241,.12)','rgba(99,102,241,.2)','rgba(99,102,241,.3)','rgba(99,102,241,.5)','rgba(99,102,241,.7)','#6366f1'],borderColor:'#6366f1',borderWidth:1,borderRadius:6}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:'#9ca3af',font:{size:11}}},y:{grid:{color:'rgba(0,0,0,.04)'},ticks:{color:'#9ca3af',font:{size:12}}}}}});
+}
+
+// ── TABS
+function switchTab(id,btn){
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  btn.classList.add('active');
+  if(id==='analytics') initCharts();
+}
+
+// ── SIDEBAR
+function toggleSidebar(){
+  document.getElementById('sidebar').classList.toggle('collapsed');
+  document.getElementById('topbar').classList.toggle('collapsed');
+  document.getElementById('mainContent').classList.toggle('collapsed');
+}
+
+// ── EXPORT
+function exportCSV(){
+  const rows=['ID,Employee,Department,Basic,HRA,Allowance,Bonus,Gross,PF,Tax,Deductions,Net,Status',...payrollData.map(e=>`${e.id},${e.name},${e.dept},${e.basic},${e.hra},${e.allow},${e.bonus},${gross(e)},${e.pf},${e.tax},${deduct(e)},${net(e)},${e.status}`)].join('\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([rows],{type:'text/csv'}));
+  a.download='vendhan_payroll_june2025.csv';a.click();
+  showToast('📥 Payroll report exported!');
+}
+
+// ── TOAST
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3500);}
+
+// ── INIT
+renderPayroll(payrollData);
+renderHistory(salaryHistory);
+renderBonusDeduct();
+</script>
+</body>
+</html>
