@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Employee Portal — Vendhan InfoTech</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--accent:#4f46e5;--al:#eef2ff;--bg:#f4f6fb;--sur:#fff;--bor:#e5e7eb;--tp:#111827;--ts:#6b7280;--tm:#9ca3af;--ok:#059669;--okb:#ecfdf5;--warn:#d97706;--warnb:#fffbeb;--pur:#7c3aed;--purb:#f5f3ff;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tp);display:flex;height:100vh;overflow:hidden;}
+
+/* SIDEBAR */
+.sb{width:220px;background:#0f172a;display:flex;flex-direction:column;flex-shrink:0;height:100vh;}
+.sb-logo{padding:16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(255,255,255,.06);}
+.sb-icon{width:32px;height:32px;background:linear-gradient(135deg,#6366f1,#4f46e5);border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:14px;flex-shrink:0;}
+.sb-title{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:13.5px;color:#fff;}
+.sb-sub{font-size:10px;color:rgba(255,255,255,.4);}
+.sb-nav{flex:1;padding:8px;overflow-y:auto;}
+.nav-btn{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:7px;color:rgba(255,255,255,.55);font-size:12.5px;font-weight:500;cursor:pointer;border:none;background:none;width:100%;text-align:left;font-family:'DM Sans',sans-serif;transition:all .15s;margin-bottom:1px;}
+.nav-btn:hover{background:rgba(255,255,255,.07);color:rgba(255,255,255,.9);}
+.nav-btn.active{background:rgba(99,102,241,.2);color:#a5b4fc;}
+.sb-foot{padding:10px 8px;border-top:1px solid rgba(255,255,255,.06);}
+.sb-user{display:flex;align-items:center;gap:8px;padding:8px;background:rgba(255,255,255,.05);border-radius:7px;}
+.sb-av{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0;}
+.sb-uname{font-size:12px;font-weight:600;color:#fff;}
+.sb-uid{font-size:10px;color:rgba(255,255,255,.4);}
+
+/* MAIN */
+.wrap{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.topbar{background:var(--sur);border-bottom:1px solid var(--bor);padding:0 24px;height:60px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.top-title{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:16px;}
+.top-sub{font-size:11.5px;color:var(--tm);margin-top:2px;}
+.main{flex:1;overflow-y:auto;padding:24px;}
+
+/* SECTIONS */
+.section{display:none;}
+.section.active{display:block;}
+.empty{background:var(--sur);border:1px dashed var(--bor);border-radius:14px;padding:44px 24px;text-align:center;max-width:440px;margin:20px auto 0;}
+.empty-icon{font-size:36px;margin-bottom:10px;}
+.empty-title{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:15px;margin-bottom:6px;}
+.empty-desc{font-size:12.5px;color:var(--tm);line-height:1.6;}
+
+/* BUTTONS */
+.btn{padding:9px 18px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;border:none;display:inline-flex;align-items:center;gap:7px;}
+.btn-p{background:var(--accent);color:#fff;}
+.btn-p:hover{background:#4338ca;}
+.btn-p:disabled{opacity:.55;cursor:not-allowed;}
+.btn-s{background:var(--ok);color:#fff;}
+.btn-o{background:var(--sur);color:var(--ts);border:1px solid var(--bor);}
+.btn-o:hover{border-color:#dc2626;color:#dc2626;}
+
+/* DATA ENTRY specific */
+.tabs{display:flex;gap:4px;background:var(--bg);border:1px solid var(--bor);border-radius:10px;padding:4px;width:fit-content;margin-bottom:16px;}
+.tab{padding:7px 16px;border-radius:7px;border:none;background:none;font-size:12.5px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--ts);}
+.tab.active{background:var(--accent);color:#fff;}
+.panel{display:none;} .panel.active{display:block;}
+.dz{border:2px dashed var(--bor);border-radius:12px;padding:32px;text-align:center;background:var(--bg);cursor:pointer;position:relative;transition:all .2s;}
+.dz:hover,.dz.over{border-color:var(--accent);background:var(--al);}
+.dz input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+textarea.paste{width:100%;height:140px;border:1px solid var(--bor);border-radius:8px;padding:12px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;resize:vertical;}
+textarea.paste:focus{border-color:var(--accent);}
+.fchip{display:none;margin-top:10px;padding:9px 13px;background:var(--okb);border:1px solid #a7f3d0;border-radius:8px;font-size:12.5px;color:var(--ok);align-items:center;gap:7px;}
+.imgprev{max-width:100%;border-radius:8px;margin-top:10px;display:none;}
+.proc{background:linear-gradient(135deg,#312e81,#4f46e5);border-radius:12px;padding:20px;text-align:center;color:#fff;display:none;margin:12px 0;}
+.proc.show{display:block;}
+.spin{width:32px;height:32px;border:3px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;animation:sp .8s linear infinite;margin:0 auto 10px;}
+@keyframes sp{to{transform:rotate(360deg);}}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px;}
+.fg.full{grid-column:1/-1;}
+.fl{font-size:11px;font-weight:700;color:var(--tm);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;}
+.fi{border:1.5px solid var(--bor);border-radius:8px;padding:9px 12px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;width:100%;}
+.fi:focus{border-color:var(--accent);}
+textarea.fi{min-height:80px;resize:vertical;}
+.card{background:var(--sur);border:1px solid var(--bor);border-radius:12px;padding:18px;margin-bottom:16px;}
+.sub-row{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--bg);font-size:12.5px;}
+.sub-row:last-child{border-bottom:none;}
+.pill{font-size:10px;font-weight:700;padding:2px 8px;border-radius:5px;}
+.pill-p{background:var(--warnb);color:var(--warn);}
+.pill-r{background:var(--okb);color:var(--ok);}
+
+/* PROFILE */
+.info-card{background:var(--sur);border:1px solid var(--bor);border-radius:12px;padding:18px;max-width:520px;}
+.ir{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--bg);font-size:13px;}
+.ir:last-child{border-bottom:none;}
+.il{color:var(--tm);}
+.iv{font-weight:600;}
+
+.toast{position:fixed;bottom:24px;right:24px;background:#0f172a;color:#fff;padding:11px 18px;border-radius:10px;font-size:13px;font-weight:500;z-index:999;transform:translateY(60px);opacity:0;transition:all .3s;}
+.toast.show{transform:translateY(0);opacity:1;}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sb">
+  <div class="sb-logo">
+    <div class="sb-icon">V</div>
+    <div><div class="sb-title">Vendhan InfoTech</div><div class="sb-sub">Employee Portal</div></div>
+  </div>
+  <nav class="sb-nav" id="sbNav"></nav>
+  <div class="sb-foot">
+    <div class="sb-user">
+      <div class="sb-av" id="sbAv">?</div>
+      <div><div class="sb-uname" id="sbName">—</div><div class="sb-uid" id="sbId">—</div></div>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN WRAP -->
+<div class="wrap">
+  <header class="topbar">
+    <div>
+      <div class="top-title" id="topTitle">My Dashboard</div>
+      <div class="top-sub" id="topSub">Employee Portal</div>
+    </div>
+    <button class="btn btn-o" onclick="logout()">🚪 Sign Out</button>
+  </header>
+  <main class="main" id="mainArea"></main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── SESSION GUARD ───────────────────────────────────────────────────
+const SESSION_KEY = 'vendhan_session';
+let session;
+try { session = JSON.parse(sessionStorage.getItem(SESSION_KEY) || 'null'); } catch(e){ session = null; }
+if (!session || session.role !== 'employee') {
+  window.location.href = '../index.html';
+}
+
+// ── PER-EMPLOYEE NAMESPACE ──────────────────────────────────────────
+// Every data bucket is keyed by employeeId so accounts never share data.
+const myId = (session.employeeId || session.email || 'guest').toLowerCase().replace(/[^a-z0-9]+/g,'_');
+const ns = id => 'vendhan_emp_' + id + '_' + myId;
+
+function db(key){ try{ return JSON.parse(localStorage.getItem(key)||'[]'); }catch(e){ return []; } }
+function save(key,val){ try{ localStorage.setItem(key, JSON.stringify(val)); }catch(e){} }
+
+// ── SECTION DEFINITIONS ─────────────────────────────────────────────
+const SECTIONS = [
+  { id:'dashboard',      icon:'⊞',  label:'My Dashboard',           sub:'Overview of your portal' },
+  { id:'attendance',     icon:'🕐',  label:'My Attendance',          sub:'Check in/out and history',
+    empty:'🕐', etitle:'No attendance records yet',
+    edesc:'Once you check in for the first time, your attendance history will appear here.' },
+  { id:'leave',          icon:'📅',  label:'My Leave',               sub:'Apply and track leave',
+    empty:'📅', etitle:'No leave requests yet',
+    edesc:'Apply for leave below and your requests and approval status will show here.' },
+  { id:'salary',         icon:'💰',  label:'My Salary',              sub:'Payslips and breakdown',
+    empty:'💰', etitle:'No payslips yet',
+    edesc:'Your payslips will appear here once payroll has been processed by the admin.' },
+  { id:'tasks',          icon:'📁',  label:'My Tasks',               sub:'Personal task board',
+    empty:'📁', etitle:'No tasks yet',
+    edesc:'Tasks assigned to you will appear here on your personal board.' },
+  { id:'data_entry',     icon:'🤖',  label:'Data Entry Automation',  sub:'Upload PDF/image or paste text' },
+  { id:'chat',           icon:'💬',  label:'Chat',                   sub:'Chat with teammates and HR',
+    empty:'💬', etitle:'No conversations yet',
+    edesc:'Start a conversation and it will appear here.' },
+  { id:'notifications',  icon:'🔔',  label:'Notifications',          sub:'Your personal notification feed',
+    empty:'🔔', etitle:'You\'re all caught up',
+    edesc:'New notifications addressed to you will show up here.' },
+  { id:'profile',        icon:'👤',  label:'My Profile',             sub:'Personal details and settings',
+    empty:null  /* rendered custom */ },
+  { id:'settings',       icon:'⚙️',  label:'Settings',               sub:'Preferences',
+    empty:'⚙️', etitle:'Using default settings',
+    edesc:'Your personal preferences will be saved here once you change something.' },
+];
+
+// ── BUILD SIDEBAR NAV ───────────────────────────────────────────────
+const sbNav = document.getElementById('sbNav');
+SECTIONS.forEach(s => {
+  const btn = document.createElement('button');
+  btn.className = 'nav-btn';
+  btn.id = 'nav_' + s.id;
+  btn.innerHTML = `<span>${s.icon}</span>${s.label}`;
+  btn.onclick = () => switchSection(s.id);
+  sbNav.appendChild(btn);
+});
+
+// ── BUILD SECTION PANELS ────────────────────────────────────────────
+const mainArea = document.getElementById('mainArea');
+
+SECTIONS.forEach(s => {
+  const div = document.createElement('div');
+  div.className = 'section';
+  div.id = 'sec_' + s.id;
+
+  if (s.id === 'dashboard') {
+    div.innerHTML = dashboardHTML();
+  } else if (s.id === 'data_entry') {
+    div.innerHTML = dataEntryHTML();
+  } else if (s.id === 'profile') {
+    div.innerHTML = profileHTML();
+  } else {
+    div.innerHTML = `<div class="empty"><div class="empty-icon">${s.empty}</div><div class="empty-title">${s.etitle}</div><div class="empty-desc">${s.edesc}</div></div>`;
+  }
+
+  mainArea.appendChild(div);
+});
+
+// ── SWITCH SECTION ──────────────────────────────────────────────────
+function switchSection(id) {
+  document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById('sec_' + id).classList.add('active');
+  document.getElementById('nav_' + id).classList.add('active');
+  const s = SECTIONS.find(x => x.id === id);
+  document.getElementById('topTitle').textContent = s.icon + ' ' + s.label;
+  document.getElementById('topSub').textContent = s.sub;
+  if (id === 'data_entry') renderSubmissions();
+}
+
+// ── SESSION INFO in sidebar ─────────────────────────────────────────
+const uname = session.name || 'Employee';
+const initials = uname.split(' ').filter(Boolean).map(p=>p[0]).join('').slice(0,2).toUpperCase()||'?';
+document.getElementById('sbAv').textContent = initials;
+document.getElementById('sbName').textContent = uname;
+document.getElementById('sbId').textContent = session.employeeId || '';
+
+// ── DASHBOARD HTML ──────────────────────────────────────────────────
+function dashboardHTML() {
+  return `
+    <div style="background:linear-gradient(135deg,#4f46e5,#6366f1);border-radius:16px;padding:26px;color:#fff;margin-bottom:20px;">
+      <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:21px;font-weight:700;margin-bottom:5px;">Welcome back, ${uname.split(' ')[0]}!</div>
+      <div style="font-size:13px;opacity:.85;">Click any section in the sidebar to get started.</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:640px;">
+      ${SECTIONS.filter(s=>s.id!=='dashboard').map(s=>`
+        <div onclick="switchSection('${s.id}')" style="background:var(--sur);border:1px solid var(--bor);border-radius:12px;padding:18px;cursor:pointer;transition:all .15s;"
+          onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--bor)'">
+          <div style="font-size:22px;margin-bottom:8px;">${s.icon}</div>
+          <div style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:13.5px;margin-bottom:3px;">${s.label}</div>
+          <div style="font-size:11.5px;color:var(--tm);">${s.sub}</div>
+        </div>`).join('')}
+    </div>
+    <div class="info-card" style="margin-top:20px;">
+      <div style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:13px;margin-bottom:10px;">Account Details</div>
+      <div class="ir"><span class="il">Name</span><span class="iv">${session.name||'—'}</span></div>
+      <div class="ir"><span class="il">Employee ID</span><span class="iv">${session.employeeId||'—'}</span></div>
+      <div class="ir"><span class="il">Login Email</span><span class="iv">${session.email||'—'}</span></div>
+    </div>`;
+}
+
+// ── PROFILE HTML ────────────────────────────────────────────────────
+function profileHTML() {
+  return `
+    <div class="info-card">
+      <div style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:13px;margin-bottom:10px;">My Profile</div>
+      <div class="ir"><span class="il">Full Name</span><span class="iv">${session.name||'—'}</span></div>
+      <div class="ir"><span class="il">Employee ID</span><span class="iv">${session.employeeId||'—'}</span></div>
+      <div class="ir"><span class="il">Login Email</span><span class="iv">${session.email||'—'}</span></div>
+      <div class="ir"><span class="il">Portal Role</span><span class="iv">🧑‍💼 Employee</span></div>
+    </div>
+    <div class="empty" style="margin-top:16px;">
+      <div class="empty-icon">✏️</div>
+      <div class="empty-title">Edit profile coming soon</div>
+      <div class="empty-desc">Personal details, bank info, and password change will be available here.</div>
+    </div>`;
+}
+
+// ── DATA ENTRY HTML ─────────────────────────────────────────────────
+function dataEntryHTML() {
+  return `
+    <div class="card">
+      <div style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:14px;margin-bottom:14px;">📥 Input Source</div>
+      <div class="tabs">
+        <button class="tab active" onclick="switchTab('pdf',this)">📄 PDF</button>
+        <button class="tab" onclick="switchTab('image',this)">🖼️ Image</button>
+        <button class="tab" onclick="switchTab('text',this)">✍️ Paste Text</button>
+      </div>
+      <div class="panel active" id="panel-pdf">
+        <div class="dz" id="pdfZone" ondragover="event.preventDefault();this.classList.add('over')" ondragleave="this.classList.remove('over')" ondrop="dropFile(event,'pdf')">
+          <input type="file" accept=".pdf" onchange="pickFile(event,'pdf')">
+          <div style="font-size:32px;">📄</div>
+          <div style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;margin:6px 0 3px;">Drop PDF or click to browse</div>
+          <div style="font-size:12px;color:var(--tm);">Text extracted directly from the file</div>
+        </div>
+        <div class="fchip" id="pdfChip">📄 <span id="pdfChipText"></span></div>
+      </div>
+      <div class="panel" id="panel-image">
+        <div class="dz" id="imgZone" ondragover="event.preventDefault();this.classList.add('over')" ondragleave="this.classList.remove('over')" ondrop="dropFile(event,'image')">
+          <input type="file" accept="image/*" onchange="pickFile(event,'image')">
+          <div style="font-size:32px;">🖼️</div>
+          <div style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;margin:6px 0 3px;">Drop image or click to browse</div>
+          <div style="font-size:12px;color:var(--tm);">OCR reads text from photo (10–20 sec)</div>
+        </div>
+        <img id="imgPrev" class="imgprev">
+      </div>
+      <div class="panel" id="panel-text">
+        <textarea class="paste" id="pasteBox" placeholder="Paste newspaper or article text here..."></textarea>
+      </div>
+      <div style="margin-top:14px;display:flex;gap:10px;align-items:center;">
+        <button class="btn btn-p" id="extractBtn" onclick="extract()">🤖 Extract Fields</button>
+        <span style="font-size:12px;color:var(--tm);">Reads actual file content</span>
+      </div>
+    </div>
+
+    <div class="proc" id="procCard">
+      <div class="spin"></div>
+      <div style="font-weight:700;margin-bottom:3px;">Processing...</div>
+      <div style="font-size:12px;opacity:.75;" id="procStatus">Reading content...</div>
+    </div>
+
+    <div class="card" id="fieldsCard" style="display:none;">
+      <div style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:14px;margin-bottom:14px;">📝 Review &amp; Submit</div>
+      <div class="fg">
+        <div><div class="fl">Publication</div><input class="fi" id="f_pub" placeholder="e.g. The Hindu"></div>
+        <div><div class="fl">Edition / Date</div><input class="fi" id="f_ed" placeholder="e.g. June 2025"></div>
+        <div><div class="fl">Author</div><input class="fi" id="f_auth" placeholder="e.g. Rajesh Kumar"></div>
+        <div><div class="fl">Category</div><input class="fi" id="f_cat" placeholder="e.g. National"></div>
+        <div class="fg full"><div class="fl">Headline</div><input class="fi" id="f_hl" placeholder="Headline..."></div>
+        <div class="fg full"><div class="fl">Main Content</div><textarea class="fi" id="f_body" placeholder="Article body..."></textarea></div>
+      </div>
+      <div style="margin-top:14px;display:flex;gap:10px;">
+        <button class="btn btn-s" onclick="submitRecord()">📤 Submit to Admin</button>
+        <button class="btn btn-o" onclick="clearFields()">🗑 Clear</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:14px;margin-bottom:10px;">📋 My Submissions</div>
+      <div id="subList"><div style="font-size:13px;color:var(--tm);">No submissions yet — personal to your account only.</div></div>
+    </div>`;
+}
+
+// ── DATA ENTRY LOGIC ────────────────────────────────────────────────
+if (window.pdfjsLib) pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+let curTab = 'pdf', pdfFile = null, imgFile = null;
+
+function switchTab(t, btn) {
+  curTab = t;
+  document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('panel-' + t).classList.add('active');
+}
+
+function pickFile(e, type) {
+  const f = e.target.files[0]; if (!f) return;
+  if (type === 'pdf') {
+    pdfFile = f;
+    document.getElementById('pdfChip').style.display = 'flex';
+    document.getElementById('pdfChipText').textContent = f.name;
+  } else {
+    imgFile = f;
+    const r = new FileReader();
+    r.onload = ev => { const i = document.getElementById('imgPrev'); i.src = ev.target.result; i.style.display = 'block'; };
+    r.readAsDataURL(f);
+  }
+  toast('📄 ' + f.name + ' loaded!');
+}
+function dropFile(e, type) {
+  e.preventDefault();
+  document.getElementById(type === 'pdf' ? 'pdfZone' : 'imgZone').classList.remove('over');
+  const f = e.dataTransfer.files[0];
+  if (f) pickFile({ target: { files: [f] } }, type);
+}
+
+async function extract() {
+  if (curTab === 'pdf' && !pdfFile) { toast('⚠️ Upload a PDF first'); return; }
+  if (curTab === 'image' && !imgFile) { toast('⚠️ Upload an image first'); return; }
+  if (curTab === 'text' && !document.getElementById('pasteBox').value.trim()) { toast('⚠️ Paste some text first'); return; }
+
+  document.getElementById('procCard').classList.add('show');
+  document.getElementById('fieldsCard').style.display = 'none';
+  document.getElementById('extractBtn').disabled = true;
+
+  try {
+    let text = '';
+    if (curTab === 'text') {
+      text = document.getElementById('pasteBox').value;
+    } else if (curTab === 'pdf') {
+      document.getElementById('procStatus').textContent = 'Reading PDF...';
+      const buf = await pdfFile.arrayBuffer();
+      const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
+      for (let p = 1; p <= pdf.numPages; p++) {
+        const pg = await pdf.getPage(p);
+        const tc = await pg.getTextContent();
+        let ly = null, ln = '';
+        tc.items.forEach(it => {
+          const y = it.transform[5];
+          if (ly !== null && Math.abs(y - ly) > 2) { text += ln.trim() + '\n'; ln = ''; }
+          ln += it.str + ' '; ly = y;
+        });
+        text += ln.trim() + '\n';
+      }
+    } else {
+      document.getElementById('procStatus').textContent = 'Running OCR (10–20 sec)...';
+      const res = await Tesseract.recognize(imgFile, 'eng');
+      text = res.data.text;
+    }
+
+    const lines = text.split('\n').filter(l => l.trim());
+    document.getElementById('f_pub').value = (lines[0] || '').split('|')[0].trim();
+    document.getElementById('f_hl').value = lines[1] || lines[2] || '';
+    let auth = '';
+    lines.forEach(l => { if (l.toLowerCase().startsWith('by')) auth = l.replace(/^by:?\s*/i,'').trim(); });
+    document.getElementById('f_auth').value = auth;
+    const paras = lines.filter(l => l.length > 60);
+    document.getElementById('f_body').value = paras.slice(0, 4).join(' ').substring(0, 500);
+
+    document.getElementById('procCard').classList.remove('show');
+    document.getElementById('fieldsCard').style.display = 'block';
+    document.getElementById('extractBtn').disabled = false;
+    toast('✅ Fields extracted!');
+  } catch(e) {
+    document.getElementById('procCard').classList.remove('show');
+    document.getElementById('extractBtn').disabled = false;
+    toast('⚠️ ' + e.message);
+  }
+}
+
+function submitRecord() {
+  const hl = document.getElementById('f_hl').value.trim();
+  if (!hl) { toast('⚠️ Headline required'); return; }
+  const key = ns('data_entry');
+  const recs = db(key);
+  recs.unshift({
+    id: 'r_' + Date.now(),
+    headline: hl,
+    publication: document.getElementById('f_pub').value,
+    author: document.getElementById('f_auth').value,
+    category: document.getElementById('f_cat').value || 'General',
+    body: document.getElementById('f_body').value,
+    submittedBy: session.name || session.email,
+    submittedByEmployeeId: session.employeeId,
+    status: 'Pending',
+    savedAt: new Date().toLocaleString('en-IN')
+  });
+  save(key, recs);
+  clearFields();
+  renderSubmissions();
+  toast('✅ Submitted to admin!');
+}
+
+function clearFields() {
+  ['f_pub','f_ed','f_auth','f_cat','f_hl','f_body'].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
+  document.getElementById('fieldsCard').style.display = 'none';
+}
+
+function renderSubmissions() {
+  const el = document.getElementById('subList'); if (!el) return;
+  const recs = db(ns('data_entry'));
+  if (!recs.length) {
+    el.innerHTML = '<div style="font-size:13px;color:var(--tm);">No submissions yet — personal to your account only.</div>';
+    return;
+  }
+  el.innerHTML = recs.map(r => `
+    <div class="sub-row">
+      <div>
+        <div style="font-weight:600;">${r.headline}</div>
+        <div style="font-size:11px;color:var(--tm);">${r.publication||'—'} · ${r.savedAt}</div>
+      </div>
+      <span class="pill ${r.status==='Reviewed'?'pill-r':'pill-p'}">${r.status==='Reviewed'?'✅ Reviewed':'⏳ Pending'}</span>
+    </div>`).join('');
+}
+
+// ── TOAST ───────────────────────────────────────────────────────────
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ── LOGOUT ──────────────────────────────────────────────────────────
+function logout() {
+  sessionStorage.removeItem(SESSION_KEY);
+  window.location.href = '../index.html';
+}
+
+// ── INIT ────────────────────────────────────────────────────────────
+switchSection('dashboard');
+</script>
+</body>
+</html>

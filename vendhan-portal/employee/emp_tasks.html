@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Tasks — Vendhan InfoTech</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{--sidebar-w:240px;--topbar-h:64px;--accent:#4f46e5;--accent-light:#eef2ff;--surface:#fff;--bg:#f4f6fb;--border:#e5e7eb;--text-primary:#111827;--text-secondary:#6b7280;--text-muted:#9ca3af;--success:#059669;--success-bg:#ecfdf5;--warning:#d97706;--warning-bg:#fffbeb;--danger:#dc2626;--danger-bg:#fef2f2;--info:#2563eb;--info-bg:#eff6ff;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text-primary);display:flex;min-height:100vh;}
+  .sidebar{width:var(--sidebar-w);background:linear-gradient(180deg,#1e1b4b,#312e81);position:fixed;top:0;left:0;height:100vh;display:flex;flex-direction:column;z-index:100;transition:width .3s;overflow:hidden;}
+  .sidebar.collapsed{width:68px;}
+  .sidebar-logo{padding:20px 18px 16px;display:flex;align-items:center;gap:12px;border-bottom:1px solid rgba(255,255,255,.08);min-height:var(--topbar-h);}
+  .logo-icon{width:36px;height:36px;background:linear-gradient(135deg,#818cf8,#6366f1);border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;color:#fff;flex-shrink:0;}
+  .logo-text{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:14px;color:#fff;white-space:nowrap;}
+  .logo-sub{font-size:10.5px;color:rgba(255,255,255,.4);}
+  .sidebar-nav{flex:1;padding:14px 10px;overflow-y:auto;overflow-x:hidden;}
+  .nav-section-label{font-size:10px;font-weight:600;letter-spacing:.09em;color:rgba(255,255,255,.3);text-transform:uppercase;padding:12px 10px 6px;white-space:nowrap;}
+  .sidebar.collapsed .nav-section-label{opacity:0;}
+  .nav-item{display:flex;align-items:center;gap:11px;padding:10px;border-radius:9px;cursor:pointer;color:rgba(255,255,255,.6);font-size:13.5px;font-weight:500;transition:all .15s;white-space:nowrap;text-decoration:none;margin-bottom:3px;}
+  .nav-item:hover{background:rgba(255,255,255,.08);color:rgba(255,255,255,.95);}
+  .nav-item.active{background:rgba(129,140,248,.25);color:#c7d2fe;border-left:3px solid #818cf8;padding-left:7px;}
+  .nav-icon{font-size:18px;flex-shrink:0;width:20px;text-align:center;}
+  .nav-badge{margin-left:auto;background:#dc2626;color:#fff;font-size:10px;font-weight:700;padding:2px 6px;border-radius:10px;}
+  .sidebar-footer{padding:14px 10px;border-top:1px solid rgba(255,255,255,.08);}
+  .user-card{display:flex;align-items:center;gap:10px;padding:10px;border-radius:9px;background:rgba(255,255,255,.07);overflow:hidden;}
+  .user-avatar-lg{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#818cf8,#6366f1);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;flex-shrink:0;}
+  .user-name{font-size:13px;font-weight:600;color:#fff;white-space:nowrap;}
+  .user-role-s{font-size:11px;color:rgba(255,255,255,.4);}
+  .topbar{position:fixed;top:0;left:var(--sidebar-w);right:0;height:var(--topbar-h);background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:16px;z-index:90;transition:left .3s;}
+  .topbar.collapsed{left:68px;}
+  .toggle-btn{width:36px;height:36px;border-radius:8px;background:none;border:1px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-secondary);font-size:18px;}
+  .page-title{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:17px;}
+  .page-breadcrumb{font-size:12px;color:var(--text-muted);}
+  .topbar-right{margin-left:auto;display:flex;align-items:center;gap:10px;}
+  .topbar-avatar{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#818cf8,#6366f1);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;}
+  .main{margin-left:var(--sidebar-w);margin-top:var(--topbar-h);padding:26px;transition:margin-left .3s;}
+  .main.collapsed{margin-left:68px;}
+  .btn-primary{background:var(--accent);color:#fff;border:none;border-radius:9px;padding:9px 18px;font-size:13.5px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:7px;font-family:'DM Sans',sans-serif;transition:all .15s;}
+  .btn-primary:hover{background:#4338ca;}
+  .btn-outline{background:#fff;color:var(--text-secondary);border:1px solid var(--border);border-radius:9px;padding:9px 16px;font-size:13.5px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;display:inline-flex;align-items:center;gap:7px;}
+  .btn-outline:hover{border-color:var(--accent);color:var(--accent);}
+
+  /* STATS */
+  .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px;}
+  .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px 18px;display:flex;align-items:center;gap:12px;}
+  .stat-icon{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+  .stat-value{font-family:'Plus Jakarta Sans',sans-serif;font-size:22px;font-weight:700;}
+  .stat-label{font-size:12px;color:var(--text-secondary);margin-top:2px;}
+
+  /* PROGRESS BAR */
+  .overall-progress{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px 20px;margin-bottom:22px;display:flex;align-items:center;gap:20px;}
+  .prog-label{font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;font-size:14px;white-space:nowrap;}
+  .prog-bar{flex:1;height:10px;background:var(--bg);border-radius:10px;overflow:hidden;}
+  .prog-fill{height:100%;border-radius:10px;background:linear-gradient(90deg,#4f46e5,#818cf8);transition:width 1s ease;}
+  .prog-pct{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:16px;color:var(--accent);white-space:nowrap;}
+
+  /* KANBAN */
+  .kanban{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+  .kanban-col{background:var(--bg);border-radius:14px;padding:16px;min-height:400px;}
+  .kanban-col-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+  .col-title{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:14px;display:flex;align-items:center;gap:8px;}
+  .col-count{background:var(--surface);border:1px solid var(--border);color:var(--text-secondary);font-size:12px;font-weight:600;padding:2px 8px;border-radius:20px;}
+  .task-card{background:var(--surface);border:1px solid var(--border);border-radius:11px;padding:14px;margin-bottom:10px;cursor:pointer;transition:all .2s;position:relative;}
+  .task-card:hover{box-shadow:0 4px 16px rgba(0,0,0,.08);transform:translateY(-1px);}
+  .task-card.dragging{opacity:.5;}
+  .task-priority-bar{position:absolute;left:0;top:0;bottom:0;width:4px;border-radius:11px 0 0 11px;}
+  .task-title{font-size:13.5px;font-weight:600;margin-bottom:6px;padding-left:8px;}
+  .task-desc{font-size:12px;color:var(--text-secondary);margin-bottom:10px;padding-left:8px;line-height:1.5;}
+  .task-footer{display:flex;align-items:center;justify-content:space-between;padding-left:8px;}
+  .task-due{font-size:11.5px;color:var(--text-muted);display:flex;align-items:center;gap:4px;}
+  .task-due.overdue{color:var(--danger);font-weight:600;}
+  .task-tag{font-size:11px;font-weight:600;padding:2px 8px;border-radius:5px;}
+  .move-btn{font-size:11px;padding:4px 9px;border-radius:6px;border:1px solid var(--border);background:none;cursor:pointer;color:var(--text-secondary);transition:all .15s;margin-top:8px;display:inline-flex;align-items:center;gap:4px;}
+  .move-btn:hover{border-color:var(--accent);color:var(--accent);}
+
+  /* MODAL */
+  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:500;display:none;align-items:center;justify-content:center;}
+  .modal-overlay.open{display:flex;}
+  .modal{background:#fff;border-radius:18px;width:480px;max-width:95vw;max-height:90vh;overflow-y:auto;box-shadow:0 24px 64px rgba(0,0,0,.18);animation:modalIn .25s ease;}
+  @keyframes modalIn{from{opacity:0;transform:scale(.95);}to{opacity:1;transform:scale(1);}}
+  .modal-header{padding:20px 24px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+  .modal-title{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:17px;}
+  .modal-close{width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:none;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;}
+  .modal-close:hover{background:var(--danger-bg);color:var(--danger);}
+  .modal-body{padding:22px 24px;}
+  .modal-footer{padding:14px 24px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px;}
+  .info-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--bg);font-size:13.5px;}
+  .info-row:last-child{border-bottom:none;}
+  .info-label{color:var(--text-muted);font-size:13px;}
+  .info-value{font-weight:500;}
+
+  .toast{position:fixed;bottom:28px;right:28px;background:#0f172a;color:#fff;padding:13px 20px;border-radius:12px;font-size:13.5px;font-weight:500;z-index:600;display:flex;align-items:center;gap:10px;box-shadow:0 8px 24px rgba(0,0,0,.2);transform:translateY(80px);opacity:0;transition:all .3s ease;}
+  .toast.show{transform:translateY(0);opacity:1;}
+  ::-webkit-scrollbar{width:5px;}
+  ::-webkit-scrollbar-thumb{background:var(--border);border-radius:10px;}
+</style>
+</head>
+<body>
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">V</div>
+    <div><div class="logo-text">Vendhan InfoTech</div><div class="logo-sub">Employee Portal</div></div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">My Workspace</div>
+    <a href="emp_dashboard.html" class="nav-item"><span class="nav-icon">⊞</span> Dashboard</a>
+    <a href="emp_attendance.html" class="nav-item"><span class="nav-icon">🕐</span> My Attendance</a>
+    <a href="emp_leave.html" class="nav-item"><span class="nav-icon">📅</span> My Leave<span class="nav-badge">1</span></a>
+    <a href="emp_salary.html" class="nav-item"><span class="nav-icon">💰</span> My Salary</a>
+    <a href="emp_tasks.html" class="nav-item active"><span class="nav-icon">✅</span> My Tasks<span class="nav-badge">3</span></a>
+ <div class="nav-section-label">Automation</div>
+    <a href="emp_data_entry.html" class="nav-item"><span class="nav-icon">🤖</span> Data Entry Task</a>
+    <div class="nav-section-label">Communication</div>
+    <a href="emp_chat.html" class="nav-item"><span class="nav-icon">💬</span> Chat<span class="nav-badge">2</span></a>
+    <a href="emp_notifications.html" class="nav-item"><span class="nav-icon">🔔</span> Notifications</a>
+    <div class="nav-section-label">Account</div>
+    <a href="emp_profile.html" class="nav-item"><span class="nav-icon">👤</span> My Profile</a>
+    <a href="emp_settings.html" class="nav-item"><span class="nav-icon">⚙️</span> Settings</a>
+    <a href="../index.html" class="nav-item"><span class="nav-icon">🚪</span> Logout</a>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="user-card">
+      <div class="user-avatar-lg">AK</div>
+      <div><div class="user-name">Arjun Kumar</div><div class="user-role-s">Senior Developer</div></div>
+    </div>
+  </div>
+</aside>
+
+<header class="topbar" id="topbar">
+  <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
+  <div><div class="page-title">My Tasks</div><div class="page-breadcrumb">Employee Portal › Tasks</div></div>
+  <div class="topbar-right"><div class="topbar-avatar">AK</div></div>
+</header>
+<main class="main" id="mainContent">
+
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-icon" style="background:var(--accent-light);color:var(--accent);">📋</div>
+      <div><div class="stat-value" id="todoCount">0</div><div class="stat-label">To Do</div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background:var(--warning-bg);color:var(--warning);">⚡</div>
+      <div><div class="stat-value" id="inProgressCount">0</div><div class="stat-label">In Progress</div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background:var(--success-bg);color:var(--success);">✅</div>
+      <div><div class="stat-value" id="doneCount">0</div><div class="stat-label">Completed</div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background:var(--danger-bg);color:var(--danger);">🔥</div>
+      <div><div class="stat-value" id="overdueCount">0</div><div class="stat-label">Overdue</div></div>
+    </div>
+  </div>
+
+  <div class="overall-progress">
+    <div class="prog-label">Overall Progress</div>
+    <div class="prog-bar"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+    <div class="prog-pct" id="progPct">0%</div>
+    <div style="font-size:12px;color:var(--text-muted);white-space:nowrap;" id="progLabel"></div>
+  </div>
+
+  <div class="kanban">
+    <div class="kanban-col" id="col-todo">
+      <div class="kanban-col-header">
+        <div class="col-title"><span style="width:10px;height:10px;background:#6366f1;border-radius:50%;display:inline-block;"></span>To Do</div>
+        <span class="col-count" id="badge-todo">0</span>
+      </div>
+      <div id="tasks-todo"></div>
+    </div>
+    <div class="kanban-col" id="col-progress">
+      <div class="kanban-col-header">
+        <div class="col-title"><span style="width:10px;height:10px;background:#d97706;border-radius:50%;display:inline-block;"></span>In Progress</div>
+        <span class="col-count" id="badge-progress">0</span>
+      </div>
+      <div id="tasks-progress"></div>
+    </div>
+    <div class="kanban-col" id="col-done">
+      <div class="kanban-col-header">
+        <div class="col-title"><span style="width:10px;height:10px;background:#059669;border-radius:50%;display:inline-block;"></span>Done</div>
+        <span class="col-count" id="badge-done">0</span>
+      </div>
+      <div id="tasks-done"></div>
+    </div>
+  </div>
+</main>
+
+<!-- TASK DETAIL MODAL -->
+<div class="modal-overlay" id="taskModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div><div class="modal-title" id="taskModalTitle"></div></div>
+      <button class="modal-close" onclick="closeTaskModal()">✕</button>
+    </div>
+    <div class="modal-body" id="taskModalBody"></div>
+    <div class="modal-footer">
+      <button class="btn-outline" onclick="closeTaskModal()">Close</button>
+      <button class="btn-primary" id="taskModalAction" onclick="moveTaskFromModal()">→ Move to Next</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script>
+let tasks = [
+  {id:1,title:'API Integration — Payment Gateway',desc:'Integrate Razorpay payment gateway into the checkout flow. Include webhook handling and error states.',col:'todo',priority:'high',due:'2025-06-18',tag:'Backend',assignedBy:'Vikram Nair'},
+  {id:2,title:'Dashboard UI Fixes — Sprint 4',desc:'Fix responsive issues on the admin dashboard. Update chart colours per new design system.',col:'progress',priority:'medium',due:'2025-06-22',tag:'Frontend',assignedBy:'Priya Sharma'},
+  {id:3,title:'Write Unit Tests for Auth Module',desc:'Achieve 80% test coverage for the authentication module. Use Jest framework.',col:'todo',priority:'low',due:'2025-06-28',tag:'Testing',assignedBy:'Vikram Nair'},
+  {id:4,title:'Code Review — User Management PR',desc:'Review pull request #47 for the user management module and provide feedback.',col:'progress',priority:'medium',due:'2025-06-15',tag:'Review',assignedBy:'Karthik Raj'},
+  {id:5,title:'Database Optimisation — Reports',desc:'Optimise slow queries in the reports module. Target: reduce load time by 40%.',col:'todo',priority:'high',due:'2025-06-20',tag:'Backend',assignedBy:'Vikram Nair'},
+  {id:6,title:'Setup CI/CD Pipeline',desc:'Configure GitHub Actions for automated testing and deployment to staging.',col:'done',priority:'high',due:'2025-06-10',tag:'DevOps',assignedBy:'Karthik Raj'},
+  {id:7,title:'Update API Documentation',desc:'Document all new endpoints added in Sprint 3 using Swagger.',col:'done',priority:'low',due:'2025-06-08',tag:'Docs',assignedBy:'Priya Sharma'},
+  {id:8,title:'Fix Login Bug — Safari Browser',desc:'Login form not submitting on Safari v16. Debug and patch the issue.',col:'done',priority:'high',due:'2025-06-05',tag:'Bug Fix',assignedBy:'Vikram Nair'},
+];
+
+const priorityColor={high:'#dc2626',medium:'#d97706',low:'#059669'};
+const tagColor={'Backend':'#eef2ff','Frontend':'#eff6ff','Testing':'#ecfdf5','Review':'#fffbeb','DevOps':'#f5f3ff','Docs':'#f3f4f6','Bug Fix':'#fef2f2'};
+const tagTextColor={'Backend':'#6366f1','Frontend':'#2563eb','Testing':'#059669','Review':'#d97706','DevOps':'#7c3aed','Docs':'#6b7280','Bug Fix':'#dc2626'};
+
+let currentTaskId = null;
+
+function isOverdue(due,col){
+  return col!=='done' && new Date(due) < new Date();
+}
+
+function renderKanban(){
+  ['todo','progress','done'].forEach(col=>{
+    const colTasks = tasks.filter(t=>t.col===col);
+    const colId = col==='progress'?'progress':col;
+    document.getElementById('tasks-'+colId).innerHTML = colTasks.map(t=>{
+      const overdue = isOverdue(t.due,t.col);
+      const nextLabel = col==='todo'?'→ Start':col==='progress'?'✓ Complete':'';
+      return `<div class="task-card" onclick="openTaskModal(${t.id})">
+        <div class="task-priority-bar" style="background:${priorityColor[t.priority]};"></div>
+        <div class="task-title">${t.title}</div>
+        <div class="task-desc">${t.desc.substring(0,70)}...</div>
+        <div class="task-footer">
+          <div class="task-due ${overdue?'overdue':''}">📅 ${new Date(t.due).toLocaleDateString('en-IN',{day:'2-digit',month:'short'})}</div>
+          <span class="task-tag" style="background:${tagColor[t.tag]||'#f3f4f6'};color:${tagTextColor[t.tag]||'#6b7280'};">${t.tag}</span>
+        </div>
+        ${col!=='done'?`<button class="move-btn" onclick="event.stopPropagation();moveTask(${t.id})">${nextLabel}</button>`:''}
+      </div>`;
+    }).join('');
+    document.getElementById('badge-'+colId).textContent = colTasks.length;
+  });
+  updateStats();
+}
+
+function updateStats(){
+  const todo     = tasks.filter(t=>t.col==='todo').length;
+  const progress = tasks.filter(t=>t.col==='progress').length;
+  const done     = tasks.filter(t=>t.col==='done').length;
+  const overdue  = tasks.filter(t=>isOverdue(t.due,t.col)).length;
+  const total    = tasks.length;
+  const pct      = Math.round((done/total)*100);
+  document.getElementById('todoCount').textContent     = todo;
+  document.getElementById('inProgressCount').textContent = progress;
+  document.getElementById('doneCount').textContent     = done;
+  document.getElementById('overdueCount').textContent  = overdue;
+  document.getElementById('progFill').style.width      = pct+'%';
+  document.getElementById('progPct').textContent       = pct+'%';
+  document.getElementById('progLabel').textContent     = `${done} of ${total} tasks completed`;
+}
+
+function moveTask(id){
+  const t = tasks.find(x=>x.id===id);
+  if(!t) return;
+  if(t.col==='todo')      { t.col='progress'; showToast('⚡ Task moved to In Progress!'); }
+  else if(t.col==='progress'){ t.col='done';  showToast('✅ Task marked as Done!'); }
+  renderKanban();
+}
+
+function openTaskModal(id){
+  const t = tasks.find(x=>x.id===id);
+  if(!t) return;
+  currentTaskId = id;
+  document.getElementById('taskModalTitle').textContent = t.title;
+  const overdue = isOverdue(t.due,t.col);
+  document.getElementById('taskModalBody').innerHTML = `
+    <div style="margin-bottom:14px;display:flex;gap:8px;flex-wrap:wrap;">
+      <span style="background:${tagColor[t.tag]||'#f3f4f6'};color:${tagTextColor[t.tag]||'#6b7280'};font-size:12px;font-weight:600;padding:3px 10px;border-radius:6px;">${t.tag}</span>
+      <span style="background:${t.priority==='high'?'#fef2f2':t.priority==='medium'?'#fffbeb':'#ecfdf5'};color:${priorityColor[t.priority]};font-size:12px;font-weight:600;padding:3px 10px;border-radius:6px;">${t.priority.charAt(0).toUpperCase()+t.priority.slice(1)} Priority</span>
+      ${overdue?'<span style="background:#fef2f2;color:#dc2626;font-size:12px;font-weight:600;padding:3px 10px;border-radius:6px;">⚠️ Overdue</span>':''}
+    </div>
+    <div style="font-size:13.5px;color:var(--text-secondary);line-height:1.6;background:var(--bg);border-radius:9px;padding:12px 14px;margin-bottom:16px;">${t.desc}</div>
+    <div class="info-row"><span class="info-label">Status</span><span class="info-value">${t.col==='todo'?'To Do':t.col==='progress'?'In Progress':'Done'}</span></div>
+    <div class="info-row"><span class="info-label">Due Date</span><span class="info-value ${overdue?'':''}" style="color:${overdue?'#dc2626':''};">${new Date(t.due).toLocaleDateString('en-IN',{weekday:'short',day:'2-digit',month:'long',year:'numeric'})}</span></div>
+    <div class="info-row"><span class="info-label">Assigned By</span><span class="info-value">${t.assignedBy}</span></div>
+  `;
+  const actionBtn = document.getElementById('taskModalAction');
+  if(t.col==='done'){ actionBtn.style.display='none'; }
+  else { actionBtn.style.display=''; actionBtn.textContent=t.col==='todo'?'⚡ Start Task':'✅ Mark Done'; }
+  document.getElementById('taskModal').classList.add('open');
+}
+function closeTaskModal(){ document.getElementById('taskModal').classList.remove('open'); }
+function moveTaskFromModal(){
+  if(currentTaskId){ moveTask(currentTaskId); closeTaskModal(); }
+}
+
+function toggleSidebar(){document.getElementById('sidebar').classList.toggle('collapsed');document.getElementById('topbar').classList.toggle('collapsed');document.getElementById('mainContent').classList.toggle('collapsed');}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3500);}
+
+renderKanban();
+</script>
+</body>
+</html>

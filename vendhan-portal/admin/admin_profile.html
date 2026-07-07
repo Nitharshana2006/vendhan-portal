@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Profile — Admin | Vendhan InfoTech</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{--sidebar-w:260px;--topbar-h:64px;--accent:#4f46e5;--accent-light:#eef2ff;--surface:#fff;--bg:#f4f6fb;--border:#e5e7eb;--text-primary:#111827;--text-secondary:#6b7280;--text-muted:#9ca3af;--success:#059669;--success-bg:#ecfdf5;--danger:#dc2626;--danger-bg:#fef2f2;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text-primary);display:flex;min-height:100vh;}
+
+  /* SIDEBAR */
+  .sidebar { width:var(--sidebar-w); background:#0f172a; position:fixed; top:0; left:0; height:100vh; display:flex; flex-direction:column; z-index:100; transition:width 0.3s; overflow:hidden; }
+  .sidebar.collapsed { width:68px; }
+  .sidebar-logo { padding:20px 20px 16px; display:flex; align-items:center; gap:12px; border-bottom:1px solid rgba(255,255,255,0.06); min-height:var(--topbar-h); }
+  .logo-icon { width:36px; height:36px; background:linear-gradient(135deg,#6366f1,#4f46e5); border-radius:10px; display:flex; align-items:center; justify-content:center; font-family:'Plus Jakarta Sans',sans-serif; font-weight:700; font-size:16px; color:white; flex-shrink:0; }
+  .logo-text { font-family:'Plus Jakarta Sans',sans-serif; font-weight:700; font-size:15px; color:white; white-space:nowrap; }
+  .logo-sub { font-size:11px; color:rgba(255,255,255,0.4); }
+  .sidebar-nav { flex:1; padding:12px 10px; overflow-y:auto; overflow-x:hidden; }
+  .nav-section-label { font-size:10px; font-weight:600; letter-spacing:0.08em; color:rgba(255,255,255,0.25); text-transform:uppercase; padding:12px 10px 6px; white-space:nowrap; transition:opacity 0.2s; }
+  .sidebar.collapsed .nav-section-label { opacity:0; }
+  .nav-item { display:flex; align-items:center; gap:12px; padding:10px 10px; border-radius:8px; cursor:pointer; color:rgba(255,255,255,0.55); font-size:13.5px; font-weight:500; transition:all 0.15s; white-space:nowrap; text-decoration:none; margin-bottom:2px; }
+  .nav-item:hover { background:rgba(255,255,255,0.07); color:rgba(255,255,255,0.9); }
+  .nav-item.active { background:rgba(99,102,241,0.18); color:#a5b4fc; }
+  .nav-icon { font-size:18px; flex-shrink:0; width:20px; text-align:center; }
+  .nav-badge { margin-left:auto; background:#dc2626; color:white; font-size:10px; font-weight:700; padding:2px 6px; border-radius:10px; flex-shrink:0; }
+  .sidebar-footer { padding:12px 10px; border-top:1px solid rgba(255,255,255,0.06); }
+  .user-card { display:flex; align-items:center; gap:10px; padding:10px; border-radius:8px; background:rgba(255,255,255,0.05); cursor:pointer; overflow:hidden; }
+  .user-avatar { width:32px; height:32px; border-radius:50%; background:linear-gradient(135deg,#6366f1,#8b5cf6); display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; color:white; flex-shrink:0; }
+  .user-name { font-size:13px; font-weight:600; color:white; white-space:nowrap; }
+  .user-role { font-size:11px; color:rgba(255,255,255,0.4); }
+  .topbar{position:fixed;top:0;left:var(--sidebar-w);right:0;height:var(--topbar-h);background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:16px;z-index:90;transition:left .3s;}
+  .topbar.collapsed{left:68px;}
+  .toggle-btn{width:36px;height:36px;border-radius:8px;background:none;border:1px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-secondary);font-size:18px;}
+  .page-title{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:17px;}
+  .page-breadcrumb{font-size:12px;color:var(--text-muted);}
+  .topbar-right{margin-left:auto;display:flex;align-items:center;gap:8px;}
+  .topbar-avatar{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;cursor:pointer;}
+  .main{margin-left:var(--sidebar-w);margin-top:var(--topbar-h);padding:28px;transition:margin-left .3s;}
+  .main.collapsed{margin-left:68px;}
+  .btn-primary{background:var(--accent);color:#fff;border:none;border-radius:9px;padding:9px 18px;font-size:13.5px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:7px;font-family:'DM Sans',sans-serif;transition:all .15s;}
+  .btn-primary:hover{background:#4338ca;}
+  .btn-outline{background:#fff;color:var(--text-secondary);border:1px solid var(--border);border-radius:9px;padding:9px 16px;font-size:13.5px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;display:inline-flex;align-items:center;gap:7px;}
+  .btn-outline:hover{border-color:var(--accent);color:var(--accent);}
+  .profile-layout{display:grid;grid-template-columns:280px 1fr;gap:20px;}
+  .profile-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px 22px;text-align:center;height:fit-content;}
+  .profile-avatar{width:88px;height:88px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#4f46e5);display:flex;align-items:center;justify-content:center;font-family:'Plus Jakarta Sans',sans-serif;font-size:30px;font-weight:700;color:#fff;margin:0 auto 16px;position:relative;}
+  .avatar-edit{position:absolute;bottom:0;right:0;width:28px;height:28px;background:var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;cursor:pointer;border:2px solid #fff;}
+  .profile-name{font-family:'Plus Jakarta Sans',sans-serif;font-size:19px;font-weight:700;margin-bottom:4px;}
+  .profile-role-text{font-size:13px;color:var(--text-secondary);margin-bottom:4px;}
+  .profile-id{font-size:12px;color:var(--text-muted);background:var(--bg);border-radius:6px;padding:3px 10px;display:inline-block;margin-bottom:14px;}
+  .profile-badge{display:inline-flex;align-items:center;gap:6px;background:var(--success-bg);color:var(--success);font-size:12px;font-weight:600;padding:5px 12px;border-radius:20px;margin-bottom:18px;}
+  .divider{height:1px;background:var(--border);margin:14px 0;}
+  .stat-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--bg);font-size:13px;}
+  .stat-row:last-child{border-bottom:none;}
+  .stat-label{color:var(--text-muted);}
+  .stat-val{font-weight:600;}
+  .right-col{display:flex;flex-direction:column;gap:16px;}
+  .info-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px;}
+  .info-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}
+  .info-card-title{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:15px;}
+  .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .field-wrap{display:flex;flex-direction:column;gap:5px;}
+  .field-label{font-size:11.5px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.05em;}
+  .field-input{height:40px;border:1px solid var(--border);border-radius:9px;padding:0 14px;font-size:13.5px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .15s;background:#fff;}
+  .field-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(99,102,241,.1);}
+  .field-input:disabled{background:var(--bg);color:var(--text-secondary);}
+  .pwd-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+  .toast{position:fixed;bottom:28px;right:28px;background:#0f172a;color:#fff;padding:13px 20px;border-radius:12px;font-size:13.5px;font-weight:500;z-index:600;display:flex;align-items:center;gap:10px;box-shadow:0 8px 24px rgba(0,0,0,.2);transform:translateY(80px);opacity:0;transition:all .3s ease;}
+  .toast.show{transform:translateY(0);opacity:1;}
+  ::-webkit-scrollbar{width:5px;}
+  ::-webkit-scrollbar-thumb{background:var(--border);border-radius:10px;}
+</style>
+</head>
+<body>
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo"><div class="logo-icon">V</div><div><div class="logo-text">Vendhan InfoTech</div><div class="logo-sub">Admin Portal</div></div></div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Main</div>
+    <a href="dashboard.html" class="nav-item"><span class="nav-icon">⊞</span> Dashboard</a>
+    <a href="employees.html" class="nav-item"><span class="nav-icon">👥</span> Employee Management</a>
+    <a href="attendance.html" class="nav-item"><span class="nav-icon">🕐</span> Attendance</a>
+    <a href="leave.html" class="nav-item"><span class="nav-icon">📅</span> Leave Management<span class="nav-badge">7</span></a>
+    <a href="payroll.html" class="nav-item"><span class="nav-icon">💰</span> Payroll</a>
+    <div class="nav-section-label">Analytics</div>
+    <a href="reports.html" class="nav-item"><span class="nav-icon">📊</span> Reports &amp; Analytics</a>
+    <a href="projects.html" class="nav-item"><span class="nav-icon">📁</span> Projects &amp; Tasks</a>
+    <a href="departments.html" class="nav-item"><span class="nav-icon">🏢</span> Departments</a>
+    <div class="nav-section-label">Automation</div>
+    <a href="data_entry.html" class="nav-item"><span class="nav-icon">🤖</span> Data Entry Automation</a>
+    <div class="nav-section-label">Communication</div>
+    <a href="chat.html" class="nav-item"><span class="nav-icon">💬</span> Chat System<span class="nav-badge">3</span></a>
+    <a href="notifications.html" class="nav-item"><span class="nav-icon">🔔</span> Notifications</a>
+    <div class="nav-section-label">System</div>
+    <a href="settings.html" class="nav-item"><span class="nav-icon">⚙️</span> Settings</a>
+    <a href="security.html" class="nav-item"><span class="nav-icon">🔒</span> Security</a>
+    <a href="logs.html" class="nav-item"><span class="nav-icon">📋</span> Activity Logs</a>
+    <a href="admin_profile.html" class="nav-item active"><span class="nav-icon">👤</span> My Profile</a>
+    <a href="../index.html" class="nav-item"><span class="nav-icon">🚪</span> Logout</a>
+  </nav>
+  <div class="sidebar-footer"><div class="user-card" onclick="window.location.href='admin_profile.html'"><div class="user-avatar">A</div><div><div class="user-name">Admin User</div><div class="user-role-s">Super Administrator</div></div></div></div>
+</aside>
+<header class="topbar" id="topbar">
+  <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
+  <div><div class="page-title">My Profile</div><div class="page-breadcrumb">Admin Portal › My Profile</div></div>
+  <div class="topbar-right"><div class="topbar-avatar">A</div></div>
+</header>
+<main class="main" id="mainContent">
+  <div class="profile-layout">
+    <div>
+      <div class="profile-card">
+        <div class="profile-avatar">A<div class="avatar-edit" onclick="showToast('📷 Photo upload coming soon!')">✏️</div></div>
+        <div class="profile-name">Admin User</div>
+        <div class="profile-role-text">Super Administrator</div>
+        <div class="profile-id">ID: ADMIN-001</div>
+        <div class="profile-badge">🟢 Active</div>
+        <div class="divider"></div>
+        <div class="stat-row"><span class="stat-label">Role</span><span class="stat-val">Super Admin</span></div>
+        <div class="stat-row"><span class="stat-label">Department</span><span class="stat-val">Management</span></div>
+        <div class="stat-row"><span class="stat-label">Joined</span><span class="stat-val">Jan 1, 2023</span></div>
+        <div class="stat-row"><span class="stat-label">Last Login</span><span class="stat-val">Today 9:01 AM</span></div>
+        <div class="stat-row"><span class="stat-label">Employees</span><span class="stat-val">124 managed</span></div>
+        <div class="divider"></div>
+        <button class="btn-outline" style="width:100%;justify-content:center;" onclick="showToast('📥 Profile exported!')">📥 Export Profile</button>
+      </div>
+    </div>
+    <div class="right-col">
+      <div class="info-card">
+        <div class="info-card-header">
+          <div class="info-card-title">👤 Personal Information</div>
+          <button class="btn-outline" style="font-size:12px;padding:6px 14px;" onclick="toggleEdit('personal',this)">✏️ Edit</button>
+        </div>
+        <div class="info-grid">
+          <div class="field-wrap"><div class="field-label">First Name</div><input class="field-input" id="p_fname" value="Admin" disabled></div>
+          <div class="field-wrap"><div class="field-label">Last Name</div><input class="field-input" id="p_lname" value="User" disabled></div>
+          <div class="field-wrap"><div class="field-label">Email Address</div><input class="field-input" id="p_email" value="admin@vendhan.com" disabled></div>
+          <div class="field-wrap"><div class="field-label">Phone Number</div><input class="field-input" id="p_phone" value="9876543200" disabled></div>
+          <div class="field-wrap"><div class="field-label">Date of Birth</div><input class="field-input" type="date" id="p_dob" value="1990-01-15" disabled></div>
+          <div class="field-wrap"><div class="field-label">Gender</div><input class="field-input" id="p_gender" value="Male" disabled></div>
+          <div class="field-wrap" style="grid-column:1/-1;"><div class="field-label">Address</div><input class="field-input" id="p_addr" value="Vendhan InfoTech HQ, Coimbatore - 641001, Tamil Nadu" disabled></div>
+        </div>
+        <div id="personalSave" style="display:none;margin-top:14px;"><button class="btn-primary" onclick="saveEdit('personal')">✓ Save Changes</button></div>
+      </div>
+      <div class="info-card">
+        <div class="info-card-header"><div class="info-card-title">💼 Admin Access Details</div></div>
+        <div class="info-grid">
+          <div class="field-wrap"><div class="field-label">Admin ID</div><div style="font-size:13.5px;font-weight:500;padding:10px 0;">ADMIN-001</div></div>
+          <div class="field-wrap"><div class="field-label">Access Level</div><div style="font-size:13.5px;font-weight:500;padding:10px 0;">Super Administrator</div></div>
+          <div class="field-wrap"><div class="field-label">Permissions</div><div style="font-size:13.5px;font-weight:500;padding:10px 0;">Full Access</div></div>
+          <div class="field-wrap"><div class="field-label">Account Status</div><div style="padding:10px 0;"><span style="background:var(--success-bg);color:var(--success);font-size:12px;font-weight:600;padding:3px 10px;border-radius:6px;">🟢 Active</span></div></div>
+          <div class="field-wrap"><div class="field-label">2FA Status</div><div style="padding:10px 0;"><span style="background:var(--success-bg);color:var(--success);font-size:12px;font-weight:600;padding:3px 10px;border-radius:6px;">✅ Enabled</span></div></div>
+          <div class="field-wrap"><div class="field-label">Last Password Change</div><div style="font-size:13.5px;font-weight:500;padding:10px 0;">Jun 11, 2025</div></div>
+        </div>
+      </div>
+      <div class="info-card">
+        <div class="info-card-header"><div class="info-card-title">🔒 Change Password</div></div>
+        <div class="pwd-grid">
+          <div class="field-wrap"><div class="field-label">Current Password</div><input class="field-input" type="password" id="cp" placeholder="••••••••"></div>
+          <div class="field-wrap"><div class="field-label">New Password</div><input class="field-input" type="password" id="np" placeholder="Min 8 chars"></div>
+          <div class="field-wrap"><div class="field-label">Confirm Password</div><input class="field-input" type="password" id="cnp" placeholder="Re-enter"></div>
+        </div>
+        <button class="btn-primary" style="margin-top:14px;" onclick="changePwd()">🔒 Update Password</button>
+      </div>
+    </div>
+  </div>
+</main>
+<div class="toast" id="toast"></div>
+<script>
+function toggleEdit(sec,btn){
+  const fields={personal:['p_fname','p_lname','p_email','p_phone','p_dob','p_gender','p_addr']};
+  const ids=fields[sec];
+  const isDisabled=document.getElementById(ids[0]).disabled;
+  ids.forEach(id=>document.getElementById(id).disabled=!isDisabled);
+  document.getElementById(sec+'Save').style.display=isDisabled?'block':'none';
+  btn.textContent=isDisabled?'✕ Cancel':'✏️ Edit';
+  if(!isDisabled) showToast('✏️ Edit mode enabled');
+}
+function saveEdit(sec){
+  const fields={personal:['p_fname','p_lname','p_email','p_phone','p_dob','p_gender','p_addr']};
+  fields[sec].forEach(id=>document.getElementById(id).disabled=true);
+  document.getElementById(sec+'Save').style.display='none';
+  showToast('✅ Profile updated successfully!');
+}
+function changePwd(){
+  const cp=document.getElementById('cp').value;
+  const np=document.getElementById('np').value;
+  const cnp=document.getElementById('cnp').value;
+  if(!cp||!np||!cnp){showToast('⚠️ Please fill all password fields');return;}
+  if(np!==cnp){showToast('⚠️ New passwords do not match');return;}
+  if(np.length<8){showToast('⚠️ Password must be at least 8 characters');return;}
+  document.getElementById('cp').value='';document.getElementById('np').value='';document.getElementById('cnp').value='';
+  showToast('✅ Password updated successfully!');
+}
+function toggleSidebar(){document.getElementById('sidebar').classList.toggle('collapsed');document.getElementById('topbar').classList.toggle('collapsed');document.getElementById('mainContent').classList.toggle('collapsed');}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3500);}
+</script>
+</body>
+</html>
