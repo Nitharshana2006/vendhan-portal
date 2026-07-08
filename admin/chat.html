@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+E html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -10,25 +10,27 @@
   :root{--sidebar-w:260px;--topbar-h:64px;--accent:#4f46e5;--accent-light:#eef2ff;--surface:#fff;--bg:#f4f6fb;--border:#e5e7eb;--text-primary:#111827;--text-secondary:#6b7280;--text-muted:#9ca3af;--success:#059669;--success-bg:#ecfdf5;--danger:#dc2626;}
   *{margin:0;padding:0;box-sizing:border-box;}
   body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text-primary);display:flex;min-height:100vh;}
-  .sidebar{width:var(--sidebar-w);background:#0f172a;position:fixed;top:0;left:0;height:100vh;display:flex;flex-direction:column;z-index:100;transition:width .3s;overflow:hidden;}
-  .sidebar.collapsed{width:68px;}
-  .sidebar-logo{padding:20px 20px 16px;display:flex;align-items:center;gap:12px;border-bottom:1px solid rgba(255,255,255,.06);min-height:var(--topbar-h);}
-  .logo-icon{width:36px;height:36px;background:linear-gradient(135deg,#6366f1,#4f46e5);border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;color:#fff;flex-shrink:0;}
-  .logo-text{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:15px;color:#fff;white-space:nowrap;}
-  .logo-sub{font-size:11px;color:rgba(255,255,255,.4);}
-  .sidebar-nav{flex:1;padding:12px 10px;overflow-y:auto;overflow-x:hidden;}
-  .nav-section-label{font-size:10px;font-weight:600;letter-spacing:.08em;color:rgba(255,255,255,.25);text-transform:uppercase;padding:12px 10px 6px;white-space:nowrap;}
-  .sidebar.collapsed .nav-section-label{opacity:0;}
-  .nav-item{display:flex;align-items:center;gap:12px;padding:10px;border-radius:8px;cursor:pointer;color:rgba(255,255,255,.55);font-size:13.5px;font-weight:500;transition:all .15s;white-space:nowrap;text-decoration:none;margin-bottom:2px;}
-  .nav-item:hover{background:rgba(255,255,255,.07);color:rgba(255,255,255,.9);}
-  .nav-item.active{background:rgba(99,102,241,.18);color:#a5b4fc;}
-  .nav-icon{font-size:18px;flex-shrink:0;width:20px;text-align:center;}
-  .nav-badge{margin-left:auto;background:#dc2626;color:#fff;font-size:10px;font-weight:700;padding:2px 6px;border-radius:10px;}
-  .sidebar-footer{padding:12px 10px;border-top:1px solid rgba(255,255,255,.06);}
-  .user-card{display:flex;align-items:center;gap:10px;padding:10px;border-radius:8px;background:rgba(255,255,255,.05);overflow:hidden;}
-  .user-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0;}
-  .user-name{font-size:13px;font-weight:600;color:#fff;white-space:nowrap;}
-  .user-role{font-size:11px;color:rgba(255,255,255,.4);}
+  
+  /* SIDEBAR */
+  .sidebar { width:var(--sidebar-w); background:#0f172a; position:fixed; top:0; left:0; height:100vh; display:flex; flex-direction:column; z-index:100; transition:width 0.3s; overflow:hidden; }
+  .sidebar.collapsed { width:68px; }
+  .sidebar-logo { padding:20px 20px 16px; display:flex; align-items:center; gap:12px; border-bottom:1px solid rgba(255,255,255,0.06); min-height:var(--topbar-h); }
+  .logo-icon { width:36px; height:36px; background:linear-gradient(135deg,#6366f1,#4f46e5); border-radius:10px; display:flex; align-items:center; justify-content:center; font-family:'Plus Jakarta Sans',sans-serif; font-weight:700; font-size:16px; color:white; flex-shrink:0; }
+  .logo-text { font-family:'Plus Jakarta Sans',sans-serif; font-weight:700; font-size:15px; color:white; white-space:nowrap; }
+  .logo-sub { font-size:11px; color:rgba(255,255,255,0.4); }
+  .sidebar-nav { flex:1; padding:12px 10px; overflow-y:auto; overflow-x:hidden; }
+  .nav-section-label { font-size:10px; font-weight:600; letter-spacing:0.08em; color:rgba(255,255,255,0.25); text-transform:uppercase; padding:12px 10px 6px; white-space:nowrap; transition:opacity 0.2s; }
+  .sidebar.collapsed .nav-section-label { opacity:0; }
+  .nav-item { display:flex; align-items:center; gap:12px; padding:10px 10px; border-radius:8px; cursor:pointer; color:rgba(255,255,255,0.55); font-size:13.5px; font-weight:500; transition:all 0.15s; white-space:nowrap; text-decoration:none; margin-bottom:2px; }
+  .nav-item:hover { background:rgba(255,255,255,0.07); color:rgba(255,255,255,0.9); }
+  .nav-item.active { background:rgba(99,102,241,0.18); color:#a5b4fc; }
+  .nav-icon { font-size:18px; flex-shrink:0; width:20px; text-align:center; }
+  .nav-badge { margin-left:auto; background:#dc2626; color:white; font-size:10px; font-weight:700; padding:2px 6px; border-radius:10px; flex-shrink:0; }
+  .sidebar-footer { padding:12px 10px; border-top:1px solid rgba(255,255,255,0.06); }
+  .user-card { display:flex; align-items:center; gap:10px; padding:10px; border-radius:8px; background:rgba(255,255,255,0.05); cursor:pointer; overflow:hidden; }
+  .user-avatar { width:32px; height:32px; border-radius:50%; background:linear-gradient(135deg,#6366f1,#8b5cf6); display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; color:white; flex-shrink:0; }
+  .user-name { font-size:13px; font-weight:600; color:white; white-space:nowrap; }
+  .user-role { font-size:11px; color:rgba(255,255,255,0.4); }
   .topbar{position:fixed;top:0;left:var(--sidebar-w);right:0;height:var(--topbar-h);background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:16px;z-index:90;transition:left .3s;}
   .topbar.collapsed{left:68px;}
   .toggle-btn{width:36px;height:36px;border-radius:8px;background:none;border:1px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-secondary);font-size:18px;}
@@ -102,10 +104,7 @@
 </head>
 <body>
 <aside class="sidebar" id="sidebar">
-  <div class="sidebar-logo">
-    <div class="logo-icon">V</div>
-    <div><div class="logo-text">Vendhan InfoTech</div><div class="logo-sub">Admin Portal</div></div>
-  </div>
+  <div class="sidebar-logo"><div class="logo-icon">V</div><div><div class="logo-text">Vendhan InfoTech</div><div class="logo-sub">Admin Portal</div></div></div>
   <nav class="sidebar-nav">
     <div class="nav-section-label">Main</div>
     <a href="dashboard.html" class="nav-item"><span class="nav-icon">⊞</span> Dashboard</a>
@@ -114,23 +113,22 @@
     <a href="leave.html" class="nav-item"><span class="nav-icon">📅</span> Leave Management<span class="nav-badge">7</span></a>
     <a href="payroll.html" class="nav-item"><span class="nav-icon">💰</span> Payroll</a>
     <div class="nav-section-label">Analytics</div>
-    <a href="reports.html" class="nav-item"><span class="nav-icon">📊</span> Reports & Analytics</a>
-    <a href="projects.html" class="nav-item"><span class="nav-icon">📁</span> Projects & Tasks</a>
+    <a href="reports.html" class="nav-item"><span class="nav-icon">📊</span> Reports &amp; Analytics</a>
+    <a href="projects.html" class="nav-item"><span class="nav-icon">📁</span> Projects &amp; Tasks</a>
     <a href="departments.html" class="nav-item"><span class="nav-icon">🏢</span> Departments</a>
+    <div class="nav-section-label">Automation</div>
+    <a href="data_entry.html" class="nav-item"><span class="nav-icon">🤖</span> Data Entry Automation</a>
     <div class="nav-section-label">Communication</div>
-    <a href="chat.html" class="nav-item active"><span class="nav-icon">💬</span> Chat System<span class="nav-badge">3</span></a>
+    <a href="chat.html" class="nav-item  active"><span class="nav-icon">💬</span> Chat System<span class="nav-badge">3</span></a>
     <a href="notifications.html" class="nav-item"><span class="nav-icon">🔔</span> Notifications</a>
     <div class="nav-section-label">System</div>
     <a href="settings.html" class="nav-item"><span class="nav-icon">⚙️</span> Settings</a>
     <a href="security.html" class="nav-item"><span class="nav-icon">🔒</span> Security</a>
     <a href="logs.html" class="nav-item"><span class="nav-icon">📋</span> Activity Logs</a>
+    <a href="admin_profile.html" class="nav-item"><span class="nav-icon">👤</span> My Profile</a>
+    <a href="../index.html" class="nav-item"><span class="nav-icon">🚪</span> Logout</a>
   </nav>
-  <div class="sidebar-footer">
-    <div class="user-card">
-      <div class="user-avatar">A</div>
-      <div><div class="user-name">Admin User</div><div class="user-role">Super Administrator</div></div>
-    </div>
-  </div>
+  <div class="sidebar-footer"><div class="user-card" onclick="window.location.href='admin_profile.html'"><div class="user-avatar">A</div><div><div class="user-name">Admin User</div><div class="user-role">Super Administrator</div></div></div></div>
 </aside>
 
 <header class="topbar" id="topbar">

@@ -1,110 +1,216 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Vendhan InfoTech — Login</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
-  <style>
-    body{font-family:'DM Sans',sans-serif;}
-    @keyframes fadeIn{from{opacity:0;transform:translateY(-16px);}to{opacity:1;transform:translateY(0);}}
-    .fade-in{animation:fadeIn 0.5s ease forwards;}
-    input:focus{outline:none;border-color:#4f46e5;box-shadow:0 0 0 3px rgba(99,102,241,0.12);}
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign In — Vendhan InfoTech</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --accent:#4f46e5;--accent-light:#eef2ff;
+    --surface:#fff;--bg:#f4f6fb;--border:#e5e7eb;
+    --text-primary:#111827;--text-secondary:#6b7280;--text-muted:#9ca3af;
+    --danger:#dc2626;--danger-bg:#fef2f2;
+    --success:#059669;--success-bg:#ecfdf5;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{
+    font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text-primary);
+    min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;
+  }
+  .login-card{
+    background:var(--surface);border:1px solid var(--border);border-radius:20px;
+    padding:40px 36px;width:420px;max-width:100%;box-shadow:0 20px 50px rgba(0,0,0,.06);
+  }
+  .logo-row{display:flex;align-items:center;gap:12px;margin-bottom:28px;}
+  .logo-icon{width:44px;height:44px;background:linear-gradient(135deg,#6366f1,#4f46e5);border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:19px;color:#fff;}
+  .logo-text{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:17px;}
+  .logo-sub{font-size:11.5px;color:var(--text-muted);}
+  h1{font-family:'Plus Jakarta Sans',sans-serif;font-size:21px;font-weight:700;margin-bottom:6px;}
+  .sub{font-size:13.5px;color:var(--text-secondary);margin-bottom:26px;}
+
+  .role-tabs{display:flex;gap:4px;background:var(--bg);border:1px solid var(--border);border-radius:11px;padding:4px;margin-bottom:24px;}
+  .role-tab{flex:1;padding:9px;border-radius:8px;border:none;background:none;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--text-secondary);transition:all .15s;}
+  .role-tab.active{background:var(--accent);color:#fff;}
+
+  .form-group{margin-bottom:16px;}
+  label{font-size:12.5px;font-weight:600;color:var(--text-primary);display:block;margin-bottom:6px;}
+  .input-wrap{position:relative;}
+  input[type=email],input[type=password],input[type=text]{
+    width:100%;height:44px;border:1.5px solid var(--border);border-radius:10px;padding:0 14px;
+    font-size:13.5px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .15s;
+  }
+  input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(99,102,241,.1);}
+  .toggle-pass{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:14px;color:var(--text-muted);}
+
+  .error-box{background:var(--danger-bg);border:1px solid #fecaca;border-radius:10px;padding:11px 14px;font-size:12.5px;color:var(--danger);margin-bottom:16px;display:none;align-items:flex-start;gap:8px;}
+  .error-box.show{display:flex;}
+
+  .btn-submit{
+    width:100%;height:46px;background:var(--accent);color:#fff;border:none;border-radius:10px;
+    font-size:14px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;
+    display:flex;align-items:center;justify-content:center;gap:8px;margin-top:6px;
+  }
+  .btn-submit:hover{background:#4338ca;}
+  .btn-submit:disabled{opacity:.6;cursor:not-allowed;}
+
+  .hint-box{background:var(--accent-light);border:1px solid #c7d2fe;border-radius:10px;padding:11px 14px;font-size:12px;color:var(--accent);margin-top:18px;line-height:1.5;}
+
+  .spinner{width:16px;height:16px;border:2.5px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:none;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+</style>
 </head>
-<body class="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-indigo-100 flex items-center justify-center px-4">
+<body>
 
-  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-10 fade-in">
-
-    <!-- LOGO -->
-    <div class="text-center mb-8">
-      <div class="w-16 h-16 bg-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-        <span class="text-white text-2xl font-bold" style="font-family:'Plus Jakarta Sans',sans-serif;">V</span>
-      </div>
-      <h1 class="text-2xl font-bold text-gray-800" style="font-family:'Plus Jakarta Sans',sans-serif;">Vendhan InfoTech</h1>
-      <p class="text-gray-500 mt-1 text-sm">Employee Management Portal</p>
-    </div>
-
-    <!-- FORM -->
-    <div>
-      <div class="mb-5">
-        <label class="block text-sm font-semibold text-gray-700 mb-2">Email Address</label>
-        <input id="emailInput" type="email" placeholder="Enter your email"
-          class="w-full border border-gray-300 rounded-xl px-4 py-3 text-gray-800 text-sm transition duration-200">
-      </div>
-
-      <div class="mb-5">
-        <label class="block text-sm font-semibold text-gray-700 mb-2">Password</label>
-        <div style="position:relative;">
-          <input id="passwordInput" type="password" placeholder="Enter your password"
-            class="w-full border border-gray-300 rounded-xl px-4 py-3 text-gray-800 text-sm transition duration-200">
-          <button onclick="togglePwd()" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:18px;color:#9ca3af;" id="eyeBtn">👁</button>
-        </div>
-      </div>
-
-      <!-- Error message -->
-      <div id="errorMessage" class="hidden mb-4 bg-red-50 border border-red-200 text-red-600 text-sm px-4 py-3 rounded-xl">
-        ❌ Invalid email or password. Please try again.
-      </div>
-
-      <!-- Login Button -->
-      <button onclick="handleLogin()"
-        class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-xl transition duration-200 text-sm mt-1">
-        Sign In to Portal
-      </button>
-
-      <p class="text-center text-xs text-gray-400 mt-6">
-        © 2025 Vendhan InfoTech Pvt. Ltd. All rights reserved.
-      </p>
-    </div>
+<div class="login-card">
+  <div class="logo-row">
+    <div class="logo-icon">V</div>
+    <div><div class="logo-text">Vendhan InfoTech</div><div class="logo-sub">HRMS Portal</div></div>
   </div>
 
-  <script>
-    function handleLogin() {
-      const email    = document.getElementById('emailInput').value.trim();
-      const password = document.getElementById('passwordInput').value.trim();
-      const errorBox = document.getElementById('errorMessage');
+  <h1>Welcome back</h1>
+  <div class="sub">Sign in to continue to your portal</div>
 
-      if (email === '' || password === '') {
-        errorBox.textContent = '⚠️ Please enter both email and password.';
-        errorBox.classList.remove('hidden');
-        return;
-      }
+  <div class="role-tabs">
+    <button class="role-tab active" id="tabEmployee" onclick="switchRole('employee')">🧑‍💼 Employee</button>
+    <button class="role-tab" id="tabAdmin" onclick="switchRole('admin')">🔑 Admin</button>
+  </div>
 
-      if (email === 'admin@vendhan.com' && password === 'admin123') {
-        localStorage.setItem('userRole', 'admin');
-        localStorage.setItem('userName', 'Admin User');
-        window.location.href = 'admin/dashboard.html';
-        return;
-      }
+  <div class="error-box" id="errorBox"></div>
 
-      if (email === 'employee@vendhan.com' && password === 'emp123') {
-        localStorage.setItem('userRole', 'employee');
-        localStorage.setItem('userName', 'Arjun Kumar');
-        window.location.href = 'employee/emp_dashboard.html';
-        return;
-      }
+  <form id="loginForm" onsubmit="handleLogin(event)">
+    <div class="form-group">
+      <label for="loginEmail">Email Address</label>
+      <input type="email" id="loginEmail" placeholder="you@vendhan.com" required>
+    </div>
+    <div class="form-group">
+      <label for="loginPassword">Password</label>
+      <div class="input-wrap">
+        <input type="password" id="loginPassword" placeholder="Enter your password" required>
+        <button type="button" class="toggle-pass" onclick="togglePassword()">👁</button>
+      </div>
+    </div>
+    <button type="submit" class="btn-submit" id="submitBtn">
+      <div class="spinner" id="spinner"></div>
+      <span id="submitLabel">Sign In</span>
+    </button>
+  </form>
 
-      errorBox.textContent = '❌ Invalid email or password. Please try again.';
-      errorBox.classList.remove('hidden');
+  <div class="hint-box" id="hintBox">
+    🧑‍💼 Use the email and password your admin set for you in Employee Management.
+  </div>
+</div>
+
+<script>
+// ── Shared stores ────────────────────────────────────────────────────
+// Written by admin/employees.html → { "<email lowercased>": { password, employeeId, name, ... } }
+const EMPLOYEE_CREDENTIALS_KEY = 'vendhan_employee_credentials';
+// Written by admin/employees.html (Admin role) or admin/create_admin.html
+const ADMIN_CREDENTIALS_KEY = 'vendhan_admin_credentials';
+const SESSION_KEY = 'vendhan_session';
+
+// ── Permanent built-in demo accounts ───────────────────────────────
+// These always work, regardless of what's been registered in localStorage.
+// Not shown anywhere in the UI — kept for testing convenience only.
+const BUILT_IN_ACCOUNTS = {
+  admin: {
+    'admin@vendhan.com': { password: 'admin123', employeeId: 'ADMIN000', name: 'Admin User' }
+  },
+  employee: {
+    'employee@vendhan.com': { password: 'emp123', employeeId: 'E000', name: 'Demo Employee' }
+  }
+};
+
+let currentRole = 'employee';
+
+function readCredentials(key) {
+  try { return JSON.parse(localStorage.getItem(key) || '{}'); } catch (e) { return {}; }
+}
+
+function switchRole(role) {
+  currentRole = role;
+  document.getElementById('tabEmployee').classList.toggle('active', role === 'employee');
+  document.getElementById('tabAdmin').classList.toggle('active', role === 'admin');
+  document.getElementById('hintBox').innerHTML = role === 'employee'
+    ? '🧑\u200d💼 Use the email and password your admin set for you in Employee Management.'
+    : '🔑 Use a registered admin email and password.';
+  hideError();
+}
+
+function togglePassword() {
+  const field = document.getElementById('loginPassword');
+  const btn = document.querySelector('.toggle-pass');
+  field.type = field.type === 'password' ? 'text' : 'password';
+  btn.textContent = field.type === 'password' ? '👁' : '🙈';
+}
+
+function showError(msg) {
+  const box = document.getElementById('errorBox');
+  box.textContent = '⚠️ ' + msg;
+  box.classList.add('show');
+}
+function hideError() {
+  document.getElementById('errorBox').classList.remove('show');
+}
+
+function setLoading(loading) {
+  document.getElementById('submitBtn').disabled = loading;
+  document.getElementById('spinner').style.display = loading ? 'block' : 'none';
+  document.getElementById('submitLabel').textContent = loading ? 'Signing in...' : 'Sign In';
+}
+
+// Checks the fixed demo account first, then real registered accounts in localStorage.
+function findAccount(role, email) {
+  const builtIn = BUILT_IN_ACCOUNTS[role] || {};
+  if (builtIn[email]) return builtIn[email];
+
+  const key = role === 'admin' ? ADMIN_CREDENTIALS_KEY : EMPLOYEE_CREDENTIALS_KEY;
+  const creds = readCredentials(key);
+  return creds[email] || null;
+}
+
+function handleLogin(event) {
+  event.preventDefault();
+  hideError();
+
+  const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+  const password = document.getElementById('loginPassword').value;
+
+  if (!email || !password) { showError('Please enter both email and password.'); return; }
+
+  setLoading(true);
+
+  setTimeout(() => {
+    const account = findAccount(currentRole, email);
+
+    if (!account || account.password !== password) {
+      setLoading(false);
+      showError(
+        currentRole === 'admin'
+          ? 'Incorrect admin email or password.'
+          : 'Incorrect email or password, or no account exists for this email yet. Ask your admin to register you in Employee Management.'
+      );
+      return;
     }
 
-    function togglePwd() {
-      const input = document.getElementById('passwordInput');
-      const btn   = document.getElementById('eyeBtn');
-      if (input.type === 'password') {
-        input.type = 'text';
-        btn.textContent = '🙈';
-      } else {
-        input.type = 'password';
-        btn.textContent = '👁';
-      }
-    }
+    // employeeId uniquely identifies this person — every page that stores
+    // per-person data (attendance, tasks, leave, etc.) MUST key its storage
+    // off this id (or off `email` as a fallback), never store data globally.
+    sessionStorage.setItem(SESSION_KEY, JSON.stringify({
+      role: currentRole,
+      email,
+      employeeId: account.employeeId || email, // fallback keeps every account unique even if employeeId is missing
+      name: account.name || '',
+      loggedInAt: Date.now()
+    }));
 
-    document.addEventListener('keydown', function(e) {
-      if (e.key === 'Enter') handleLogin();
-    });
-  </script>
+    setLoading(false);
+
+    window.location.href = currentRole === 'admin'
+      ? 'admin/dashboard.html'
+     : 'employee/emp_portal.html';
+  }, 450);
+}
+</script>
 </body>
 </html>

@@ -73,7 +73,10 @@
 </head>
 <body>
 <aside class="sidebar" id="sidebar">
-  <div class="sidebar-logo"><div class="logo-icon">V</div><div><div class="logo-text">Vendhan InfoTech</div><div class="logo-sub">Employee Portal</div></div></div>
+  <div class="sidebar-logo">
+    <div class="logo-icon">V</div>
+    <div><div class="logo-text">Vendhan InfoTech</div><div class="logo-sub">Employee Portal</div></div>
+  </div>
   <nav class="sidebar-nav">
     <div class="nav-section-label">My Workspace</div>
     <a href="emp_dashboard.html" class="nav-item"><span class="nav-icon">⊞</span> Dashboard</a>
@@ -81,6 +84,8 @@
     <a href="emp_leave.html" class="nav-item"><span class="nav-icon">📅</span> My Leave<span class="nav-badge">1</span></a>
     <a href="emp_salary.html" class="nav-item"><span class="nav-icon">💰</span> My Salary</a>
     <a href="emp_tasks.html" class="nav-item"><span class="nav-icon">✅</span> My Tasks<span class="nav-badge">3</span></a>
+ <div class="nav-section-label">Automation</div>
+    <a href="emp_data_entry.html" class="nav-item"><span class="nav-icon">🤖</span> Data Entry Task</a>
     <div class="nav-section-label">Communication</div>
     <a href="emp_chat.html" class="nav-item"><span class="nav-icon">💬</span> Chat<span class="nav-badge">2</span></a>
     <a href="emp_notifications.html" class="nav-item"><span class="nav-icon">🔔</span> Notifications</a>
@@ -89,8 +94,14 @@
     <a href="emp_settings.html" class="nav-item active"><span class="nav-icon">⚙️</span> Settings</a>
     <a href="../index.html" class="nav-item"><span class="nav-icon">🚪</span> Logout</a>
   </nav>
-  <div class="sidebar-footer"><div class="user-card" onclick="window.location.href='emp_profile.html'"><div class="user-avatar-lg">AK</div><div><div class="user-name">Arjun Kumar</div><div class="user-role-s">Senior Developer</div></div></div></div>
+  <div class="sidebar-footer">
+    <div class="user-card">
+      <div class="user-avatar-lg">AK</div>
+      <div><div class="user-name">Arjun Kumar</div><div class="user-role-s">Senior Developer</div></div>
+    </div>
+  </div>
 </aside>
+
 <header class="topbar" id="topbar">
   <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
   <div><div class="page-title">Settings</div><div class="page-breadcrumb">Employee Portal › Settings</div></div>

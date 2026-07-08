@@ -3,236 +3,476 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>My Profile — Vendhan InfoTech</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<title>Employee Portal — Vendhan InfoTech</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
 <style>
-  :root{--sidebar-w:240px;--topbar-h:64px;--accent:#4f46e5;--accent-light:#eef2ff;--surface:#fff;--bg:#f4f6fb;--border:#e5e7eb;--text-primary:#111827;--text-secondary:#6b7280;--text-muted:#9ca3af;--success:#059669;--success-bg:#ecfdf5;--warning:#d97706;--warning-bg:#fffbeb;--danger:#dc2626;--danger-bg:#fef2f2;}
-  *{margin:0;padding:0;box-sizing:border-box;}
-  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text-primary);display:flex;min-height:100vh;}
-  .sidebar{width:var(--sidebar-w);background:linear-gradient(180deg,#1e1b4b,#312e81);position:fixed;top:0;left:0;height:100vh;display:flex;flex-direction:column;z-index:100;transition:width .3s;overflow:hidden;}
-  .sidebar.collapsed{width:68px;}
-  .sidebar-logo{padding:20px 18px 16px;display:flex;align-items:center;gap:12px;border-bottom:1px solid rgba(255,255,255,.08);min-height:var(--topbar-h);}
-  .logo-icon{width:36px;height:36px;background:linear-gradient(135deg,#818cf8,#6366f1);border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;color:#fff;flex-shrink:0;}
-  .logo-text{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:14px;color:#fff;white-space:nowrap;}
-  .logo-sub{font-size:10.5px;color:rgba(255,255,255,.4);}
-  .sidebar-nav{flex:1;padding:14px 10px;overflow-y:auto;overflow-x:hidden;}
-  .nav-section-label{font-size:10px;font-weight:600;letter-spacing:.09em;color:rgba(255,255,255,.3);text-transform:uppercase;padding:12px 10px 6px;white-space:nowrap;}
-  .sidebar.collapsed .nav-section-label{opacity:0;}
-  .nav-item{display:flex;align-items:center;gap:11px;padding:10px;border-radius:9px;cursor:pointer;color:rgba(255,255,255,.6);font-size:13.5px;font-weight:500;transition:all .15s;white-space:nowrap;text-decoration:none;margin-bottom:3px;}
-  .nav-item:hover{background:rgba(255,255,255,.08);color:rgba(255,255,255,.95);}
-  .nav-item.active{background:rgba(129,140,248,.25);color:#c7d2fe;border-left:3px solid #818cf8;padding-left:7px;}
-  .nav-icon{font-size:18px;flex-shrink:0;width:20px;text-align:center;}
-  .nav-badge{margin-left:auto;background:#dc2626;color:#fff;font-size:10px;font-weight:700;padding:2px 6px;border-radius:10px;}
-  .sidebar-footer{padding:14px 10px;border-top:1px solid rgba(255,255,255,.08);}
-  .user-card{display:flex;align-items:center;gap:10px;padding:10px;border-radius:9px;background:rgba(255,255,255,.07);overflow:hidden;}
-  .user-avatar-lg{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#818cf8,#6366f1);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;flex-shrink:0;}
-  .user-name{font-size:13px;font-weight:600;color:#fff;white-space:nowrap;}
-  .user-role-s{font-size:11px;color:rgba(255,255,255,.4);}
-  .topbar{position:fixed;top:0;left:var(--sidebar-w);right:0;height:var(--topbar-h);background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:16px;z-index:90;transition:left .3s;}
-  .topbar.collapsed{left:68px;}
-  .toggle-btn{width:36px;height:36px;border-radius:8px;background:none;border:1px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-secondary);font-size:18px;}
-  .page-title{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:17px;}
-  .page-breadcrumb{font-size:12px;color:var(--text-muted);}
-  .topbar-right{margin-left:auto;display:flex;align-items:center;gap:10px;}
-  .topbar-avatar{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#818cf8,#6366f1);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;}
-  .main{margin-left:var(--sidebar-w);margin-top:var(--topbar-h);padding:26px;transition:margin-left .3s;}
-  .main.collapsed{margin-left:68px;}
-  .btn-primary{background:var(--accent);color:#fff;border:none;border-radius:9px;padding:9px 18px;font-size:13.5px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:7px;font-family:'DM Sans',sans-serif;transition:all .15s;}
-  .btn-primary:hover{background:#4338ca;}
-  .btn-outline{background:#fff;color:var(--text-secondary);border:1px solid var(--border);border-radius:9px;padding:9px 16px;font-size:13.5px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;display:inline-flex;align-items:center;gap:7px;}
-  .btn-outline:hover{border-color:var(--accent);color:var(--accent);}
+:root{--accent:#4f46e5;--al:#eef2ff;--bg:#f4f6fb;--sur:#fff;--bor:#e5e7eb;--tp:#111827;--ts:#6b7280;--tm:#9ca3af;--ok:#059669;--okb:#ecfdf5;--warn:#d97706;--warnb:#fffbeb;--pur:#7c3aed;--purb:#f5f3ff;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tp);display:flex;height:100vh;overflow:hidden;}
 
-  .profile-layout{display:grid;grid-template-columns:300px 1fr;gap:20px;}
+/* SIDEBAR */
+.sb{width:220px;background:#0f172a;display:flex;flex-direction:column;flex-shrink:0;height:100vh;}
+.sb-logo{padding:16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(255,255,255,.06);}
+.sb-icon{width:32px;height:32px;background:linear-gradient(135deg,#6366f1,#4f46e5);border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:14px;flex-shrink:0;}
+.sb-title{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:13.5px;color:#fff;}
+.sb-sub{font-size:10px;color:rgba(255,255,255,.4);}
+.sb-nav{flex:1;padding:8px;overflow-y:auto;}
+.nav-btn{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:7px;color:rgba(255,255,255,.55);font-size:12.5px;font-weight:500;cursor:pointer;border:none;background:none;width:100%;text-align:left;font-family:'DM Sans',sans-serif;transition:all .15s;margin-bottom:1px;}
+.nav-btn:hover{background:rgba(255,255,255,.07);color:rgba(255,255,255,.9);}
+.nav-btn.active{background:rgba(99,102,241,.2);color:#a5b4fc;}
+.sb-foot{padding:10px 8px;border-top:1px solid rgba(255,255,255,.06);}
+.sb-user{display:flex;align-items:center;gap:8px;padding:8px;background:rgba(255,255,255,.05);border-radius:7px;}
+.sb-av{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0;}
+.sb-uname{font-size:12px;font-weight:600;color:#fff;}
+.sb-uid{font-size:10px;color:rgba(255,255,255,.4);}
 
-  /* LEFT CARD */
-  .profile-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px 24px;text-align:center;}
-  .profile-avatar{width:90px;height:90px;border-radius:50%;background:linear-gradient(135deg,#818cf8,#4f46e5);display:flex;align-items:center;justify-content:center;font-family:'Plus Jakarta Sans',sans-serif;font-size:32px;font-weight:700;color:#fff;margin:0 auto 16px;position:relative;}
-  .avatar-edit{position:absolute;bottom:0;right:0;width:28px;height:28px;background:var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;cursor:pointer;border:2px solid #fff;}
-  .profile-name{font-family:'Plus Jakarta Sans',sans-serif;font-size:20px;font-weight:700;margin-bottom:4px;}
-  .profile-role{font-size:13.5px;color:var(--text-secondary);margin-bottom:4px;}
-  .profile-id{font-size:12px;color:var(--text-muted);background:var(--bg);border-radius:6px;padding:3px 10px;display:inline-block;margin-bottom:16px;}
-  .profile-badge{display:inline-flex;align-items:center;gap:6px;background:var(--success-bg);color:var(--success);font-size:12px;font-weight:600;padding:5px 12px;border-radius:20px;margin-bottom:20px;}
-  .profile-divider{height:1px;background:var(--border);margin:16px 0;}
-  .profile-stat{display:flex;justify-content:space-between;align-items:center;padding:9px 0;font-size:13px;border-bottom:1px solid var(--bg);}
-  .profile-stat:last-child{border-bottom:none;}
-  .pstat-label{color:var(--text-muted);}
-  .pstat-value{font-weight:600;}
+/* MAIN */
+.wrap{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.topbar{background:var(--sur);border-bottom:1px solid var(--bor);padding:0 24px;height:60px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.top-title{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:16px;}
+.top-sub{font-size:11.5px;color:var(--tm);margin-top:2px;}
+.main{flex:1;overflow-y:auto;padding:24px;}
 
-  /* RIGHT CARDS */
-  .right-col{display:flex;flex-direction:column;gap:16px;}
-  .info-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px;}
-  .info-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}
-  .info-card-title{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:15px;}
-  .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
-  .info-field{display:flex;flex-direction:column;gap:5px;}
-  .field-label{font-size:11.5px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.05em;}
-  .field-value{font-size:13.5px;font-weight:500;color:var(--text-primary);}
-  .field-input{height:40px;border:1px solid var(--border);border-radius:9px;padding:0 14px;font-size:13.5px;font-family:'DM Sans',sans-serif;outline:none;background:#fff;transition:border-color .15s;}
-  .field-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(99,102,241,.12);}
-  .field-input:disabled{background:var(--bg);color:var(--text-secondary);}
+/* SECTIONS */
+.section{display:none;}
+.section.active{display:block;}
+.empty{background:var(--sur);border:1px dashed var(--bor);border-radius:14px;padding:44px 24px;text-align:center;max-width:440px;margin:20px auto 0;}
+.empty-icon{font-size:36px;margin-bottom:10px;}
+.empty-title{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:15px;margin-bottom:6px;}
+.empty-desc{font-size:12.5px;color:var(--tm);line-height:1.6;}
 
-  /* CHANGE PASSWORD */
-  .pwd-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+/* BUTTONS */
+.btn{padding:9px 18px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;border:none;display:inline-flex;align-items:center;gap:7px;}
+.btn-p{background:var(--accent);color:#fff;}
+.btn-p:hover{background:#4338ca;}
+.btn-p:disabled{opacity:.55;cursor:not-allowed;}
+.btn-s{background:var(--ok);color:#fff;}
+.btn-o{background:var(--sur);color:var(--ts);border:1px solid var(--bor);}
+.btn-o:hover{border-color:#dc2626;color:#dc2626;}
 
-  .toast{position:fixed;bottom:28px;right:28px;background:#0f172a;color:#fff;padding:13px 20px;border-radius:12px;font-size:13.5px;font-weight:500;z-index:600;display:flex;align-items:center;gap:10px;box-shadow:0 8px 24px rgba(0,0,0,.2);transform:translateY(80px);opacity:0;transition:all .3s ease;}
-  .toast.show{transform:translateY(0);opacity:1;}
-  ::-webkit-scrollbar{width:5px;}
-  ::-webkit-scrollbar-thumb{background:var(--border);border-radius:10px;}
+/* DATA ENTRY specific */
+.tabs{display:flex;gap:4px;background:var(--bg);border:1px solid var(--bor);border-radius:10px;padding:4px;width:fit-content;margin-bottom:16px;}
+.tab{padding:7px 16px;border-radius:7px;border:none;background:none;font-size:12.5px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--ts);}
+.tab.active{background:var(--accent);color:#fff;}
+.panel{display:none;} .panel.active{display:block;}
+.dz{border:2px dashed var(--bor);border-radius:12px;padding:32px;text-align:center;background:var(--bg);cursor:pointer;position:relative;transition:all .2s;}
+.dz:hover,.dz.over{border-color:var(--accent);background:var(--al);}
+.dz input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+textarea.paste{width:100%;height:140px;border:1px solid var(--bor);border-radius:8px;padding:12px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;resize:vertical;}
+textarea.paste:focus{border-color:var(--accent);}
+.fchip{display:none;margin-top:10px;padding:9px 13px;background:var(--okb);border:1px solid #a7f3d0;border-radius:8px;font-size:12.5px;color:var(--ok);align-items:center;gap:7px;}
+.imgprev{max-width:100%;border-radius:8px;margin-top:10px;display:none;}
+.proc{background:linear-gradient(135deg,#312e81,#4f46e5);border-radius:12px;padding:20px;text-align:center;color:#fff;display:none;margin:12px 0;}
+.proc.show{display:block;}
+.spin{width:32px;height:32px;border:3px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;animation:sp .8s linear infinite;margin:0 auto 10px;}
+@keyframes sp{to{transform:rotate(360deg);}}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px;}
+.fg.full{grid-column:1/-1;}
+.fl{font-size:11px;font-weight:700;color:var(--tm);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;}
+.fi{border:1.5px solid var(--bor);border-radius:8px;padding:9px 12px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;width:100%;}
+.fi:focus{border-color:var(--accent);}
+textarea.fi{min-height:80px;resize:vertical;}
+.card{background:var(--sur);border:1px solid var(--bor);border-radius:12px;padding:18px;margin-bottom:16px;}
+.sub-row{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--bg);font-size:12.5px;}
+.sub-row:last-child{border-bottom:none;}
+.pill{font-size:10px;font-weight:700;padding:2px 8px;border-radius:5px;}
+.pill-p{background:var(--warnb);color:var(--warn);}
+.pill-r{background:var(--okb);color:var(--ok);}
+
+/* PROFILE */
+.info-card{background:var(--sur);border:1px solid var(--bor);border-radius:12px;padding:18px;max-width:520px;}
+.ir{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--bg);font-size:13px;}
+.ir:last-child{border-bottom:none;}
+.il{color:var(--tm);}
+.iv{font-weight:600;}
+
+.toast{position:fixed;bottom:24px;right:24px;background:#0f172a;color:#fff;padding:11px 18px;border-radius:10px;font-size:13px;font-weight:500;z-index:999;transform:translateY(60px);opacity:0;transition:all .3s;}
+.toast.show{transform:translateY(0);opacity:1;}
 </style>
 </head>
 <body>
-<aside class="sidebar" id="sidebar">
-  <div class="sidebar-logo">
-    <div class="logo-icon">V</div>
-    <div><div class="logo-text">Vendhan InfoTech</div><div class="logo-sub">Employee Portal</div></div>
+
+<!-- SIDEBAR -->
+<aside class="sb">
+  <div class="sb-logo">
+    <div class="sb-icon">V</div>
+    <div><div class="sb-title">Vendhan InfoTech</div><div class="sb-sub">Employee Portal</div></div>
   </div>
-  <nav class="sidebar-nav">
-    <div class="nav-section-label">My Workspace</div>
-    <a href="emp_dashboard.html" class="nav-item"><span class="nav-icon">⊞</span> Dashboard</a>
-    <a href="emp_attendance.html" class="nav-item"><span class="nav-icon">🕐</span> My Attendance</a>
-    <a href="emp_leave.html" class="nav-item"><span class="nav-icon">📅</span> My Leave<span class="nav-badge">1</span></a>
-    <a href="emp_salary.html" class="nav-item"><span class="nav-icon">💰</span> My Salary</a>
-    <a href="emp_tasks.html" class="nav-item"><span class="nav-icon">✅</span> My Tasks<span class="nav-badge">3</span></a>
-    <div class="nav-section-label">Communication</div>
-    <a href="emp_chat.html" class="nav-item"><span class="nav-icon">💬</span> Chat<span class="nav-badge">2</span></a>
-    <a href="emp_notifications.html" class="nav-item"><span class="nav-icon">🔔</span> Notifications</a>
-    <div class="nav-section-label">Account</div>
-    <a href="emp_profile.html" class="nav-item active"><span class="nav-icon">👤</span> My Profile</a>
-    <a href="emp_settings.html" class="nav-item"><span class="nav-icon">⚙️</span> Settings</a>
-    <a href="../index.html" class="nav-item"><span class="nav-icon">🚪</span> Logout</a>
-  </nav>
-  <div class="sidebar-footer">
-    <div class="user-card">
-      <div class="user-avatar-lg">AK</div>
-      <div><div class="user-name">Arjun Kumar</div><div class="user-role-s">Senior Developer</div></div>
+  <nav class="sb-nav" id="sbNav"></nav>
+  <div class="sb-foot">
+    <div class="sb-user">
+      <div class="sb-av" id="sbAv">?</div>
+      <div><div class="sb-uname" id="sbName">—</div><div class="sb-uid" id="sbId">—</div></div>
     </div>
   </div>
 </aside>
-<header class="topbar" id="topbar">
-  <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
-  <div><div class="page-title">My Profile</div><div class="page-breadcrumb">Employee Portal › Profile</div></div>
-  <div class="topbar-right"><div class="topbar-avatar">AK</div></div>
-</header>
-<main class="main" id="mainContent">
-  <div class="profile-layout">
 
-    <!-- LEFT -->
+<!-- MAIN WRAP -->
+<div class="wrap">
+  <header class="topbar">
     <div>
-      <div class="profile-card">
-        <div class="profile-avatar">AK<div class="avatar-edit" onclick="showToast('📷 Upload photo feature coming soon!')">✏️</div></div>
-        <div class="profile-name">Arjun Kumar</div>
-        <div class="profile-role">Senior Developer</div>
-        <div class="profile-id">Employee ID: E001</div>
-        <div class="profile-badge">🟢 Active Employee</div>
-        <div class="profile-divider"></div>
-        <div class="profile-stat"><span class="pstat-label">Department</span><span class="pstat-value">Engineering</span></div>
-        <div class="profile-stat"><span class="pstat-label">Location</span><span class="pstat-value">Coimbatore</span></div>
-        <div class="profile-stat"><span class="pstat-label">Joined On</span><span class="pstat-value">Jan 15, 2024</span></div>
-        <div class="profile-stat"><span class="pstat-label">Employment</span><span class="pstat-value">Full Time</span></div>
-        <div class="profile-stat"><span class="pstat-label">Reporting To</span><span class="pstat-value">Vikram Nair</span></div>
-        <div class="profile-divider"></div>
-        <button class="btn-outline" style="width:100%;justify-content:center;" onclick="showToast('📥 Profile exported!')">📥 Download Profile</button>
-      </div>
+      <div class="top-title" id="topTitle">My Dashboard</div>
+      <div class="top-sub" id="topSub">Employee Portal</div>
     </div>
+    <button class="btn btn-o" onclick="logout()">🚪 Sign Out</button>
+  </header>
+  <main class="main" id="mainArea"></main>
+</div>
 
-    <!-- RIGHT -->
-    <div class="right-col">
-
-      <!-- Personal Info -->
-      <div class="info-card">
-        <div class="info-card-header">
-          <div class="info-card-title">👤 Personal Information</div>
-          <button class="btn-outline" style="font-size:12px;padding:6px 14px;" id="editPersonalBtn" onclick="toggleEdit('personal')">✏️ Edit</button>
-        </div>
-        <div class="info-grid">
-          <div class="info-field"><div class="field-label">First Name</div><input class="field-input" id="p_fname" value="Arjun" disabled></div>
-          <div class="info-field"><div class="field-label">Last Name</div><input class="field-input" id="p_lname" value="Kumar" disabled></div>
-          <div class="info-field"><div class="field-label">Email Address</div><input class="field-input" id="p_email" value="arjun@vendhan.com" disabled></div>
-          <div class="info-field"><div class="field-label">Phone Number</div><input class="field-input" id="p_phone" value="9876543210" disabled></div>
-          <div class="info-field"><div class="field-label">Date of Birth</div><input class="field-input" id="p_dob" type="date" value="1998-04-12" disabled></div>
-          <div class="info-field"><div class="field-label">Gender</div><input class="field-input" id="p_gender" value="Male" disabled></div>
-          <div class="info-field" style="grid-column:1/-1;"><div class="field-label">Address</div><input class="field-input" id="p_addr" value="12, Gandhi Nagar, Coimbatore - 641001, Tamil Nadu" disabled></div>
-        </div>
-        <div id="personalSaveBtn" style="display:none;margin-top:16px;display:none;">
-          <button class="btn-primary" onclick="saveSection('personal')">✓ Save Changes</button>
-        </div>
-      </div>
-
-      <!-- Work Info -->
-      <div class="info-card">
-        <div class="info-card-header">
-          <div class="info-card-title">💼 Work Information</div>
-          <span style="font-size:12px;color:var(--text-muted);">Contact HR to update work details</span>
-        </div>
-        <div class="info-grid">
-          <div class="info-field"><div class="field-label">Employee ID</div><div class="field-value">E001</div></div>
-          <div class="info-field"><div class="field-label">Department</div><div class="field-value">Engineering</div></div>
-          <div class="info-field"><div class="field-label">Designation</div><div class="field-value">Senior Developer</div></div>
-          <div class="info-field"><div class="field-label">Employment Type</div><div class="field-value">Full Time</div></div>
-          <div class="info-field"><div class="field-label">Date of Joining</div><div class="field-value">January 15, 2024</div></div>
-          <div class="info-field"><div class="field-label">Work Location</div><div class="field-value">Office — Coimbatore</div></div>
-          <div class="info-field"><div class="field-label">Reporting Manager</div><div class="field-value">Vikram Nair</div></div>
-          <div class="info-field"><div class="field-label">Work Email</div><div class="field-value">arjun@vendhan.com</div></div>
-        </div>
-      </div>
-
-      <!-- Bank Info -->
-      <div class="info-card">
-        <div class="info-card-header">
-          <div class="info-card-title">🏦 Bank Information</div>
-          <button class="btn-outline" style="font-size:12px;padding:6px 14px;" onclick="toggleEdit('bank')">✏️ Edit</button>
-        </div>
-        <div class="info-grid">
-          <div class="info-field"><div class="field-label">Bank Name</div><input class="field-input" id="b_bank" value="State Bank of India" disabled></div>
-          <div class="info-field"><div class="field-label">Account Number</div><input class="field-input" id="b_acc" value="XXXX XXXX 4521" disabled></div>
-          <div class="info-field"><div class="field-label">IFSC Code</div><input class="field-input" id="b_ifsc" value="SBIN0001234" disabled></div>
-          <div class="info-field"><div class="field-label">Account Type</div><input class="field-input" id="b_type" value="Savings" disabled></div>
-        </div>
-      </div>
-
-      <!-- Change Password -->
-      <div class="info-card">
-        <div class="info-card-header">
-          <div class="info-card-title">🔒 Change Password</div>
-        </div>
-        <div class="pwd-grid">
-          <div class="info-field"><div class="field-label">Current Password</div><input class="field-input" type="password" id="pwd_cur" placeholder="••••••••"></div>
-          <div class="info-field"><div class="field-label">New Password</div><input class="field-input" type="password" id="pwd_new" placeholder="••••••••"></div>
-          <div class="info-field"><div class="field-label">Confirm Password</div><input class="field-input" type="password" id="pwd_con" placeholder="••••••••"></div>
-        </div>
-        <button class="btn-primary" style="margin-top:14px;" onclick="changePassword()">🔒 Update Password</button>
-      </div>
-
-    </div>
-  </div>
-</main>
 <div class="toast" id="toast"></div>
+
 <script>
-function toggleEdit(section){
-  const fields = section==='personal'
-    ? ['p_fname','p_lname','p_email','p_phone','p_dob','p_gender','p_addr']
-    : ['b_bank','b_acc','b_ifsc','b_type'];
-  const isDisabled = document.getElementById(fields[0]).disabled;
-  fields.forEach(id=>{ document.getElementById(id).disabled = !isDisabled; });
-  if(!isDisabled){ showToast('💾 Changes saved successfully!'); }
-  else { showToast('✏️ Edit mode enabled — make your changes'); }
+// ── SESSION GUARD ───────────────────────────────────────────────────
+const SESSION_KEY = 'vendhan_session';
+let session;
+try { session = JSON.parse(sessionStorage.getItem(SESSION_KEY) || 'null'); } catch(e){ session = null; }
+if (!session || session.role !== 'employee') {
+  window.location.href = '../index.html';
 }
-function saveSection(section){ toggleEdit(section); }
-function changePassword(){
-  const cur=document.getElementById('pwd_cur').value;
-  const nw=document.getElementById('pwd_new').value;
-  const con=document.getElementById('pwd_con').value;
-  if(!cur||!nw||!con){showToast('⚠️ Please fill all password fields');return;}
-  if(nw!==con){showToast('⚠️ New passwords do not match');return;}
-  if(nw.length<8){showToast('⚠️ Password must be at least 8 characters');return;}
-  document.getElementById('pwd_cur').value='';
-  document.getElementById('pwd_new').value='';
-  document.getElementById('pwd_con').value='';
-  showToast('✅ Password updated successfully!');
+
+// ── PER-EMPLOYEE NAMESPACE ──────────────────────────────────────────
+// Every data bucket is keyed by employeeId so accounts never share data.
+const myId = (session.employeeId || session.email || 'guest').toLowerCase().replace(/[^a-z0-9]+/g,'_');
+const ns = id => 'vendhan_emp_' + id + '_' + myId;
+
+function db(key){ try{ return JSON.parse(localStorage.getItem(key)||'[]'); }catch(e){ return []; } }
+function save(key,val){ try{ localStorage.setItem(key, JSON.stringify(val)); }catch(e){} }
+
+// ── SECTION DEFINITIONS ─────────────────────────────────────────────
+const SECTIONS = [
+  { id:'dashboard',      icon:'⊞',  label:'My Dashboard',           sub:'Overview of your portal' },
+  { id:'attendance',     icon:'🕐',  label:'My Attendance',          sub:'Check in/out and history',
+    empty:'🕐', etitle:'No attendance records yet',
+    edesc:'Once you check in for the first time, your attendance history will appear here.' },
+  { id:'leave',          icon:'📅',  label:'My Leave',               sub:'Apply and track leave',
+    empty:'📅', etitle:'No leave requests yet',
+    edesc:'Apply for leave below and your requests and approval status will show here.' },
+  { id:'salary',         icon:'💰',  label:'My Salary',              sub:'Payslips and breakdown',
+    empty:'💰', etitle:'No payslips yet',
+    edesc:'Your payslips will appear here once payroll has been processed by the admin.' },
+  { id:'tasks',          icon:'📁',  label:'My Tasks',               sub:'Personal task board',
+    empty:'📁', etitle:'No tasks yet',
+    edesc:'Tasks assigned to you will appear here on your personal board.' },
+  { id:'data_entry',     icon:'🤖',  label:'Data Entry Automation',  sub:'Upload PDF/image or paste text' },
+  { id:'chat',           icon:'💬',  label:'Chat',                   sub:'Chat with teammates and HR',
+    empty:'💬', etitle:'No conversations yet',
+    edesc:'Start a conversation and it will appear here.' },
+  { id:'notifications',  icon:'🔔',  label:'Notifications',          sub:'Your personal notification feed',
+    empty:'🔔', etitle:'You\'re all caught up',
+    edesc:'New notifications addressed to you will show up here.' },
+  { id:'profile',        icon:'👤',  label:'My Profile',             sub:'Personal details and settings',
+    empty:null  /* rendered custom */ },
+  { id:'settings',       icon:'⚙️',  label:'Settings',               sub:'Preferences',
+    empty:'⚙️', etitle:'Using default settings',
+    edesc:'Your personal preferences will be saved here once you change something.' },
+];
+
+// ── BUILD SIDEBAR NAV ───────────────────────────────────────────────
+const sbNav = document.getElementById('sbNav');
+SECTIONS.forEach(s => {
+  const btn = document.createElement('button');
+  btn.className = 'nav-btn';
+  btn.id = 'nav_' + s.id;
+  btn.innerHTML = `<span>${s.icon}</span>${s.label}`;
+  btn.onclick = () => switchSection(s.id);
+  sbNav.appendChild(btn);
+});
+
+// ── BUILD SECTION PANELS ────────────────────────────────────────────
+const mainArea = document.getElementById('mainArea');
+
+SECTIONS.forEach(s => {
+  const div = document.createElement('div');
+  div.className = 'section';
+  div.id = 'sec_' + s.id;
+
+  if (s.id === 'dashboard') {
+    div.innerHTML = dashboardHTML();
+  } else if (s.id === 'data_entry') {
+    div.innerHTML = dataEntryHTML();
+  } else if (s.id === 'profile') {
+    div.innerHTML = profileHTML();
+  } else {
+    div.innerHTML = `<div class="empty"><div class="empty-icon">${s.empty}</div><div class="empty-title">${s.etitle}</div><div class="empty-desc">${s.edesc}</div></div>`;
+  }
+
+  mainArea.appendChild(div);
+});
+
+// ── SWITCH SECTION ──────────────────────────────────────────────────
+function switchSection(id) {
+  document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById('sec_' + id).classList.add('active');
+  document.getElementById('nav_' + id).classList.add('active');
+  const s = SECTIONS.find(x => x.id === id);
+  document.getElementById('topTitle').textContent = s.icon + ' ' + s.label;
+  document.getElementById('topSub').textContent = s.sub;
+  if (id === 'data_entry') renderSubmissions();
 }
-function toggleSidebar(){document.getElementById('sidebar').classList.toggle('collapsed');document.getElementById('topbar').classList.toggle('collapsed');document.getElementById('mainContent').classList.toggle('collapsed');}
-function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3500);}
+
+// ── SESSION INFO in sidebar ─────────────────────────────────────────
+const uname = session.name || 'Employee';
+const initials = uname.split(' ').filter(Boolean).map(p=>p[0]).join('').slice(0,2).toUpperCase()||'?';
+document.getElementById('sbAv').textContent = initials;
+document.getElementById('sbName').textContent = uname;
+document.getElementById('sbId').textContent = session.employeeId || '';
+
+// ── DASHBOARD HTML ──────────────────────────────────────────────────
+function dashboardHTML() {
+  return `
+    <div style="background:linear-gradient(135deg,#4f46e5,#6366f1);border-radius:16px;padding:26px;color:#fff;margin-bottom:20px;">
+      <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:21px;font-weight:700;margin-bottom:5px;">Welcome back, ${uname.split(' ')[0]}!</div>
+      <div style="font-size:13px;opacity:.85;">Click any section in the sidebar to get started.</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:640px;">
+      ${SECTIONS.filter(s=>s.id!=='dashboard').map(s=>`
+        <div onclick="switchSection('${s.id}')" style="background:var(--sur);border:1px solid var(--bor);border-radius:12px;padding:18px;cursor:pointer;transition:all .15s;"
+          onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--bor)'">
+          <div style="font-size:22px;margin-bottom:8px;">${s.icon}</div>
+          <div style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:13.5px;margin-bottom:3px;">${s.label}</div>
+          <div style="font-size:11.5px;color:var(--tm);">${s.sub}</div>
+        </div>`).join('')}
+    </div>
+    <div class="info-card" style="margin-top:20px;">
+      <div style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:13px;margin-bottom:10px;">Account Details</div>
+      <div class="ir"><span class="il">Name</span><span class="iv">${session.name||'—'}</span></div>
+      <div class="ir"><span class="il">Employee ID</span><span class="iv">${session.employeeId||'—'}</span></div>
+      <div class="ir"><span class="il">Login Email</span><span class="iv">${session.email||'—'}</span></div>
+    </div>`;
+}
+
+// ── PROFILE HTML ────────────────────────────────────────────────────
+function profileHTML() {
+  return `
+    <div class="info-card">
+      <div style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:13px;margin-bottom:10px;">My Profile</div>
+      <div class="ir"><span class="il">Full Name</span><span class="iv">${session.name||'—'}</span></div>
+      <div class="ir"><span class="il">Employee ID</span><span class="iv">${session.employeeId||'—'}</span></div>
+      <div class="ir"><span class="il">Login Email</span><span class="iv">${session.email||'—'}</span></div>
+      <div class="ir"><span class="il">Portal Role</span><span class="iv">🧑‍💼 Employee</span></div>
+    </div>
+    <div class="empty" style="margin-top:16px;">
+      <div class="empty-icon">✏️</div>
+      <div class="empty-title">Edit profile coming soon</div>
+      <div class="empty-desc">Personal details, bank info, and password change will be available here.</div>
+    </div>`;
+}
+
+// ── DATA ENTRY HTML ─────────────────────────────────────────────────
+function dataEntryHTML() {
+  return `
+    <div class="card">
+      <div style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:14px;margin-bottom:14px;">📥 Input Source</div>
+      <div class="tabs">
+        <button class="tab active" onclick="switchTab('pdf',this)">📄 PDF</button>
+        <button class="tab" onclick="switchTab('image',this)">🖼️ Image</button>
+        <button class="tab" onclick="switchTab('text',this)">✍️ Paste Text</button>
+      </div>
+      <div class="panel active" id="panel-pdf">
+        <div class="dz" id="pdfZone" ondragover="event.preventDefault();this.classList.add('over')" ondragleave="this.classList.remove('over')" ondrop="dropFile(event,'pdf')">
+          <input type="file" accept=".pdf" onchange="pickFile(event,'pdf')">
+          <div style="font-size:32px;">📄</div>
+          <div style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;margin:6px 0 3px;">Drop PDF or click to browse</div>
+          <div style="font-size:12px;color:var(--tm);">Text extracted directly from the file</div>
+        </div>
+        <div class="fchip" id="pdfChip">📄 <span id="pdfChipText"></span></div>
+      </div>
+      <div class="panel" id="panel-image">
+        <div class="dz" id="imgZone" ondragover="event.preventDefault();this.classList.add('over')" ondragleave="this.classList.remove('over')" ondrop="dropFile(event,'image')">
+          <input type="file" accept="image/*" onchange="pickFile(event,'image')">
+          <div style="font-size:32px;">🖼️</div>
+          <div style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;margin:6px 0 3px;">Drop image or click to browse</div>
+          <div style="font-size:12px;color:var(--tm);">OCR reads text from photo (10–20 sec)</div>
+        </div>
+        <img id="imgPrev" class="imgprev">
+      </div>
+      <div class="panel" id="panel-text">
+        <textarea class="paste" id="pasteBox" placeholder="Paste newspaper or article text here..."></textarea>
+      </div>
+      <div style="margin-top:14px;display:flex;gap:10px;align-items:center;">
+        <button class="btn btn-p" id="extractBtn" onclick="extract()">🤖 Extract Fields</button>
+        <span style="font-size:12px;color:var(--tm);">Reads actual file content</span>
+      </div>
+    </div>
+
+    <div class="proc" id="procCard">
+      <div class="spin"></div>
+      <div style="font-weight:700;margin-bottom:3px;">Processing...</div>
+      <div style="font-size:12px;opacity:.75;" id="procStatus">Reading content...</div>
+    </div>
+
+    <div class="card" id="fieldsCard" style="display:none;">
+      <div style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:14px;margin-bottom:14px;">📝 Review &amp; Submit</div>
+      <div class="fg">
+        <div><div class="fl">Publication</div><input class="fi" id="f_pub" placeholder="e.g. The Hindu"></div>
+        <div><div class="fl">Edition / Date</div><input class="fi" id="f_ed" placeholder="e.g. June 2025"></div>
+        <div><div class="fl">Author</div><input class="fi" id="f_auth" placeholder="e.g. Rajesh Kumar"></div>
+        <div><div class="fl">Category</div><input class="fi" id="f_cat" placeholder="e.g. National"></div>
+        <div class="fg full"><div class="fl">Headline</div><input class="fi" id="f_hl" placeholder="Headline..."></div>
+        <div class="fg full"><div class="fl">Main Content</div><textarea class="fi" id="f_body" placeholder="Article body..."></textarea></div>
+      </div>
+      <div style="margin-top:14px;display:flex;gap:10px;">
+        <button class="btn btn-s" onclick="submitRecord()">📤 Submit to Admin</button>
+        <button class="btn btn-o" onclick="clearFields()">🗑 Clear</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:14px;margin-bottom:10px;">📋 My Submissions</div>
+      <div id="subList"><div style="font-size:13px;color:var(--tm);">No submissions yet — personal to your account only.</div></div>
+    </div>`;
+}
+
+// ── DATA ENTRY LOGIC ────────────────────────────────────────────────
+if (window.pdfjsLib) pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+let curTab = 'pdf', pdfFile = null, imgFile = null;
+
+function switchTab(t, btn) {
+  curTab = t;
+  document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('panel-' + t).classList.add('active');
+}
+
+function pickFile(e, type) {
+  const f = e.target.files[0]; if (!f) return;
+  if (type === 'pdf') {
+    pdfFile = f;
+    document.getElementById('pdfChip').style.display = 'flex';
+    document.getElementById('pdfChipText').textContent = f.name;
+  } else {
+    imgFile = f;
+    const r = new FileReader();
+    r.onload = ev => { const i = document.getElementById('imgPrev'); i.src = ev.target.result; i.style.display = 'block'; };
+    r.readAsDataURL(f);
+  }
+  toast('📄 ' + f.name + ' loaded!');
+}
+function dropFile(e, type) {
+  e.preventDefault();
+  document.getElementById(type === 'pdf' ? 'pdfZone' : 'imgZone').classList.remove('over');
+  const f = e.dataTransfer.files[0];
+  if (f) pickFile({ target: { files: [f] } }, type);
+}
+
+async function extract() {
+  if (curTab === 'pdf' && !pdfFile) { toast('⚠️ Upload a PDF first'); return; }
+  if (curTab === 'image' && !imgFile) { toast('⚠️ Upload an image first'); return; }
+  if (curTab === 'text' && !document.getElementById('pasteBox').value.trim()) { toast('⚠️ Paste some text first'); return; }
+
+  document.getElementById('procCard').classList.add('show');
+  document.getElementById('fieldsCard').style.display = 'none';
+  document.getElementById('extractBtn').disabled = true;
+
+  try {
+    let text = '';
+    if (curTab === 'text') {
+      text = document.getElementById('pasteBox').value;
+    } else if (curTab === 'pdf') {
+      document.getElementById('procStatus').textContent = 'Reading PDF...';
+      const buf = await pdfFile.arrayBuffer();
+      const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
+      for (let p = 1; p <= pdf.numPages; p++) {
+        const pg = await pdf.getPage(p);
+        const tc = await pg.getTextContent();
+        let ly = null, ln = '';
+        tc.items.forEach(it => {
+          const y = it.transform[5];
+          if (ly !== null && Math.abs(y - ly) > 2) { text += ln.trim() + '\n'; ln = ''; }
+          ln += it.str + ' '; ly = y;
+        });
+        text += ln.trim() + '\n';
+      }
+    } else {
+      document.getElementById('procStatus').textContent = 'Running OCR (10–20 sec)...';
+      const res = await Tesseract.recognize(imgFile, 'eng');
+      text = res.data.text;
+    }
+
+    const lines = text.split('\n').filter(l => l.trim());
+    document.getElementById('f_pub').value = (lines[0] || '').split('|')[0].trim();
+    document.getElementById('f_hl').value = lines[1] || lines[2] || '';
+    let auth = '';
+    lines.forEach(l => { if (l.toLowerCase().startsWith('by')) auth = l.replace(/^by:?\s*/i,'').trim(); });
+    document.getElementById('f_auth').value = auth;
+    const paras = lines.filter(l => l.length > 60);
+    document.getElementById('f_body').value = paras.slice(0, 4).join(' ').substring(0, 500);
+
+    document.getElementById('procCard').classList.remove('show');
+    document.getElementById('fieldsCard').style.display = 'block';
+    document.getElementById('extractBtn').disabled = false;
+    toast('✅ Fields extracted!');
+  } catch(e) {
+    document.getElementById('procCard').classList.remove('show');
+    document.getElementById('extractBtn').disabled = false;
+    toast('⚠️ ' + e.message);
+  }
+}
+
+function submitRecord() {
+  const hl = document.getElementById('f_hl').value.trim();
+  if (!hl) { toast('⚠️ Headline required'); return; }
+  const key = ns('data_entry');
+  const recs = db(key);
+  recs.unshift({
+    id: 'r_' + Date.now(),
+    headline: hl,
+    publication: document.getElementById('f_pub').value,
+    author: document.getElementById('f_auth').value,
+    category: document.getElementById('f_cat').value || 'General',
+    body: document.getElementById('f_body').value,
+    submittedBy: session.name || session.email,
+    submittedByEmployeeId: session.employeeId,
+    status: 'Pending',
+    savedAt: new Date().toLocaleString('en-IN')
+  });
+  save(key, recs);
+  clearFields();
+  renderSubmissions();
+  toast('✅ Submitted to admin!');
+}
+
+function clearFields() {
+  ['f_pub','f_ed','f_auth','f_cat','f_hl','f_body'].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
+  document.getElementById('fieldsCard').style.display = 'none';
+}
+
+function renderSubmissions() {
+  const el = document.getElementById('subList'); if (!el) return;
+  const recs = db(ns('data_entry'));
+  if (!recs.length) {
+    el.innerHTML = '<div style="font-size:13px;color:var(--tm);">No submissions yet — personal to your account only.</div>';
+    return;
+  }
+  el.innerHTML = recs.map(r => `
+    <div class="sub-row">
+      <div>
+        <div style="font-weight:600;">${r.headline}</div>
+        <div style="font-size:11px;color:var(--tm);">${r.publication||'—'} · ${r.savedAt}</div>
+      </div>
+      <span class="pill ${r.status==='Reviewed'?'pill-r':'pill-p'}">${r.status==='Reviewed'?'✅ Reviewed':'⏳ Pending'}</span>
+    </div>`).join('');
+}
+
+// ── TOAST ───────────────────────────────────────────────────────────
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ── LOGOUT ──────────────────────────────────────────────────────────
+function logout() {
+  sessionStorage.removeItem(SESSION_KEY);
+  window.location.href = '../index.html';
+}
+
+// ── INIT ────────────────────────────────────────────────────────────
+switchSection('dashboard');
 </script>
 </body>
 </html>
