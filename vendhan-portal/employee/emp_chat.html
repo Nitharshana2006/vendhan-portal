@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chat — Vendhan InfoTech Employee</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{--sidebar-w:240px;--topbar-h:64px;--accent:#4f46e5;--accent-light:#eef2ff;--surface:#fff;--bg:#f4f6fb;--border:#e5e7eb;--text-primary:#111827;--text-secondary:#6b7280;--text-muted:#9ca3af;--success:#059669;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text-primary);display:flex;min-height:100vh;}
+  .sidebar{width:var(--sidebar-w);background:linear-gradient(180deg,#1e1b4b,#312e81);position:fixed;top:0;left:0;height:100vh;display:flex;flex-direction:column;z-index:100;transition:width .3s;overflow:hidden;}
+  .sidebar.collapsed{width:68px;}
+  .sidebar-logo{padding:20px 18px 16px;display:flex;align-items:center;gap:12px;border-bottom:1px solid rgba(255,255,255,.08);min-height:var(--topbar-h);}
+  .logo-icon{width:36px;height:36px;background:linear-gradient(135deg,#818cf8,#6366f1);border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;color:#fff;flex-shrink:0;}
+  .logo-text{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:14px;color:#fff;white-space:nowrap;}
+  .logo-sub{font-size:10.5px;color:rgba(255,255,255,.4);}
+  .sidebar-nav{flex:1;padding:14px 10px;overflow-y:auto;overflow-x:hidden;}
+  .nav-section-label{font-size:10px;font-weight:600;letter-spacing:.09em;color:rgba(255,255,255,.3);text-transform:uppercase;padding:12px 10px 6px;white-space:nowrap;}
+  .sidebar.collapsed .nav-section-label{opacity:0;}
+  .nav-item{display:flex;align-items:center;gap:11px;padding:10px;border-radius:9px;cursor:pointer;color:rgba(255,255,255,.6);font-size:13.5px;font-weight:500;transition:all .15s;white-space:nowrap;text-decoration:none;margin-bottom:3px;}
+  .nav-item:hover{background:rgba(255,255,255,.08);color:rgba(255,255,255,.95);}
+  .nav-item.active{background:rgba(129,140,248,.25);color:#c7d2fe;border-left:3px solid #818cf8;padding-left:7px;}
+  .nav-icon{font-size:18px;flex-shrink:0;width:20px;text-align:center;}
+  .nav-badge{margin-left:auto;background:#dc2626;color:#fff;font-size:10px;font-weight:700;padding:2px 6px;border-radius:10px;}
+  .sidebar-footer{padding:14px 10px;border-top:1px solid rgba(255,255,255,.08);}
+  .user-card{display:flex;align-items:center;gap:10px;padding:10px;border-radius:9px;background:rgba(255,255,255,.07);overflow:hidden;}
+  .user-avatar-lg{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#818cf8,#6366f1);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;flex-shrink:0;}
+  .user-name{font-size:13px;font-weight:600;color:#fff;white-space:nowrap;}
+  .user-role-s{font-size:11px;color:rgba(255,255,255,.4);}
+  .topbar{position:fixed;top:0;left:var(--sidebar-w);right:0;height:var(--topbar-h);background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:16px;z-index:90;transition:left .3s;}
+  .topbar.collapsed{left:68px;}
+  .toggle-btn{width:36px;height:36px;border-radius:8px;background:none;border:1px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-secondary);font-size:18px;}
+  .page-title{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:17px;}
+  .page-breadcrumb{font-size:12px;color:var(--text-muted);}
+  .topbar-right{margin-left:auto;display:flex;align-items:center;gap:10px;}
+  .topbar-avatar{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#818cf8,#6366f1);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;}
+
+  .chat-wrapper{margin-left:var(--sidebar-w);margin-top:var(--topbar-h);height:calc(100vh - var(--topbar-h));display:flex;transition:margin-left .3s;}
+  .chat-wrapper.collapsed{margin-left:68px;}
+  .contacts-panel{width:280px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;}
+  .contacts-header{padding:14px 16px;border-bottom:1px solid var(--border);}
+  .contacts-title{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:15px;margin-bottom:10px;}
+  .search-box{display:flex;align-items:center;gap:8px;background:var(--bg);border:1px solid var(--border);border-radius:9px;padding:0 12px;height:35px;}
+  .search-box input{border:none;background:none;outline:none;font-size:13px;width:100%;font-family:'DM Sans',sans-serif;}
+  .contacts-list{flex:1;overflow-y:auto;}
+  .contact-item{display:flex;align-items:center;gap:11px;padding:11px 16px;cursor:pointer;transition:all .15s;border-bottom:1px solid var(--bg);position:relative;}
+  .contact-item:hover{background:var(--bg);}
+  .contact-item.active{background:var(--accent-light);}
+  .contact-avatar{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;position:relative;}
+  .online-dot{position:absolute;bottom:0;right:0;width:10px;height:10px;background:#059669;border-radius:50%;border:2px solid #fff;}
+  .offline-dot{position:absolute;bottom:0;right:0;width:10px;height:10px;background:#9ca3af;border-radius:50%;border:2px solid #fff;}
+  .contact-name{font-size:13.5px;font-weight:600;}
+  .contact-preview{font-size:12px;color:var(--text-muted);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px;}
+  .contact-time{font-size:11px;color:var(--text-muted);position:absolute;right:14px;top:13px;}
+  .unread-badge{position:absolute;right:14px;bottom:13px;background:var(--accent);color:#fff;font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;}
+  .chat-area{flex:1;display:flex;flex-direction:column;}
+  .chat-header{padding:13px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;background:var(--surface);}
+  .chat-header-name{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:15px;}
+  .chat-header-status{font-size:12px;margin-top:1px;}
+  .chat-header-actions{margin-left:auto;display:flex;gap:6px;}
+  .icon-btn{width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;color:var(--text-secondary);transition:all .15s;}
+  .icon-btn:hover{background:var(--bg);color:var(--accent);}
+  .messages-area{flex:1;overflow-y:auto;padding:18px;display:flex;flex-direction:column;gap:12px;background:#fafbff;}
+  .msg-row{display:flex;gap:9px;align-items:flex-end;}
+  .msg-row.sent{flex-direction:row-reverse;}
+  .msg-avatar{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;}
+  .msg-bubble{max-width:65%;padding:10px 13px;border-radius:14px;font-size:13.5px;line-height:1.5;}
+  .msg-bubble.received{background:var(--surface);border:1px solid var(--border);border-radius:14px 14px 14px 4px;}
+  .msg-bubble.sent{background:linear-gradient(135deg,#4f46e5,#6366f1);color:#fff;border-radius:14px 14px 4px 14px;}
+  .msg-time{font-size:11px;margin-top:4px;opacity:.6;}
+  .msg-time.sent{text-align:right;}
+  .date-divider{text-align:center;font-size:12px;color:var(--text-muted);padding:4px 0;display:flex;align-items:center;gap:10px;}
+  .date-divider::before,.date-divider::after{content:'';flex:1;height:1px;background:var(--border);}
+  .chat-input-area{padding:12px 16px;border-top:1px solid var(--border);background:var(--surface);display:flex;align-items:center;gap:9px;}
+  .attach-btn{width:34px;height:34px;border-radius:8px;border:1px solid var(--border);background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:17px;color:var(--text-secondary);}
+  .attach-btn:hover{background:var(--bg);color:var(--accent);}
+  .msg-input{flex:1;border:1px solid var(--border);border-radius:10px;padding:9px 13px;font-size:13.5px;font-family:'DM Sans',sans-serif;outline:none;resize:none;min-height:40px;max-height:90px;}
+  .msg-input:focus{border-color:var(--accent);}
+  .send-btn{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#4f46e5,#6366f1);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:17px;color:#fff;flex-shrink:0;transition:all .15s;}
+  .send-btn:hover{transform:scale(1.05);}
+  .empty-chat{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--text-muted);background:#fafbff;}
+  ::-webkit-scrollbar{width:4px;}
+  ::-webkit-scrollbar-thumb{background:var(--border);border-radius:10px;}
+</style>
+</head>
+<body>
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">V</div>
+    <div><div class="logo-text">Vendhan InfoTech</div><div class="logo-sub">Employee Portal</div></div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">My Workspace</div>
+    <a href="emp_dashboard.html" class="nav-item"><span class="nav-icon">⊞</span> Dashboard</a>
+    <a href="emp_attendance.html" class="nav-item"><span class="nav-icon">🕐</span> My Attendance</a>
+    <a href="emp_leave.html" class="nav-item"><span class="nav-icon">📅</span> My Leave<span class="nav-badge">1</span></a>
+    <a href="emp_salary.html" class="nav-item"><span class="nav-icon">💰</span> My Salary</a>
+    <a href="emp_tasks.html" class="nav-item"><span class="nav-icon">✅</span> My Tasks<span class="nav-badge">3</span></a>
+ <div class="nav-section-label">Automation</div>
+    <a href="emp_data_entry.html" class="nav-item"><span class="nav-icon">🤖</span> Data Entry Task</a>
+    <div class="nav-section-label">Communication</div>
+    <a href="emp_chat.html" class="nav-item active"><span class="nav-icon">💬</span> Chat<span class="nav-badge">2</span></a>
+    <a href="emp_notifications.html" class="nav-item"><span class="nav-icon">🔔</span> Notifications</a>
+    <div class="nav-section-label">Account</div>
+    <a href="emp_profile.html" class="nav-item"><span class="nav-icon">👤</span> My Profile</a>
+    <a href="emp_settings.html" class="nav-item"><span class="nav-icon">⚙️</span> Settings</a>
+    <a href="../index.html" class="nav-item"><span class="nav-icon">🚪</span> Logout</a>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="user-card">
+      <div class="user-avatar-lg">AK</div>
+      <div><div class="user-name">Arjun Kumar</div><div class="user-role-s">Senior Developer</div></div>
+    </div>
+  </div>
+</aside>
+
+<header class="topbar" id="topbar">
+  <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
+  <div><div class="page-title">Chat</div><div class="page-breadcrumb">Employee Portal › Chat</div></div>
+  <div class="topbar-right"><div class="topbar-avatar">AK</div></div>
+</header>
+<div class="chat-wrapper" id="chatWrapper">
+  <div class="contacts-panel">
+    <div class="contacts-header">
+      <div class="contacts-title">Messages</div>
+      <div class="search-box">
+        <span style="color:#9ca3af;font-size:14px;">🔍</span>
+        <input type="text" placeholder="Search..." oninput="filterContacts(this.value)">
+      </div>
+    </div>
+    <div class="contacts-list" id="contactsList"></div>
+  </div>
+  <div class="chat-area" id="chatArea">
+    <div class="empty-chat" id="emptyChatState">
+      <div style="font-size:44px;margin-bottom:12px;">💬</div>
+      <div style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:16px;margin-bottom:5px;">Start a conversation</div>
+      <div style="font-size:13px;">Select a contact to start chatting</div>
+    </div>
+    <div id="activeChatArea" style="display:none;flex-direction:column;height:100%;flex:1;">
+      <div class="chat-header">
+        <div class="contact-avatar" id="chatAvatar" style="width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;"></div>
+        <div>
+          <div class="chat-header-name" id="chatName"></div>
+          <div class="chat-header-status" id="chatStatus"></div>
+        </div>
+        <div class="chat-header-actions">
+          <button class="icon-btn">🔍</button>
+          <button class="icon-btn">📹</button>
+        </div>
+      </div>
+      <div class="messages-area" id="messagesArea"></div>
+      <div class="chat-input-area">
+        <button class="attach-btn">📎</button>
+        <button class="attach-btn">😊</button>
+        <textarea class="msg-input" id="msgInput" placeholder="Type a message..." rows="1"
+          onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMessage();}"></textarea>
+        <button class="send-btn" onclick="sendMessage()">➤</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+const contacts = [
+  {id:1,name:'Admin (HR Team)',role:'Administrator',initials:'A',color:'#eef2ff',tc:'#6366f1',online:true,unread:1,
+   messages:[
+    {from:'them',text:'Hi Arjun! Just a reminder — please submit your timesheet for last week.',time:'10:02 AM'},
+    {from:'me',text:'Sure, I will do it right away.',time:'10:05 AM'},
+    {from:'them',text:'Also your leave request for Jun 20 has been approved! ✅',time:'10:06 AM'},
+  ]},
+  {id:2,name:'Vikram Nair',role:'Team Lead — Engineering',initials:'VN',color:'#eff6ff',tc:'#2563eb',online:true,unread:1,
+   messages:[
+    {from:'them',text:'Arjun, can you push the API changes to staging today?',time:'9:30 AM'},
+    {from:'me',text:'Yes, I am almost done. Will push by 2 PM.',time:'9:35 AM'},
+    {from:'them',text:'Perfect. Let me know once it is up.',time:'9:36 AM'},
+  ]},
+  {id:3,name:'Priya Sharma',role:'HR Manager',initials:'PS',color:'#ecfdf5',tc:'#059669',online:false,
+   unread:0,messages:[
+    {from:'them',text:'Hi, please fill the Q2 self-assessment form.',time:'Yesterday'},
+    {from:'me',text:'Will do it by today evening.',time:'Yesterday'},
+  ]},
+  {id:4,name:'Engineering Team',role:'Group · 8 members',initials:'ET',color:'#f5f3ff',tc:'#7c3aed',online:true,unread:0,
+   messages:[
+    {from:'Karthik',text:'Daily standup in 5 minutes!',time:'9:55 AM'},
+    {from:'me',text:'Joining now.',time:'9:57 AM'},
+  ]},
+  {id:5,name:'Kavya Reddy',role:'UI/UX Designer',initials:'KR',color:'#fef2f2',tc:'#dc2626',online:true,unread:0,
+   messages:[
+    {from:'me',text:'Hey, can you share the design files for the dashboard?',time:'Tue'},
+    {from:'them',text:'Sure! Sharing the Figma link now.',time:'Tue'},
+  ]},
+];
+
+let activeId=null;
+function renderContacts(list){
+  document.getElementById('contactsList').innerHTML=list.map(c=>`
+    <div class="contact-item ${activeId===c.id?'active':''}" onclick="openChat(${c.id})">
+      <div class="contact-avatar" style="background:${c.color};color:${c.tc};">
+        ${c.initials}
+        <div class="${c.online?'online-dot':'offline-dot'}"></div>
+      </div>
+      <div style="flex:1;min-width:0;">
+        <div class="contact-name">${c.name}</div>
+        <div class="contact-preview">${c.messages[c.messages.length-1].text}</div>
+      </div>
+      <div class="contact-time">${c.messages[c.messages.length-1].time}</div>
+      ${c.unread?`<div class="unread-badge">${c.unread}</div>`:''}
+    </div>`).join('');
+}
+
+function openChat(id){
+  activeId=id;
+  const c=contacts.find(x=>x.id===id);
+  c.unread=0;
+  renderContacts(contacts);
+  document.getElementById('emptyChatState').style.display='none';
+  const area=document.getElementById('activeChatArea');
+  area.style.display='flex';
+  document.getElementById('chatAvatar').style.background=c.color;
+  document.getElementById('chatAvatar').style.color=c.tc;
+  document.getElementById('chatAvatar').textContent=c.initials;
+  document.getElementById('chatName').textContent=c.name;
+  document.getElementById('chatStatus').textContent=c.online?'🟢 Online':'⚫ Offline';
+  document.getElementById('chatStatus').style.color=c.online?'#059669':'#9ca3af';
+  const area2=document.getElementById('messagesArea');
+  area2.innerHTML=`<div class="date-divider">Today</div>`+
+    c.messages.map(m=>`
+      <div class="msg-row ${m.from==='me'?'sent':''}">
+        ${m.from!=='me'?`<div class="msg-avatar" style="background:${c.color};color:${c.tc};">${m.from==='them'?c.initials:m.from[0].toUpperCase()}</div>`:''}
+        <div>
+          <div class="msg-bubble ${m.from==='me'?'sent':'received'}">${m.text}</div>
+          <div class="msg-time ${m.from==='me'?'sent':''}">${m.time}</div>
+        </div>
+      </div>`).join('');
+  area2.scrollTop=area2.scrollHeight;
+  document.getElementById('msgInput').focus();
+}
+
+function sendMessage(){
+  const input=document.getElementById('msgInput');
+  const text=input.value.trim();
+  if(!text||!activeId) return;
+  const c=contacts.find(x=>x.id===activeId);
+  const time=new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',hour12:true});
+  c.messages.push({from:'me',text,time});
+  input.value='';
+  const area=document.getElementById('messagesArea');
+  const div=document.createElement('div');
+  div.className='msg-row sent';
+  div.innerHTML=`<div><div class="msg-bubble sent">${text}</div><div class="msg-time sent">${time}</div></div>`;
+  area.appendChild(div);
+  area.scrollTop=area.scrollHeight;
+  renderContacts(contacts);
+  setTimeout(()=>{
+    const replies=['Got it! 👍','Sure thing!','Will do!','Thanks for the update!','On it right away.','Understood! 😊'];
+    const reply=replies[Math.floor(Math.random()*replies.length)];
+    const rt=new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',hour12:true});
+    c.messages.push({from:'them',text:reply,time:rt});
+    const d2=document.createElement('div');
+    d2.className='msg-row';
+    d2.innerHTML=`<div class="msg-avatar" style="background:${c.color};color:${c.tc};">${c.initials}</div><div><div class="msg-bubble received">${reply}</div><div class="msg-time">${rt}</div></div>`;
+    area.appendChild(d2);
+    area.scrollTop=area.scrollHeight;
+    renderContacts(contacts);
+  },1500);
+}
+
+function filterContacts(q){renderContacts(contacts.filter(c=>c.name.toLowerCase().includes(q.toLowerCase())));}
+function toggleSidebar(){document.getElementById('sidebar').classList.toggle('collapsed');document.getElementById('topbar').classList.toggle('collapsed');document.getElementById('chatWrapper').classList.toggle('collapsed');}
+renderContacts(contacts);
+</script>
+</body>
+</html>

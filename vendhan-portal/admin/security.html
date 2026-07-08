@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Security — Vendhan InfoTech</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{--sidebar-w:260px;--topbar-h:64px;--accent:#4f46e5;--accent-light:#eef2ff;--surface:#fff;--bg:#f4f6fb;--border:#e5e7eb;--text-primary:#111827;--text-secondary:#6b7280;--text-muted:#9ca3af;--success:#059669;--success-bg:#ecfdf5;--danger:#dc2626;--danger-bg:#fef2f2;--warning:#d97706;--warning-bg:#fffbeb;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text-primary);display:flex;min-height:100vh;}
+  .sidebar{width:var(--sidebar-w);background:#0f172a;position:fixed;top:0;left:0;height:100vh;display:flex;flex-direction:column;z-index:100;transition:width .3s;overflow:hidden;}
+  .sidebar.collapsed{width:68px;}
+  .sidebar-logo{padding:20px 20px 16px;display:flex;align-items:center;gap:12px;border-bottom:1px solid rgba(255,255,255,.06);min-height:var(--topbar-h);}
+  .logo-icon{width:36px;height:36px;background:linear-gradient(135deg,#6366f1,#4f46e5);border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;color:#fff;flex-shrink:0;}
+  .logo-text{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:15px;color:#fff;white-space:nowrap;}
+  .logo-sub{font-size:11px;color:rgba(255,255,255,.4);}
+  .sidebar-nav{flex:1;min-height:0;padding:12px 10px;overflow-y:auto;overflow-x:hidden;}
+  .nav-section-label{font-size:10px;font-weight:600;letter-spacing:.08em;color:rgba(255,255,255,.25);text-transform:uppercase;padding:12px 10px 6px;white-space:nowrap;}
+  .sidebar.collapsed .nav-section-label{opacity:0;}
+  .nav-item{display:flex;align-items:center;gap:12px;padding:10px;border-radius:8px;cursor:pointer;color:rgba(255,255,255,0.55);font-size:13.5px;font-weight:500;transition:all .15s;white-space:nowrap;text-decoration:none;margin-bottom:2px;}
+  .nav-item:hover{background:rgba(255,255,255,.07);color:rgba(255,255,255,.9);}
+  .nav-item.active{background:rgba(99,102,241,.18);color:#a5b4fc;}
+  .nav-icon{font-size:18px;flex-shrink:0;width:20px;text-align:center;}
+  .nav-badge{margin-left:auto;background:#dc2626;color:#fff;font-size:10px;font-weight:700;padding:2px 6px;border-radius:10px;}
+  .sidebar-footer{padding:12px 10px;border-top:1px solid rgba(255,255,255,.06);}
+  .user-card{display:flex;align-items:center;gap:10px;padding:10px;border-radius:8px;background:rgba(255,255,255,.05);cursor:pointer;overflow:hidden;}
+  .user-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0;}
+  .user-name{font-size:13px;font-weight:600;color:#fff;white-space:nowrap;}
+  .user-role{font-size:11px;color:rgba(255,255,255,.4);}
+  .topbar{position:fixed;top:0;left:var(--sidebar-w);right:0;height:var(--topbar-h);background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:16px;z-index:90;transition:left .3s;}
+  .topbar.collapsed{left:68px;}
+  .toggle-btn{width:36px;height:36px;border-radius:8px;background:none;border:1px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-secondary);font-size:18px;}
+  .page-title{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:17px;}
+  .page-breadcrumb{font-size:12px;color:var(--text-muted);}
+  .topbar-right{margin-left:auto;display:flex;align-items:center;gap:8px;}
+  .topbar-avatar{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;cursor:pointer;}
+  .main{margin-left:var(--sidebar-w);margin-top:var(--topbar-h);padding:28px;transition:margin-left .3s;}
+  .main.collapsed{margin-left:68px;}
+  .btn-primary{background:var(--accent);color:#fff;border:none;border-radius:9px;padding:9px 18px;font-size:13.5px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:7px;font-family:'DM Sans',sans-serif;transition:all .15s;}
+  .btn-primary:hover{background:#4338ca;}
+  .btn-danger{background:var(--danger);color:#fff;border:none;border-radius:9px;padding:9px 16px;font-size:13.5px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:7px;font-family:'DM Sans',sans-serif;transition:all .15s;}
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px;margin-bottom:16px;}
+  .card-title{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:15px;margin-bottom:4px;}
+  .card-sub{font-size:13px;color:var(--text-muted);margin-bottom:18px;}
+  .toggle-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--bg);}
+  .toggle-row:last-child{border-bottom:none;}
+  .toggle-info-title{font-size:13.5px;font-weight:600;}
+  .toggle-info-sub{font-size:12px;color:var(--text-muted);margin-top:2px;}
+  .toggle{width:44px;height:24px;background:#e5e7eb;border-radius:12px;cursor:pointer;position:relative;transition:background .2s;flex-shrink:0;}
+  .toggle.on{background:var(--accent);}
+  .toggle::after{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;background:#fff;border-radius:50%;transition:left .2s;box-shadow:0 1px 4px rgba(0,0,0,.2);}
+  .toggle.on::after{left:23px;}
+  .session-row{display:flex;align-items:center;gap:14px;padding:12px 0;border-bottom:1px solid var(--bg);}
+  .session-row:last-child{border-bottom:none;}
+  .session-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+  .session-device{font-size:13.5px;font-weight:600;}
+  .session-meta{font-size:12px;color:var(--text-muted);margin-top:2px;}
+  .badge-current{background:var(--success-bg);color:var(--success);font-size:11px;font-weight:600;padding:2px 8px;border-radius:5px;}
+  .badge-warn{background:var(--warning-bg);color:var(--warning);font-size:11px;font-weight:600;padding:2px 8px;border-radius:5px;}
+  .revoke-btn{margin-left:auto;font-size:12px;padding:5px 12px;border-radius:7px;border:1px solid var(--danger-bg);background:var(--danger-bg);color:var(--danger);cursor:pointer;font-weight:600;transition:all .15s;}
+  .revoke-btn:hover{background:var(--danger);color:#fff;}
+  .form-group{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;}
+  .form-label{font-size:13px;font-weight:600;}
+  .form-input{height:40px;border:1px solid var(--border);border-radius:9px;padding:0 14px;font-size:13.5px;font-family:'DM Sans',sans-serif;outline:none;}
+  .form-input:focus{border-color:var(--accent);}
+  .alert-box{border-radius:10px;padding:13px 16px;font-size:13px;margin-bottom:16px;display:flex;align-items:flex-start;gap:10px;}
+  .alert-warning{background:var(--warning-bg);border:1px solid #fde68a;color:#92400e;}
+  .toast{position:fixed;bottom:28px;right:28px;background:#0f172a;color:#fff;padding:13px 20px;border-radius:12px;font-size:13.5px;font-weight:500;z-index:600;display:flex;align-items:center;gap:10px;box-shadow:0 8px 24px rgba(0,0,0,.2);transform:translateY(80px);opacity:0;transition:all .3s ease;}
+  .toast.show{transform:translateY(0);opacity:1;}
+  ::-webkit-scrollbar{width:5px;}
+  ::-webkit-scrollbar-thumb{background:var(--border);border-radius:10px;}
+</style>
+</head>
+<body>
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo"><div class="logo-icon">V</div><div><div class="logo-text">Vendhan InfoTech</div><div class="logo-sub">Admin Portal</div></div></div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Main</div>
+    <a href="dashboard.html" class="nav-item"><span class="nav-icon">⊞</span> Dashboard</a>
+    <a href="employees.html" class="nav-item"><span class="nav-icon">👥</span> Employee Management</a>
+    <a href="attendance.html" class="nav-item"><span class="nav-icon">🕐</span> Attendance</a>
+    <a href="leave.html" class="nav-item"><span class="nav-icon">📅</span> Leave Management<span class="nav-badge">7</span></a>
+    <a href="payroll.html" class="nav-item"><span class="nav-icon">💰</span> Payroll</a>
+    <div class="nav-section-label">Analytics</div>
+    <a href="reports.html" class="nav-item"><span class="nav-icon">📊</span> Reports &amp; Analytics</a>
+    <a href="projects.html" class="nav-item"><span class="nav-icon">📁</span> Projects &amp; Tasks</a>
+    <a href="departments.html" class="nav-item"><span class="nav-icon">🏢</span> Departments</a>
+    <div class="nav-section-label">Automation</div>
+    <a href="data_entry.html" class="nav-item"><span class="nav-icon">🤖</span> Data Entry Automation</a>
+    <div class="nav-section-label">Communication</div>
+    <a href="chat.html" class="nav-item"><span class="nav-icon">💬</span> Chat System<span class="nav-badge">3</span></a>
+    <a href="notifications.html" class="nav-item"><span class="nav-icon">🔔</span> Notifications</a>
+    <div class="nav-section-label">System</div>
+    <a href="settings.html" class="nav-item"><span class="nav-icon">⚙️</span> Settings</a>
+    <a href="security.html" class="nav-item active"><span class="nav-icon">🔒</span> Security</a>
+    <a href="logs.html" class="nav-item"><span class="nav-icon">📋</span> Activity Logs</a>
+    <a href="admin_profile.html" class="nav-item"><span class="nav-icon">👤</span> My Profile</a>
+    <a href="../index.html" class="nav-item"><span class="nav-icon">🚪</span> Logout</a>
+  </nav>
+  <div class="sidebar-footer"><div class="user-card" onclick="window.location.href='admin_profile.html'"><div class="user-avatar">A</div><div><div class="user-name">Admin User</div><div class="user-role">Super Administrator</div></div></div></div>
+</aside>
+<header class="topbar" id="topbar">
+  <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
+  <div><div class="page-title">Security</div><div class="page-breadcrumb">Admin Portal › Security</div></div>
+  <div class="topbar-right"><div class="topbar-avatar" onclick="window.location.href='admin_profile.html'">A</div></div>
+</header>
+<main class="main" id="mainContent">
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">🔒 Change Password</div>
+      <div class="card-sub">Update your admin account password</div>
+      <div class="form-group"><label class="form-label">Current Password</label><input class="form-input" type="password" placeholder="••••••••"></div>
+      <div class="form-group"><label class="form-label">New Password</label><input class="form-input" type="password" id="np" placeholder="Min 8 characters"></div>
+      <div class="form-group"><label class="form-label">Confirm New Password</label><input class="form-input" type="password" id="cp" placeholder="Re-enter new password"></div>
+      <button class="btn-primary" onclick="changePwd()">🔒 Update Password</button>
+    </div>
+    <div class="card">
+      <div class="card-title">🛡️ Security Settings</div>
+      <div class="card-sub">Manage authentication and access controls</div>
+      <div class="toggle-row"><div><div class="toggle-info-title">Two-Factor Authentication</div><div class="toggle-info-sub">Require OTP on every login</div></div><div class="toggle on" onclick="this.classList.toggle('on');showToast('🛡️ 2FA setting updated')"></div></div>
+      <div class="toggle-row"><div><div class="toggle-info-title">Login Alerts</div><div class="toggle-info-sub">Email alert on new device login</div></div><div class="toggle on" onclick="this.classList.toggle('on');showToast('🔔 Login alert setting updated')"></div></div>
+      <div class="toggle-row"><div><div class="toggle-info-title">Session Timeout</div><div class="toggle-info-sub">Auto logout after 30 min inactivity</div></div><div class="toggle on" onclick="this.classList.toggle('on');showToast('⏱ Session timeout setting updated')"></div></div>
+      <div class="toggle-row"><div><div class="toggle-info-title">Force HTTPS</div><div class="toggle-info-sub">Redirect all HTTP to HTTPS</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">💻 Active Sessions</div>
+    <div class="card-sub">Devices currently logged into your admin account</div>
+    <div class="session-row">
+      <div class="session-icon" style="background:#eef2ff;color:#6366f1;">🖥️</div>
+      <div>
+        <div class="session-device">Chrome on Windows 11 <span class="badge-current">Current</span></div>
+        <div class="session-meta">Coimbatore, Tamil Nadu · Last active: Just now</div>
+      </div>
+    </div>
+    <div class="session-row">
+      <div class="session-icon" style="background:#fffbeb;color:#d97706;">📱</div>
+      <div>
+        <div class="session-device">Safari on iPhone 15 <span class="badge-warn">Active</span></div>
+        <div class="session-meta">Coimbatore, Tamil Nadu · Last active: 2 hours ago</div>
+      </div>
+      <button class="revoke-btn" onclick="showToast('🚫 Session revoked!')">Revoke</button>
+    </div>
+    <div class="session-row">
+      <div class="session-icon" style="background:#f3f4f6;color:#6b7280;">💻</div>
+      <div>
+        <div class="session-device">Firefox on MacOS</div>
+        <div class="session-meta">Chennai, Tamil Nadu · Last active: Yesterday</div>
+      </div>
+      <button class="revoke-btn" onclick="showToast('🚫 Session revoked!')">Revoke</button>
+    </div>
+    <div style="margin-top:14px;"><button class="btn-danger" onclick="showToast('🚫 All other sessions revoked!')">Revoke All Other Sessions</button></div>
+  </div>
+  <div class="card">
+    <div class="card-title">👥 Role & Permissions</div>
+    <div class="card-sub">Manage what each role can access in the portal</div>
+    <div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:13.5px;">
+      <thead><tr style="background:var(--bg);">
+        <th style="text-align:left;padding:11px 14px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);">Permission</th>
+        <th style="text-align:center;padding:11px 14px;font-size:11px;font-weight:600;text-transform:uppercase;color:var(--text-muted);">Super Admin</th>
+        <th style="text-align:center;padding:11px 14px;font-size:11px;font-weight:600;text-transform:uppercase;color:var(--text-muted);">HR Manager</th>
+        <th style="text-align:center;padding:11px 14px;font-size:11px;font-weight:600;text-transform:uppercase;color:var(--text-muted);">Employee</th>
+      </tr></thead>
+      <tbody>
+        <tr style="border-bottom:1px solid var(--bg);"><td style="padding:11px 14px;font-weight:500;">View Dashboard</td><td style="text-align:center;color:#059669;font-size:16px;">✅</td><td style="text-align:center;color:#059669;font-size:16px;">✅</td><td style="text-align:center;color:#059669;font-size:16px;">✅</td></tr>
+        <tr style="border-bottom:1px solid var(--bg);"><td style="padding:11px 14px;font-weight:500;">Manage Employees</td><td style="text-align:center;color:#059669;font-size:16px;">✅</td><td style="text-align:center;color:#059669;font-size:16px;">✅</td><td style="text-align:center;color:#dc2626;font-size:16px;">❌</td></tr>
+        <tr style="border-bottom:1px solid var(--bg);"><td style="padding:11px 14px;font-weight:500;">Process Payroll</td><td style="text-align:center;color:#059669;font-size:16px;">✅</td><td style="text-align:center;color:#dc2626;font-size:16px;">❌</td><td style="text-align:center;color:#dc2626;font-size:16px;">❌</td></tr>
+        <tr style="border-bottom:1px solid var(--bg);"><td style="padding:11px 14px;font-weight:500;">Approve Leaves</td><td style="text-align:center;color:#059669;font-size:16px;">✅</td><td style="text-align:center;color:#059669;font-size:16px;">✅</td><td style="text-align:center;color:#dc2626;font-size:16px;">❌</td></tr>
+        <tr><td style="padding:11px 14px;font-weight:500;">View Reports</td><td style="text-align:center;color:#059669;font-size:16px;">✅</td><td style="text-align:center;color:#059669;font-size:16px;">✅</td><td style="text-align:center;color:#dc2626;font-size:16px;">❌</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+</main>
+<div class="toast" id="toast"></div>
+<script>
+  function changePwd(){
+    const np=document.getElementById('np').value;
+    const cp=document.getElementById('cp').value;
+    if(!np||!cp){showToast('⚠️ Please fill all fields');return;}
+    if(np!==cp){showToast('⚠️ Passwords do not match');return;}
+    if(np.length<8){showToast('⚠️ Password must be at least 8 characters');return;}
+    document.getElementById('np').value='';document.getElementById('cp').value='';
+    showToast('✅ Password updated successfully!');
+  }
+  function toggleSidebar(){document.getElementById('sidebar').classList.toggle('collapsed');document.getElementById('topbar').classList.toggle('collapsed');document.getElementById('mainContent').classList.toggle('collapsed');}
+  function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3500);}
+</script>
+</body>
+</html>

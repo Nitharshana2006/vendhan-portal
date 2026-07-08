@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Attendance — Vendhan InfoTech</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{--sidebar-w:240px;--topbar-h:64px;--accent:#4f46e5;--accent-light:#eef2ff;--surface:#fff;--bg:#f4f6fb;--border:#e5e7eb;--text-primary:#111827;--text-secondary:#6b7280;--text-muted:#9ca3af;--success:#059669;--success-bg:#ecfdf5;--warning:#d97706;--warning-bg:#fffbeb;--danger:#dc2626;--danger-bg:#fef2f2;--info:#2563eb;--info-bg:#eff6ff;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text-primary);display:flex;min-height:100vh;}
+  .sidebar{width:var(--sidebar-w);background:linear-gradient(180deg,#1e1b4b,#312e81);position:fixed;top:0;left:0;height:100vh;display:flex;flex-direction:column;z-index:100;transition:width .3s;overflow:hidden;}
+  .sidebar.collapsed{width:68px;}
+  .sidebar-logo{padding:20px 18px 16px;display:flex;align-items:center;gap:12px;border-bottom:1px solid rgba(255,255,255,.08);min-height:var(--topbar-h);}
+  .logo-icon{width:36px;height:36px;background:linear-gradient(135deg,#818cf8,#6366f1);border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;color:#fff;flex-shrink:0;}
+  .logo-text{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:14px;color:#fff;white-space:nowrap;}
+  .logo-sub{font-size:10.5px;color:rgba(255,255,255,.4);}
+  .sidebar-nav{flex:1;padding:14px 10px;overflow-y:auto;overflow-x:hidden;}
+  .nav-section-label{font-size:10px;font-weight:600;letter-spacing:.09em;color:rgba(255,255,255,.3);text-transform:uppercase;padding:12px 10px 6px;white-space:nowrap;}
+  .sidebar.collapsed .nav-section-label{opacity:0;}
+  .nav-item{display:flex;align-items:center;gap:11px;padding:10px;border-radius:9px;cursor:pointer;color:rgba(255,255,255,.6);font-size:13.5px;font-weight:500;transition:all .15s;white-space:nowrap;text-decoration:none;margin-bottom:3px;}
+  .nav-item:hover{background:rgba(255,255,255,.08);color:rgba(255,255,255,.95);}
+  .nav-item.active{background:rgba(129,140,248,.25);color:#c7d2fe;border-left:3px solid #818cf8;padding-left:7px;}
+  .nav-icon{font-size:18px;flex-shrink:0;width:20px;text-align:center;}
+  .nav-badge{margin-left:auto;background:#dc2626;color:#fff;font-size:10px;font-weight:700;padding:2px 6px;border-radius:10px;}
+  .sidebar-footer{padding:14px 10px;border-top:1px solid rgba(255,255,255,.08);}
+  .user-card{display:flex;align-items:center;gap:10px;padding:10px;border-radius:9px;background:rgba(255,255,255,.07);overflow:hidden;}
+  .user-avatar-lg{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#818cf8,#6366f1);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;flex-shrink:0;}
+  .user-name{font-size:13px;font-weight:600;color:#fff;white-space:nowrap;}
+  .user-role-s{font-size:11px;color:rgba(255,255,255,.4);}
+  .topbar{position:fixed;top:0;left:var(--sidebar-w);right:0;height:var(--topbar-h);background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:16px;z-index:90;transition:left .3s;}
+  .topbar.collapsed{left:68px;}
+  .toggle-btn{width:36px;height:36px;border-radius:8px;background:none;border:1px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-secondary);font-size:18px;}
+  .page-title{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:17px;}
+  .page-breadcrumb{font-size:12px;color:var(--text-muted);}
+  .topbar-right{margin-left:auto;display:flex;align-items:center;gap:10px;}
+  .topbar-avatar{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#818cf8,#6366f1);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;cursor:pointer;}
+  .main{margin-left:var(--sidebar-w);margin-top:var(--topbar-h);padding:26px;transition:margin-left .3s;min-height:calc(100vh - var(--topbar-h));}
+  .main.collapsed{margin-left:68px;}
+  .btn-primary{background:var(--accent);color:#fff;border:none;border-radius:9px;padding:9px 18px;font-size:13.5px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:7px;font-family:'DM Sans',sans-serif;transition:all .15s;}
+  .btn-primary:hover{background:#4338ca;}
+  .btn-outline{background:#fff;color:var(--text-secondary);border:1px solid var(--border);border-radius:9px;padding:9px 16px;font-size:13.5px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;display:inline-flex;align-items:center;gap:7px;}
+  .btn-outline:hover{border-color:var(--accent);color:var(--accent);}
+  .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px;}
+  .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px;display:flex;align-items:center;gap:14px;transition:all .2s;}
+  .stat-card:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(0,0,0,.07);}
+  .stat-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+  .stat-value{font-family:'Plus Jakarta Sans',sans-serif;font-size:22px;font-weight:700;}
+  .stat-label{font-size:12.5px;color:var(--text-secondary);margin-top:2px;}
+
+  /* CHECKIN PANEL */
+  .checkin-panel{background:linear-gradient(135deg,#312e81,#4f46e5);border-radius:16px;padding:24px 28px;color:#fff;display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;}
+  .ci-time{font-family:'Plus Jakarta Sans',sans-serif;font-size:36px;font-weight:700;letter-spacing:-1px;}
+  .ci-date{font-size:13px;color:rgba(255,255,255,.65);margin-top:4px;}
+  .ci-status{display:flex;gap:16px;margin-top:14px;}
+  .ci-box{background:rgba(255,255,255,.12);border-radius:9px;padding:10px 16px;text-align:center;}
+  .ci-box-val{font-family:'Plus Jakarta Sans',sans-serif;font-size:18px;font-weight:700;}
+  .ci-box-label{font-size:11px;color:rgba(255,255,255,.6);margin-top:2px;}
+  .ci-btn{padding:12px 28px;border-radius:11px;border:none;font-size:14px;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;transition:all .2s;}
+  .ci-btn.in{background:#fff;color:#4f46e5;}
+  .ci-btn.in:hover{background:#e0e7ff;}
+  .ci-btn.out{background:#dc2626;color:#fff;}
+  .ci-btn.out:hover{background:#b91c1c;}
+
+  .table-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-top:18px;}
+  .table-header-row{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+  .table-title{font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;font-size:15px;}
+  .data-table{width:100%;border-collapse:collapse;font-size:13.5px;}
+  .data-table th{text-align:left;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);padding:12px 16px;border-bottom:1px solid var(--border);background:var(--bg);white-space:nowrap;}
+  .data-table td{padding:12px 16px;border-bottom:1px solid var(--bg);vertical-align:middle;}
+  .data-table tbody tr:last-child td{border-bottom:none;}
+  .data-table tbody tr:hover td{background:#fafbff;}
+  .badge{display:inline-flex;align-items:center;font-size:11.5px;font-weight:600;padding:3px 10px;border-radius:6px;white-space:nowrap;}
+  .badge-success{background:var(--success-bg);color:var(--success);}
+  .badge-warning{background:var(--warning-bg);color:var(--warning);}
+  .badge-danger{background:var(--danger-bg);color:var(--danger);}
+  .badge-info{background:var(--info-bg);color:var(--info);}
+
+  /* CORRECTION MODAL */
+  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:500;display:none;align-items:center;justify-content:center;}
+  .modal-overlay.open{display:flex;}
+  .modal{background:#fff;border-radius:18px;width:460px;max-width:95vw;box-shadow:0 24px 64px rgba(0,0,0,.18);animation:modalIn .25s ease;}
+  @keyframes modalIn{from{opacity:0;transform:scale(.95);}to{opacity:1;transform:scale(1);}}
+  .modal-header{padding:20px 24px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+  .modal-title{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:17px;}
+  .modal-close{width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:none;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;}
+  .modal-close:hover{background:var(--danger-bg);color:var(--danger);}
+  .modal-body{padding:22px 24px;}
+  .modal-footer{padding:14px 24px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px;}
+  .form-group{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;}
+  .form-label{font-size:13px;font-weight:600;}
+  .form-input{height:40px;border:1px solid var(--border);border-radius:9px;padding:0 14px;font-size:13.5px;font-family:'DM Sans',sans-serif;outline:none;}
+  .form-input:focus{border-color:var(--accent);}
+  .form-textarea{border:1px solid var(--border);border-radius:9px;padding:10px 14px;font-size:13.5px;font-family:'DM Sans',sans-serif;outline:none;resize:vertical;min-height:70px;width:100%;}
+  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .toolbar{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px 18px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+  .filter-select{height:38px;border:1px solid var(--border);border-radius:9px;padding:0 12px;font-size:13px;color:var(--text-secondary);background:#fff;cursor:pointer;font-family:'DM Sans',sans-serif;outline:none;}
+  .toast{position:fixed;bottom:28px;right:28px;background:#0f172a;color:#fff;padding:13px 20px;border-radius:12px;font-size:13.5px;font-weight:500;z-index:600;display:flex;align-items:center;gap:10px;box-shadow:0 8px 24px rgba(0,0,0,.2);transform:translateY(80px);opacity:0;transition:all .3s ease;}
+  .toast.show{transform:translateY(0);opacity:1;}
+  ::-webkit-scrollbar{width:5px;}
+  ::-webkit-scrollbar-thumb{background:var(--border);border-radius:10px;}
+</style>
+</head>
+<body>
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">V</div>
+    <div><div class="logo-text">Vendhan InfoTech</div><div class="logo-sub">Employee Portal</div></div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">My Workspace</div>
+    <a href="emp_dashboard.html" class="nav-item"><span class="nav-icon">⊞</span> Dashboard</a>
+    <a href="emp_attendance.html" class="nav-item active"><span class="nav-icon">🕐</span> My Attendance</a>
+    <a href="emp_leave.html" class="nav-item"><span class="nav-icon">📅</span> My Leave<span class="nav-badge">1</span></a>
+    <a href="emp_salary.html" class="nav-item"><span class="nav-icon">💰</span> My Salary</a>
+    <a href="emp_tasks.html" class="nav-item"><span class="nav-icon">✅</span> My Tasks<span class="nav-badge">3</span></a>
+ <div class="nav-section-label">Automation</div>
+    <a href="emp_data_entry.html" class="nav-item"><span class="nav-icon">🤖</span> Data Entry Task</a>
+    <div class="nav-section-label">Communication</div>
+    <a href="emp_chat.html" class="nav-item"><span class="nav-icon">💬</span> Chat<span class="nav-badge">2</span></a>
+    <a href="emp_notifications.html" class="nav-item"><span class="nav-icon">🔔</span> Notifications</a>
+    <div class="nav-section-label">Account</div>
+    <a href="emp_profile.html" class="nav-item"><span class="nav-icon">👤</span> My Profile</a>
+    <a href="emp_settings.html" class="nav-item"><span class="nav-icon">⚙️</span> Settings</a>
+    <a href="../index.html" class="nav-item"><span class="nav-icon">🚪</span> Logout</a>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="user-card">
+      <div class="user-avatar-lg">AK</div>
+      <div><div class="user-name">Arjun Kumar</div><div class="user-role-s">Senior Developer</div></div>
+    </div>
+  </div>
+</aside>
+
+<header class="topbar" id="topbar">
+  <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
+  <div>
+    <div class="page-title">My Attendance</div>
+    <div class="page-breadcrumb">Employee Portal › Attendance</div>
+  </div>
+  <div class="topbar-right">
+    <button class="btn-outline" onclick="openCorrectionModal()">📝 Request Correction</button>
+    <div class="topbar-avatar">AK</div>
+  </div>
+</header>
+
+<main class="main" id="mainContent">
+
+  <!-- CHECK IN PANEL -->
+  <div class="checkin-panel">
+    <div>
+      <div class="ci-time" id="ciTime">--:--:--</div>
+      <div class="ci-date" id="ciDate"></div>
+      <div class="ci-status">
+        <div class="ci-box"><div class="ci-box-val" id="ciInTime">--:--</div><div class="ci-box-label">Check In</div></div>
+        <div class="ci-box"><div class="ci-box-val" id="ciOutTime">--:--</div><div class="ci-box-label">Check Out</div></div>
+        <div class="ci-box"><div class="ci-box-val" id="ciHours">0h 0m</div><div class="ci-box-label">Hours Today</div></div>
+      </div>
+    </div>
+    <div style="text-align:center;">
+      <button class="ci-btn in" id="mainCiBtn" onclick="toggleCheckin()">✔ Check In</button>
+      <div style="font-size:12px;color:rgba(255,255,255,.5);margin-top:10px;" id="ciStatusLabel">Not checked in</div>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon" style="background:var(--success-bg);color:var(--success);">✅</div>
+      <div><div class="stat-value">22</div><div class="stat-label">Present Days</div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background:var(--danger-bg);color:var(--danger);">❌</div>
+      <div><div class="stat-value">2</div><div class="stat-label">Absent Days</div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background:var(--info-bg);color:var(--info);">⏰</div>
+      <div><div class="stat-value">2</div><div class="stat-label">Late Arrivals</div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background:var(--warning-bg);color:var(--warning);">⏱️</div>
+      <div><div class="stat-value">12h</div><div class="stat-label">Overtime This Month</div></div>
+    </div>
+  </div>
+
+  <!-- TOOLBAR + TABLE -->
+  <div class="toolbar" style="margin-bottom:0;">
+    <select class="filter-select" id="monthFilter" onchange="filterAttendance()">
+      <option>June 2025</option><option>May 2025</option><option>April 2025</option>
+    </select>
+    <select class="filter-select" id="statusFilter" onchange="filterAttendance()">
+      <option value="">All Status</option>
+      <option>Present</option><option>Absent</option><option>Late</option><option>On Leave</option>
+    </select>
+    <button class="btn-outline" style="margin-left:auto;" onclick="showToast('📥 Attendance exported!')">📥 Export</button>
+  </div>
+
+  <div class="table-card">
+    <div class="table-header-row">
+      <div class="table-title">My Attendance History</div>
+      <div style="font-size:13px;color:var(--text-muted);" id="attCount"></div>
+    </div>
+    <div style="overflow-x:auto;">
+      <table class="data-table">
+        <thead><tr>
+          <th>Date</th><th>Day</th><th>Check In</th><th>Check Out</th>
+          <th>Working Hours</th><th>Overtime</th><th>Status</th><th style="text-align:center;">Action</th>
+        </tr></thead>
+        <tbody id="attTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+</main>
+
+<!-- CORRECTION MODAL -->
+<div class="modal-overlay" id="corrModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Request Attendance Correction</div>
+      <button class="modal-close" onclick="closeCorrModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Date *</label>
+        <input class="form-input" type="date" id="corrDate">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Correct Check In</label>
+          <input class="form-input" type="time" id="corrIn">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Correct Check Out</label>
+          <input class="form-input" type="time" id="corrOut">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Reason *</label>
+        <textarea class="form-textarea" id="corrReason" placeholder="Explain why you need this correction..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-outline" onclick="closeCorrModal()">Cancel</button>
+      <button class="btn-primary" onclick="submitCorrection()">📝 Submit Request</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script>
+const attData = [
+  {date:'2025-06-13',checkin:'08:52',checkout:'18:10',hours:'9h 18m',ot:'1h 18m',status:'Present'},
+  {date:'2025-06-12',checkin:'09:42',checkout:'18:00',hours:'8h 18m',ot:'—',status:'Late'},
+  {date:'2025-06-11',checkin:'08:45',checkout:'19:30',hours:'10h 45m',ot:'2h 45m',status:'Present'},
+  {date:'2025-06-10',checkin:'09:00',checkout:'18:00',hours:'9h 00m',ot:'—',status:'Present'},
+  {date:'2025-06-09',checkin:'—',checkout:'—',hours:'—',ot:'—',status:'On Leave'},
+  {date:'2025-06-06',checkin:'08:50',checkout:'18:05',hours:'9h 15m',ot:'—',status:'Present'},
+  {date:'2025-06-05',checkin:'09:55',checkout:'18:00',hours:'8h 05m',ot:'—',status:'Late'},
+  {date:'2025-06-04',checkin:'—',checkout:'—',hours:'—',ot:'—',status:'Absent'},
+  {date:'2025-06-03',checkin:'08:48',checkout:'18:15',hours:'9h 27m',ot:'1h 27m',status:'Present'},
+  {date:'2025-06-02',checkin:'09:02',checkout:'18:00',hours:'8h 58m',ot:'—',status:'Present'},
+];
+const days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+
+function renderAtt(data){
+  document.getElementById('attCount').textContent=`${data.length} records`;
+  document.getElementById('attTableBody').innerHTML=data.map(r=>{
+    const d=new Date(r.date);
+    const sb=r.status==='Present'?'badge-success':r.status==='Late'?'badge-info':r.status==='Absent'?'badge-danger':'badge-warning';
+    return`<tr>
+      <td style="font-weight:600;">${d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})}</td>
+      <td style="color:var(--text-muted);font-size:13px;">${days[d.getDay()]}</td>
+      <td style="font-weight:600;color:${r.checkin==='—'?'var(--text-muted)':'#059669'};">${r.checkin}</td>
+      <td style="font-weight:600;color:${r.checkout==='—'?'var(--text-muted)':'#dc2626'};">${r.checkout}</td>
+      <td style="color:var(--text-secondary);">${r.hours}</td>
+      <td style="color:${r.ot==='—'?'var(--text-muted)':'#7c3aed'};font-weight:${r.ot==='—'?400:600};">${r.ot}</td>
+      <td><span class="badge ${sb}">● ${r.status}</span></td>
+      <td style="text-align:center;"><button style="font-size:12px;padding:4px 10px;border-radius:7px;border:1px solid var(--border);background:none;cursor:pointer;" onclick="openCorrectionModal('${r.date}')">Correct</button></td>
+    </tr>`;
+  }).join('');
+}
+function filterAttendance(){
+  const st=document.getElementById('statusFilter').value;
+  renderAtt(st?attData.filter(r=>r.status===st):attData);
+}
+
+let ciIn=false,ciStart=null,timerInterval=null;
+function toggleCheckin(){
+  const btn=document.getElementById('mainCiBtn');
+  const lbl=document.getElementById('ciStatusLabel');
+  const now=new Date();
+  if(!ciIn){
+    ciIn=true; ciStart=now;
+    document.getElementById('ciInTime').textContent=now.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',hour12:true});
+    btn.className='ci-btn out'; btn.textContent='✗ Check Out';
+    lbl.textContent='Currently working...';
+    timerInterval=setInterval(()=>{
+      const diff=new Date()-ciStart;
+      const h=Math.floor(diff/3600000);
+      const m=Math.floor((diff%3600000)/60000);
+      const s=Math.floor((diff%60000)/1000);
+      document.getElementById('ciHours').textContent=`${h}h ${m}m ${s}s`;
+    },1000);
+    showToast('✅ Checked in at '+now.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',hour12:true}));
+  } else {
+    ciIn=false; clearInterval(timerInterval);
+    document.getElementById('ciOutTime').textContent=now.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',hour12:true});
+    btn.className='ci-btn in'; btn.textContent='✔ Check In';
+    lbl.textContent='Checked out';
+    showToast('👋 Checked out successfully!');
+  }
+}
+
+function updateClock(){
+  const now=new Date();
+  document.getElementById('ciTime').textContent=now.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:true});
+  document.getElementById('ciDate').textContent=now.toLocaleDateString('en-IN',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
+}
+setInterval(updateClock,1000); updateClock();
+
+function openCorrectionModal(date=''){
+  if(date) document.getElementById('corrDate').value=date;
+  else document.getElementById('corrDate').value=new Date().toISOString().split('T')[0];
+  document.getElementById('corrModal').classList.add('open');
+}
+function closeCorrModal(){document.getElementById('corrModal').classList.remove('open');}
+function submitCorrection(){
+  const reason=document.getElementById('corrReason').value.trim();
+  if(!reason){showToast('⚠️ Please enter a reason');return;}
+  closeCorrModal(); document.getElementById('corrReason').value='';
+  showToast('📝 Correction request submitted to admin!');
+}
+function toggleSidebar(){
+  document.getElementById('sidebar').classList.toggle('collapsed');
+  document.getElementById('topbar').classList.toggle('collapsed');
+  document.getElementById('mainContent').classList.toggle('collapsed');
+}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3500);}
+
+renderAtt(attData);
+</script>
+</body>
+</html>

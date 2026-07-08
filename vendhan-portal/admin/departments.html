@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Departments — Vendhan InfoTech</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{--sidebar-w:260px;--topbar-h:64px;--accent:#4f46e5;--accent-light:#eef2ff;--surface:#fff;--bg:#f4f6fb;--border:#e5e7eb;--text-primary:#111827;--text-secondary:#6b7280;--text-muted:#9ca3af;--success:#059669;--success-bg:#ecfdf5;--warning:#d97706;--warning-bg:#fffbeb;--danger:#dc2626;--danger-bg:#fef2f2;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text-primary);display:flex;min-height:100vh;}
+  .sidebar{width:var(--sidebar-w);background:#0f172a;position:fixed;top:0;left:0;height:100vh;display:flex;flex-direction:column;z-index:100;transition:width .3s;overflow:hidden;}
+  .sidebar.collapsed{width:68px;}
+  .sidebar-logo{padding:20px 20px 16px;display:flex;align-items:center;gap:12px;border-bottom:1px solid rgba(255,255,255,.06);min-height:var(--topbar-h);}
+  .logo-icon{width:36px;height:36px;background:linear-gradient(135deg,#6366f1,#4f46e5);border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;color:#fff;flex-shrink:0;}
+  .logo-text{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:15px;color:#fff;white-space:nowrap;}
+  .logo-sub{font-size:11px;color:rgba(255,255,255,.4);}
+  .sidebar-nav{flex:1;padding:12px 10px;overflow-y:auto;overflow-x:hidden;}
+  .nav-section-label{font-size:10px;font-weight:600;letter-spacing:.08em;color:rgba(255,255,255,.25);text-transform:uppercase;padding:12px 10px 6px;white-space:nowrap;}
+  .sidebar.collapsed .nav-section-label{opacity:0;}
+  .nav-item{display:flex;align-items:center;gap:12px;padding:10px;border-radius:8px;cursor:pointer;color:rgba(255,255,255,.55);font-size:13.5px;font-weight:500;transition:all .15s;white-space:nowrap;text-decoration:none;margin-bottom:2px;}
+  .nav-item:hover{background:rgba(255,255,255,.07);color:rgba(255,255,255,.9);}
+  .nav-item.active{background:rgba(99,102,241,.18);color:#a5b4fc;}
+  .nav-icon{font-size:18px;flex-shrink:0;width:20px;text-align:center;}
+  .nav-badge{margin-left:auto;background:#dc2626;color:#fff;font-size:10px;font-weight:700;padding:2px 6px;border-radius:10px;}
+  .sidebar-footer{padding:12px 10px;border-top:1px solid rgba(255,255,255,.06);}
+  .user-card{display:flex;align-items:center;gap:10px;padding:10px;border-radius:8px;background:rgba(255,255,255,.05);cursor:pointer;overflow:hidden;}
+  .user-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0;}
+  .user-name{font-size:13px;font-weight:600;color:#fff;white-space:nowrap;}
+  .user-role{font-size:11px;color:rgba(255,255,255,.4);}
+  .topbar{position:fixed;top:0;left:var(--sidebar-w);right:0;height:var(--topbar-h);background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:16px;z-index:90;transition:left .3s;}
+  .topbar.collapsed{left:68px;}
+  .toggle-btn{width:36px;height:36px;border-radius:8px;background:none;border:1px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-secondary);font-size:18px;}
+  .page-title{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:17px;}
+  .page-breadcrumb{font-size:12px;color:var(--text-muted);}
+  .topbar-right{margin-left:auto;display:flex;align-items:center;gap:8px;}
+  .topbar-avatar{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;cursor:pointer;}
+  .main{margin-left:var(--sidebar-w);margin-top:var(--topbar-h);padding:28px;transition:margin-left .3s;}
+  .main.collapsed{margin-left:68px;}
+  .btn-primary{background:var(--accent);color:#fff;border:none;border-radius:9px;padding:9px 18px;font-size:13.5px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:7px;font-family:'DM Sans',sans-serif;transition:all .15s;}
+  .btn-primary:hover{background:#4338ca;}
+  .btn-outline{background:#fff;color:var(--text-secondary);border:1px solid var(--border);border-radius:9px;padding:9px 16px;font-size:13.5px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;display:inline-flex;align-items:center;gap:7px;}
+  .btn-outline:hover{border-color:var(--accent);color:var(--accent);}
+  .dept-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+  .dept-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:22px;transition:all .2s;position:relative;overflow:hidden;}
+  .dept-card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.08);}
+  .dept-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;border-radius:16px 16px 0 0;}
+  .dept-icon{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:14px;}
+  .dept-name{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:17px;margin-bottom:4px;}
+  .dept-head{font-size:13px;color:var(--text-secondary);margin-bottom:14px;}
+  .dept-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px;}
+  .dept-stat-box{background:var(--bg);border-radius:9px;padding:9px 10px;text-align:center;}
+  .dept-stat-val{font-family:'Plus Jakarta Sans',sans-serif;font-size:18px;font-weight:700;}
+  .dept-stat-label{font-size:11px;color:var(--text-muted);margin-top:2px;}
+  .dept-bar{height:6px;background:var(--bg);border-radius:10px;overflow:hidden;margin-bottom:12px;}
+  .dept-bar-fill{height:100%;border-radius:10px;}
+  .dept-actions{display:flex;gap:8px;}
+  .action-btn-sm{flex:1;padding:7px;border-radius:8px;border:1px solid var(--border);background:none;cursor:pointer;font-size:12.5px;font-weight:600;font-family:'DM Sans',sans-serif;transition:all .15s;text-align:center;}
+  .action-btn-sm:hover{border-color:var(--accent);color:var(--accent);}
+  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:500;display:none;align-items:center;justify-content:center;}
+  .modal-overlay.open{display:flex;}
+  .modal{background:#fff;border-radius:18px;width:480px;max-width:95vw;box-shadow:0 24px 64px rgba(0,0,0,.18);animation:mIn .25s ease;}
+  @keyframes mIn{from{opacity:0;transform:scale(.95);}to{opacity:1;transform:scale(1);}}
+  .modal-header{padding:20px 24px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+  .modal-title{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:17px;}
+  .modal-close{width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:none;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;}
+  .modal-close:hover{background:var(--danger-bg);color:var(--danger);}
+  .modal-body{padding:22px 24px;}
+  .modal-footer{padding:14px 24px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px;}
+  .form-group{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;}
+  .form-label{font-size:13px;font-weight:600;}
+  .form-input{height:40px;border:1px solid var(--border);border-radius:9px;padding:0 14px;font-size:13.5px;font-family:'DM Sans',sans-serif;outline:none;}
+  .form-input:focus{border-color:var(--accent);}
+  .form-select{height:40px;border:1px solid var(--border);border-radius:9px;padding:0 14px;font-size:13.5px;font-family:'DM Sans',sans-serif;outline:none;background:#fff;}
+  .toast{position:fixed;bottom:28px;right:28px;background:#0f172a;color:#fff;padding:13px 20px;border-radius:12px;font-size:13.5px;font-weight:500;z-index:600;display:flex;align-items:center;gap:10px;box-shadow:0 8px 24px rgba(0,0,0,.2);transform:translateY(80px);opacity:0;transition:all .3s ease;}
+  .toast.show{transform:translateY(0);opacity:1;}
+  ::-webkit-scrollbar{width:5px;}
+  ::-webkit-scrollbar-thumb{background:var(--border);border-radius:10px;}
+</style>
+</head>
+<body>
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo"><div class="logo-icon">V</div><div><div class="logo-text">Vendhan InfoTech</div><div class="logo-sub">Admin Portal</div></div></div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Main</div>
+    <a href="dashboard.html" class="nav-item"><span class="nav-icon">⊞</span> Dashboard</a>
+    <a href="employees.html" class="nav-item"><span class="nav-icon">👥</span> Employee Management</a>
+    <a href="attendance.html" class="nav-item"><span class="nav-icon">🕐</span> Attendance</a>
+    <a href="leave.html" class="nav-item"><span class="nav-icon">📅</span> Leave Management<span class="nav-badge">7</span></a>
+    <a href="payroll.html" class="nav-item"><span class="nav-icon">💰</span> Payroll</a>
+    <div class="nav-section-label">Analytics</div>
+    <a href="reports.html" class="nav-item"><span class="nav-icon">📊</span> Reports &amp; Analytics</a>
+    <a href="projects.html" class="nav-item"><span class="nav-icon">📁</span> Projects &amp; Tasks</a>
+    <a href="departments.html" class="nav-item  active"><span class="nav-icon">🏢</span> Departments</a>
+    <div class="nav-section-label">Automation</div>
+    <a href="data_entry.html" class="nav-item"><span class="nav-icon">🤖</span> Data Entry Automation</a>
+    <div class="nav-section-label">Communication</div>
+    <a href="chat.html" class="nav-item"><span class="nav-icon">💬</span> Chat System<span class="nav-badge">3</span></a>
+    <a href="notifications.html" class="nav-item"><span class="nav-icon">🔔</span> Notifications</a>
+    <div class="nav-section-label">System</div>
+    <a href="settings.html" class="nav-item "><span class="nav-icon">⚙️</span> Settings</a>
+    <a href="security.html" class="nav-item"><span class="nav-icon">🔒</span> Security</a>
+    <a href="logs.html" class="nav-item"><span class="nav-icon">📋</span> Activity Logs</a>
+    <a href="admin_profile.html" class="nav-item"><span class="nav-icon">👤</span> My Profile</a>
+    <a href="../index.html" class="nav-item"><span class="nav-icon">🚪</span> Logout</a>
+  </nav>
+  <div class="sidebar-footer"><div class="user-card" onclick="window.location.href='admin_profile.html'"><div class="user-avatar">A</div><div><div class="user-name">Admin User</div><div class="user-role">Super Administrator</div></div></div></div>
+</aside>
+
+<header class="topbar" id="topbar">
+  <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
+  <div><div class="page-title">Departments</div><div class="page-breadcrumb">Admin Portal › Departments</div></div>
+  <div class="topbar-right">
+    <button class="btn-primary" onclick="document.getElementById('modal').classList.add('open')">+ Add Department</button>
+    <div class="topbar-avatar" onclick="window.location.href='admin_profile.html'">A</div>
+  </div>
+</header>
+<main class="main" id="mainContent">
+  <div class="dept-grid" id="deptGrid"></div>
+</main>
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">Add Department</div><button class="modal-close" onclick="document.getElementById('modal').classList.remove('open')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">Department Name *</label><input class="form-input" id="dName" placeholder="e.g. Operations"></div>
+      <div class="form-group"><label class="form-label">Department Head *</label><select class="form-select" id="dHead"><option value="">Select Head</option><option>Arjun Kumar</option><option>Priya Sharma</option><option>Vikram Nair</option><option>Nisha Menon</option></select></div>
+      <div class="form-group"><label class="form-label">Description</label><input class="form-input" id="dDesc" placeholder="Brief department description"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-outline" onclick="document.getElementById('modal').classList.remove('open')">Cancel</button>
+      <button class="btn-primary" onclick="addDept()">✓ Add Department</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const depts=[
+  {name:'Engineering',head:'Vikram Nair',icon:'💻',color:'#6366f1',bg:'#eef2ff',employees:48,attendance:94,tasks:18,fill:'#6366f1'},
+  {name:'Human Resources',head:'Priya Sharma',icon:'👥',color:'#059669',bg:'#ecfdf5',employees:16,attendance:92,tasks:8,fill:'#059669'},
+  {name:'Finance',head:'Deepa Thomas',icon:'💰',color:'#d97706',bg:'#fffbeb',employees:20,attendance:88,tasks:10,fill:'#d97706'},
+  {name:'Marketing',head:'Nisha Menon',icon:'📣',color:'#7c3aed',bg:'#f5f3ff',employees:26,attendance:91,tasks:12,fill:'#7c3aed'},
+  {name:'Design',head:'Kavya Reddy',icon:'🎨',color:'#dc2626',bg:'#fef2f2',employees:14,attendance:89,tasks:7,fill:'#dc2626'},
+  {name:'Operations',head:'Suresh Babu',icon:'⚙️',color:'#2563eb',bg:'#eff6ff',employees:0,attendance:0,tasks:2,fill:'#2563eb'},
+];
+function renderDepts(list){
+  document.getElementById('deptGrid').innerHTML=list.map(d=>`
+    <div class="dept-card">
+      <div class="dept-card" style="display:none;"></div>
+      <div style="position:absolute;top:0;left:0;right:0;height:4px;background:${d.fill};border-radius:16px 16px 0 0;"></div>
+      <div class="dept-icon" style="background:${d.bg};color:${d.color};">${d.icon}</div>
+      <div class="dept-name">${d.name}</div>
+      <div class="dept-head">👤 Head: <strong>${d.head}</strong></div>
+      <div class="dept-stats">
+        <div class="dept-stat-box"><div class="dept-stat-val" style="color:${d.color};">${d.employees}</div><div class="dept-stat-label">Employees</div></div>
+        <div class="dept-stat-box"><div class="dept-stat-val" style="color:${d.color};">${d.attendance}%</div><div class="dept-stat-label">Attendance</div></div>
+        <div class="dept-stat-box"><div class="dept-stat-val" style="color:${d.color};">${d.tasks}</div><div class="dept-stat-label">Tasks</div></div>
+      </div>
+      <div class="dept-bar"><div class="dept-bar-fill" style="width:${d.attendance}%;background:${d.fill};"></div></div>
+      <div class="dept-actions">
+        <button class="action-btn-sm" onclick="showToast('👥 Viewing ${d.name} employees')">View Team</button>
+        <button class="action-btn-sm" onclick="showToast('✏️ Editing ${d.name}')">Edit</button>
+        <button class="action-btn-sm" style="color:var(--danger);" onclick="showToast('🗑 Confirm delete in settings')">Delete</button>
+      </div>
+    </div>`).join('');
+}
+function addDept(){
+  const name=document.getElementById('dName').value.trim();
+  const head=document.getElementById('dHead').value;
+  if(!name||!head){showToast('⚠️ Please fill all required fields');return;}
+  depts.push({name,head,icon:'🏢',color:'#6366f1',bg:'#eef2ff',employees:0,attendance:0,tasks:0,fill:'#6366f1'});
+  renderDepts(depts);
+  document.getElementById('modal').classList.remove('open');
+  showToast('✅ Department "'+name+'" added!');
+}
+function toggleSidebar(){document.getElementById('sidebar').classList.toggle('collapsed');document.getElementById('topbar').classList.toggle('collapsed');document.getElementById('mainContent').classList.toggle('collapsed');}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3500);}
+renderDepts(depts);
+</script>
+</body>
+</html>
