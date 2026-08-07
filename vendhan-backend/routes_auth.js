@@ -13,8 +13,11 @@ require('dotenv').config();
 // body: { full_name, email, password, role }
 router.post('/register', async (req, res) => {
   try {
-    const { full_name, email, password, role } = req.body;
+    const { full_name, email, password, role, setupSecret } = req.body;
 
+    if (setupSecret !== process.env.SETUP_SECRET) {
+      return res.status(403).json({ error: 'Not authorized to register.' });
+    }
     if (!full_name || !email || !password) {
       return res.status(400).json({ error: 'Full name, email and password are required.' });
     }
