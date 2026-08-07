@@ -206,9 +206,11 @@ function handleLogin(event) {
 
     setLoading(false);
 
+    setLoading(false);
+
     window.location.href = currentRole === 'admin'
       ? 'admin/dashboard.html'
-     : 'employee/emp_portal.html';
+      : 'employee/emp_dashboard.html';
   }, 450);
 }
 </script>
