@@ -15,6 +15,7 @@ app.use('/api/employees', require('./routes_employees'));
 app.use('/api/data-entries', require('./routes_data_entries'));
 app.use('/api/attendance', require('./routes_attendance'));
 app.use('/api/salary', require('./routes_salary'));
+app.use('/api/leave', require('./routes_leave'));
 // ─── HEALTH CHECK ───────────────────────────────────────────
 app.get('/', (req, res) => {
   res.json({ message: 'Vendhan InfoTech HRMS API is running ✅' });
