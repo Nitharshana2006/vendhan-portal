@@ -102,30 +102,10 @@
 </div>
 
 <script>
-// ── Shared stores ────────────────────────────────────────────────────
-// Written by admin/employees.html → { "<email lowercased>": { password, employeeId, name, ... } }
-const EMPLOYEE_CREDENTIALS_KEY = 'vendhan_employee_credentials';
-// Written by admin/employees.html (Admin role) or admin/create_admin.html
-const ADMIN_CREDENTIALS_KEY = 'vendhan_admin_credentials';
 const SESSION_KEY = 'vendhan_session';
-
-// ── Permanent built-in demo accounts ───────────────────────────────
-// These always work, regardless of what's been registered in localStorage.
-// Not shown anywhere in the UI — kept for testing convenience only.
-const BUILT_IN_ACCOUNTS = {
-  admin: {
-    'admin@vendhan.com': { password: 'admin123', employeeId: 'ADMIN000', name: 'Admin User' }
-  },
-  employee: {
-    'employee@vendhan.com': { password: 'emp123', employeeId: 'E000', name: 'Demo Employee' }
-  }
-};
+const API_URL = 'https://vendhan-backend.onrender.com';
 
 let currentRole = 'employee';
-
-function readCredentials(key) {
-  try { return JSON.parse(localStorage.getItem(key) || '{}'); } catch (e) { return {}; }
-}
 
 function switchRole(role) {
   currentRole = role;
@@ -159,17 +139,7 @@ function setLoading(loading) {
   document.getElementById('submitLabel').textContent = loading ? 'Signing in...' : 'Sign In';
 }
 
-// Checks the fixed demo account first, then real registered accounts in localStorage.
-function findAccount(role, email) {
-  const builtIn = BUILT_IN_ACCOUNTS[role] || {};
-  if (builtIn[email]) return builtIn[email];
-
-  const key = role === 'admin' ? ADMIN_CREDENTIALS_KEY : EMPLOYEE_CREDENTIALS_KEY;
-  const creds = readCredentials(key);
-  return creds[email] || null;
-}
-
-function handleLogin(event) {
+async function handleLogin(event) {
   event.preventDefault();
   hideError();
 
@@ -180,38 +150,46 @@ function handleLogin(event) {
 
   setLoading(true);
 
-  setTimeout(() => {
-    const account = findAccount(currentRole, email);
+  try {
+    const response = await fetch(`${API_URL}/api/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
 
-    if (!account || account.password !== password) {
+    const data = await response.json();
+
+    if (!response.ok) {
+      showError(data.error || 'Login failed. Please try again.');
       setLoading(false);
-      showError(
-        currentRole === 'admin'
-          ? 'Incorrect admin email or password.'
-          : 'Incorrect email or password, or no account exists for this email yet. Ask your admin to register you in Employee Management.'
-      );
       return;
     }
 
-    // employeeId uniquely identifies this person — every page that stores
-    // per-person data (attendance, tasks, leave, etc.) MUST key its storage
-    // off this id (or off `email` as a fallback), never store data globally.
+    if (data.user.role !== currentRole) {
+      showError(`This account is registered as ${data.user.role}, not ${currentRole}. Please switch tabs.`);
+      setLoading(false);
+      return;
+    }
+
     sessionStorage.setItem(SESSION_KEY, JSON.stringify({
-      role: currentRole,
-      email,
-      employeeId: account.employeeId || email, // fallback keeps every account unique even if employeeId is missing
-      name: account.name || '',
+      role: data.user.role,
+      email: data.user.email,
+      employeeId: data.user.id,
+      name: data.user.full_name,
+      token: data.token,
       loggedInAt: Date.now()
     }));
 
     setLoading(false);
-
-    setLoading(false);
-
     window.location.href = currentRole === 'admin'
       ? 'admin/dashboard.html'
       : 'employee/emp_dashboard.html';
-  }, 450);
+
+  } catch (err) {
+    console.error(err);
+    showError('Could not connect to server. Please try again.');
+    setLoading(false);
+  }
 }
 </script>
 </body>
