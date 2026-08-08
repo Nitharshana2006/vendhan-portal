@@ -249,18 +249,36 @@
 
 <div class="toast" id="toast"></div>
 <script>
-const attData = [
-  {date:'2025-06-13',checkin:'08:52',checkout:'18:10',hours:'9h 18m',ot:'1h 18m',status:'Present'},
-  {date:'2025-06-12',checkin:'09:42',checkout:'18:00',hours:'8h 18m',ot:'—',status:'Late'},
-  {date:'2025-06-11',checkin:'08:45',checkout:'19:30',hours:'10h 45m',ot:'2h 45m',status:'Present'},
-  {date:'2025-06-10',checkin:'09:00',checkout:'18:00',hours:'9h 00m',ot:'—',status:'Present'},
-  {date:'2025-06-09',checkin:'—',checkout:'—',hours:'—',ot:'—',status:'On Leave'},
-  {date:'2025-06-06',checkin:'08:50',checkout:'18:05',hours:'9h 15m',ot:'—',status:'Present'},
-  {date:'2025-06-05',checkin:'09:55',checkout:'18:00',hours:'8h 05m',ot:'—',status:'Late'},
-  {date:'2025-06-04',checkin:'—',checkout:'—',hours:'—',ot:'—',status:'Absent'},
-  {date:'2025-06-03',checkin:'08:48',checkout:'18:15',hours:'9h 27m',ot:'1h 27m',status:'Present'},
-  {date:'2025-06-02',checkin:'09:02',checkout:'18:00',hours:'8h 58m',ot:'—',status:'Present'},
-];
+let attData = [];
+const API_BASE = 'https://vendhan-backend.onrender.com';
+
+function getSession(){
+  const s = sessionStorage.getItem('vendhan_session');
+  return s ? JSON.parse(s) : null;
+}
+
+async function loadAttendance(){
+  try{
+    const session = getSession();
+    if(!session) return;
+    const res = await fetch(API_BASE+'/api/attendance', { headers:{ 'Authorization':'Bearer '+session.token } });
+    const all = await res.json();
+    const mine = all.filter(r=>r.employee_id===session.employeeId);
+
+    attData = mine.map(r=>({
+      date: r.date,
+      checkin: r.check_in || '—',
+      checkout: r.check_out || '—',
+      hours: '—',
+      ot: '—',
+      status: r.status
+    }));
+    renderAtt(attData);
+  }catch(err){
+    console.error(err);
+    showToast('⚠️ Could not load attendance');
+  }
+}
 const days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 
 function renderAtt(data){
@@ -338,7 +356,7 @@ function toggleSidebar(){
 }
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3500);}
 
-renderAtt(attData);
+loadAttendance();;
 </script>
 </body>
 </html>
