@@ -421,9 +421,9 @@
         <div class="stat-icon blue">👥</div>
         <div class="stat-trend up">↑ 4.2%</div>
       </div>
-      <div class="stat-value">124</div>
+      <div class="stat-value" id="totalEmployeesStat">124</div>
       <div class="stat-label">Total Employees</div>
-      <div class="stat-footer">+5 joined this month</div>
+      <div class="stat-footer" id="totalEmployeesFooter">+5 joined this month</div>
     </div>
 
     <div class="stat-card green">
@@ -508,7 +508,7 @@
             <th>Joined</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody id="recentEmployeesBody">
           <tr>
             <td><div class="emp-info"><div class="emp-avatar" style="background:#eef2ff;color:#6366f1;">AK</div><div><div class="emp-name">Arjun Kumar</div><div class="emp-dept">Developer</div></div></div></td>
             <td style="font-size:13px;color:#6b7280;">Engineering</td>
@@ -663,6 +663,9 @@
 
 <!-- ══════════════════════════════════ JAVASCRIPT ══════════════════════════════════ -->
 <script>
+    const session = JSON.parse(sessionStorage.getItem('vendhan_session') || 'null');
+  ... (all the new code I gave you) ...
+  loadEmployees();
   // ── Sidebar Toggle
   function toggleSidebar() {
     const sb = document.getElementById('sidebar');
