@@ -560,16 +560,48 @@ function openLeaveModal(){
   calcLeaveDays();
 }
 function closeLeaveModal(){document.getElementById('leaveModal').classList.remove('open');}
-function submitLeave(){
+const API_BASE = 'https://vendhan-backend.onrender.com';
+
+function getSession(){
+  const s = sessionStorage.getItem('vendhan_session');
+  return s ? JSON.parse(s) : null;
+}
+
+async function submitLeave(){
   const type=document.getElementById('leaveType').value;
   const from=document.getElementById('leaveFrom').value;
   const to=document.getElementById('leaveTo').value;
   const reason=document.getElementById('leaveReason').value.trim();
   if(!type||!from||!to||!reason){showToast('⚠️ Please fill all required fields');return;}
-  closeLeaveModal();
-  document.getElementById('leaveReason').value='';
-  document.getElementById('leaveType').value='';
-  showToast('📅 Leave request submitted! Awaiting approval.');
+
+  const session = getSession();
+  if(!session){ showToast('⚠️ Session expired, please log in again'); return; }
+
+  const d1=new Date(from), d2=new Date(to);
+  const days = Math.round((d2-d1)/(1000*60*60*24))+1;
+
+  try{
+    const res = await fetch(API_BASE+'/api/leave', {
+      method:'POST',
+      headers:{ 'Content-Type':'application/json', 'Authorization':'Bearer '+session.token },
+      body: JSON.stringify({
+        employee_id: session.employeeId,
+        leave_type: type,
+        start_date: from,
+        end_date: to,
+        days: days,
+        reason: reason
+      })
+    });
+    if(!res.ok) throw new Error('Request failed');
+    closeLeaveModal();
+    document.getElementById('leaveReason').value='';
+    document.getElementById('leaveType').value='';
+    showToast('📅 Leave request submitted! Awaiting approval.');
+  }catch(err){
+    console.error(err);
+    showToast('⚠️ Could not submit leave request');
+  }
 }
 
 // ── SIDEBAR TOGGLE
