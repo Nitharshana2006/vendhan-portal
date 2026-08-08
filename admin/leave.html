@@ -498,15 +498,51 @@
 
 <script>
 // ── DATA
-let leaveRequests = [
-  { id:1, name:'Priya Sharma',    dept:'Human Resources', initials:'PS', color:'#ecfdf5', tc:'#059669', type:'Sick Leave',      from:'2025-06-15', to:'2025-06-17', days:3, applied:'2025-06-13', reason:'Fever and throat infection. Doctor has advised rest for 3 days.', priority:'high' },
-  { id:2, name:'Arjun Kumar',     dept:'Engineering',     initials:'AK', color:'#eef2ff', tc:'#6366f1', type:'Casual Leave',    from:'2025-06-20', to:'2025-06-20', days:1, applied:'2025-06-12', reason:'Personal work to attend in home town.', priority:'low' },
-  { id:3, name:'Nisha Menon',     dept:'Marketing',       initials:'NM', color:'#f5f3ff', tc:'#7c3aed', type:'Annual Leave',    from:'2025-06-22', to:'2025-06-26', days:5, applied:'2025-06-11', reason:'Family vacation planned well in advance.', priority:'medium' },
-  { id:4, name:'Rahul Verma',     dept:'Finance',         initials:'RV', color:'#fffbeb', tc:'#d97706', type:'Emergency Leave', from:'2025-06-14', to:'2025-06-14', days:1, applied:'2025-06-14', reason:'Family emergency — needs immediate attention.', priority:'high' },
-  { id:5, name:'Kavya Reddy',     dept:'Design',          initials:'KR', color:'#fef2f2', tc:'#dc2626', type:'Sick Leave',      from:'2025-06-18', to:'2025-06-19', days:2, applied:'2025-06-13', reason:'Migraine issue, doctor visit required.', priority:'medium' },
-  { id:6, name:'Suresh Babu',     dept:'Operations',      initials:'SB', color:'#eff6ff', tc:'#2563eb', type:'Casual Leave',    from:'2025-06-25', to:'2025-06-25', days:1, applied:'2025-06-10', reason:'Attending sibling\'s engagement ceremony.', priority:'low' },
-  { id:7, name:'Deepa Thomas',    dept:'Finance',         initials:'DT', color:'#fffbeb', tc:'#d97706', type:'Annual Leave',    from:'2025-06-28', to:'2025-07-02', days:5, applied:'2025-06-09', reason:'Annual family trip booked in advance.', priority:'low' },
+// ── DATA (loaded from backend)
+let leaveRequests = [];
+const API_BASE = 'https://vendhan-backend.onrender.com';
+
+function getToken(){
+  const s = sessionStorage.getItem('vendhan_session');
+  return s ? JSON.parse(s).token : null;
+}
+
+const initialsColors = [
+  {bg:'#eef2ff',tc:'#6366f1'},{bg:'#ecfdf5',tc:'#059669'},{bg:'#fffbeb',tc:'#d97706'},
+  {bg:'#fef2f2',tc:'#dc2626'},{bg:'#eff6ff',tc:'#2563eb'},{bg:'#f5f3ff',tc:'#7c3aed'}
 ];
+
+async function loadLeaveRequests(){
+  try{
+    const token = getToken();
+    const res = await fetch(API_BASE+'/api/leave', { headers:{ 'Authorization':'Bearer '+token } });
+    const all = await res.json();
+    const pending = all.filter(r=>r.status==='Pending');
+
+    leaveRequests = pending.map((r,i)=>{
+      const c = initialsColors[i % initialsColors.length];
+      return {
+        id: r.id,
+        name: r.full_name,
+        dept: r.department,
+        initials: r.full_name.split(' ').map(n=>n[0]).join(''),
+        color: c.bg, tc: c.tc,
+        type: r.leave_type,
+        from: r.start_date,
+        to: r.end_date,
+        days: r.days,
+        applied: r.applied_on,
+        reason: r.reason || 'No reason provided',
+        priority: 'medium'
+      };
+    });
+    document.getElementById('pendingCount').textContent = leaveRequests.length;
+    renderRequests(leaveRequests);
+  }catch(err){
+    console.error(err);
+    showToast('⚠️ Could not load leave requests');
+  }
+}
 
 const leaveHistory = [
   { name:'Arjun Kumar',    dept:'Engineering', type:'Casual Leave',    from:'2025-05-10', to:'2025-05-10', days:1, applied:'2025-05-08', status:'Approved' },
