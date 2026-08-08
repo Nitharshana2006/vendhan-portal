@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const db = require('./db');
-const verifyToken = require('./auth');
+const { verifyToken } = require('./auth');
 
 // GET all salary records
 router.get('/', verifyToken, (req, res) => {
