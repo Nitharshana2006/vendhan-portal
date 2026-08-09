@@ -288,30 +288,56 @@
 
 <div class="toast" id="toast"></div>
 <script>
-const salHistory = [
-  {month:'May 2025',  basic:75000,hra:15000,allow:8000,bonus:5000,gross:103000,ded:16700,net:81500,paid:'2025-05-31'},
-  {month:'Apr 2025',  basic:75000,hra:15000,allow:8000,bonus:0,   gross:98000, ded:16500,net:81500,paid:'2025-04-30'},
-  {month:'Mar 2025',  basic:75000,hra:15000,allow:8000,bonus:8000,gross:106000,ded:16500,net:89500,paid:'2025-03-31'},
-  {month:'Feb 2025',  basic:75000,hra:15000,allow:8000,bonus:0,   gross:98000, ded:16500,net:81500,paid:'2025-02-28'},
-  {month:'Jan 2025',  basic:75000,hra:15000,allow:8000,bonus:5000,gross:103000,ded:16500,net:86500,paid:'2025-01-31'},
-  {month:'Dec 2024',  basic:72000,hra:14400,allow:7500,bonus:10000,gross:103900,ded:15840,net:88060,paid:'2024-12-31'},
-];
+let salHistory = [];
+const API_BASE = 'https://vendhan-backend.onrender.com';
+
+function getSession(){
+  const s = sessionStorage.getItem('vendhan_session');
+  return s ? JSON.parse(s) : null;
+}
 
 function fmt(n){return '₹'+Number(n).toLocaleString('en-IN');}
 
-document.getElementById('salHistBody').innerHTML = salHistory.map(s=>`<tr>
-  <td style="font-weight:600;">${s.month}</td>
-  <td>${fmt(s.basic)}</td>
-  <td style="color:var(--text-secondary);">${fmt(s.hra)}</td>
-  <td style="color:var(--text-secondary);">${fmt(s.allow)}</td>
-  <td style="color:var(--purple);font-weight:600;">${s.bonus?'+'+fmt(s.bonus):'—'}</td>
-  <td style="font-weight:700;">${fmt(s.gross)}</td>
-  <td style="color:var(--danger);">-${fmt(s.ded)}</td>
-  <td style="font-weight:700;color:var(--success);">${fmt(s.net)}</td>
-  <td style="font-size:12px;color:var(--text-muted);">${new Date(s.paid).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})}</td>
-  <td><span class="badge-success">Paid</span></td>
-  <td style="text-align:center;"><button style="font-size:12px;padding:4px 10px;border-radius:7px;border:1px solid var(--border);background:none;cursor:pointer;" onclick="openPayslip('${s.month}')">📄 View</button></td>
-</tr>`).join('');
+async function loadSalaryHistory(){
+  try{
+    const session = getSession();
+    if(!session) return;
+    const res = await fetch(API_BASE+'/api/salary', { headers:{ 'Authorization':'Bearer '+session.token } });
+    const all = await res.json();
+    const mine = all.filter(s=>s.employee_id===session.employeeId);
+
+    salHistory = mine.map(s=>({
+      month: s.month+' '+s.year,
+      basic: Number(s.basic_salary),
+      hra: 0,
+      allow: Number(s.allowances),
+      bonus: 0,
+      gross: Number(s.basic_salary)+Number(s.allowances),
+      ded: Number(s.deductions),
+      net: Number(s.net_salary),
+      paid: s.paid_date || null,
+      status: s.status
+    }));
+
+    document.getElementById('salHistBody').innerHTML = salHistory.map(s=>`<tr>
+      <td style="font-weight:600;">${s.month}</td>
+      <td>${fmt(s.basic)}</td>
+      <td style="color:var(--text-secondary);">${fmt(s.hra)}</td>
+      <td style="color:var(--text-secondary);">${fmt(s.allow)}</td>
+      <td style="color:var(--purple);font-weight:600;">${s.bonus?'+'+fmt(s.bonus):'—'}</td>
+      <td style="font-weight:700;">${fmt(s.gross)}</td>
+      <td style="color:var(--danger);">-${fmt(s.ded)}</td>
+      <td style="font-weight:700;color:var(--success);">${fmt(s.net)}</td>
+      <td style="font-size:12px;color:var(--text-muted);">${s.paid ? new Date(s.paid).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}) : '—'}</td>
+      <td><span class="badge-success">${s.status}</span></td>
+      <td style="text-align:center;"><button style="font-size:12px;padding:4px 10px;border-radius:7px;border:1px solid var(--border);background:none;cursor:pointer;" onclick="openPayslip('${s.month}')">📄 View</button></td>
+    </tr>`).join('') || `<tr><td colspan="11" style="text-align:center;padding:24px;color:var(--text-muted);">No salary records yet.</td></tr>`;
+  }catch(err){
+    console.error(err);
+    showToast('⚠️ Could not load salary history');
+  }
+}
+loadSalaryHistory();
 
 // Chart
 new Chart(document.getElementById('salaryChart'),{
