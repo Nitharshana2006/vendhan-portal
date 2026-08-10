@@ -492,8 +492,7 @@ async function loadEmployees(){
     });
     filtered = [...employees];
     currentPage = 1;
-  // ── Init
-loadEmployees();
+    renderTable();
   }catch(err){
     console.error(err);
     showToast('⚠️ Could not load employees');
@@ -811,7 +810,8 @@ function toggleSidebar() {
 }
 
 // ── Init
-renderTable();
+// ── Init
+loadEmployees();
 </script>
 </body>
 </html>
