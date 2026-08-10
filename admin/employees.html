@@ -357,6 +357,10 @@
           <input class="form-input" id="empPhone" placeholder="9876543210">
         </div>
         <div class="form-group">
+          <label class="form-label">Login Password *</label>
+          <input class="form-input" id="empPassword" type="text" placeholder="Set a password for their login (min 6 chars)">
+        </div>
+        <div class="form-group">
           <label class="form-label">Date of Birth</label>
           <input class="form-input" id="empDob" type="date">
         </div>
@@ -632,48 +636,77 @@ function clearForm() {
   ['fName','lName','empEmail','empPhone','empDob','empGender','empDept','empRole','empJoin','empType','empSalary','empLocation']
     .forEach(id => { const el = document.getElementById(id); if (el) el.value = el.tagName === 'SELECT' ? '' : ''; });
 }
-function saveEmployee() {
+async function saveEmployee() {
   const first = document.getElementById('fName').value.trim();
   const last  = document.getElementById('lName').value.trim();
   const email = document.getElementById('empEmail').value.trim();
   const phone = document.getElementById('empPhone').value.trim();
+  const password = document.getElementById('empPassword').value;
   const dept  = document.getElementById('empDept').value;
   const role  = document.getElementById('empRole').value.trim();
   const join  = document.getElementById('empJoin').value;
+  const salary = parseInt(document.getElementById('empSalary').value) || 0;
 
-  if (!first || !last || !email || !phone || !dept || !role || !join) {
-    showToast('⚠️ Please fill all required fields');
+  if (!first || !last || !email || !phone || !dept || !role || !join || !password) {
+    showToast('⚠️ Please fill all required fields, including a login password');
+    return;
+  }
+  if (password.length < 6) {
+    showToast('⚠️ Password must be at least 6 characters');
     return;
   }
 
-  const colors = [
-    { color:'#eef2ff', textColor:'#6366f1' },
-    { color:'#ecfdf5', textColor:'#059669' },
-    { color:'#fffbeb', textColor:'#d97706' },
-    { color:'#fef2f2', textColor:'#dc2626' },
-    { color:'#eff6ff', textColor:'#2563eb' },
-  ];
-  const c = colors[nextId % colors.length];
+  const session = getSession();
+  const fullName = first + ' ' + last;
 
-  const newEmp = {
-    id: 'E' + String(nextId).padStart(3,'0'),
-    first, last, dept, role, email, phone,
-    joined: join,
-    status: 'Active',
-    type: document.getElementById('empType').value,
-    salary: parseInt(document.getElementById('empSalary').value) || 0,
-    ...c
-  };
+  try {
+    // 1. Create the employee record
+    const empRes = await fetch(API_BASE + '/api/employees', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.token },
+      body: JSON.stringify({
+        employee_code: 'E' + String(employees.length + 1).padStart(3, '0'),
+        full_name: fullName,
+        department: dept,
+        designation: role,
+        email: email,
+        phone: phone,
+        joined_date: join,
+        status: 'Active',
+        basic_salary: salary
+      })
+    });
+    const empData = await empRes.json();
+    if (!empRes.ok) { showToast('⚠️ ' + (empData.error || 'Could not create employee')); return; }
 
-  employees.unshift(newEmp);
-  filtered = [...employees];
-  nextId++;
-  currentPage = 1;
-  renderTable();
-  closeAddModal();
-  showToast('✅ Employee added successfully!');
+    // 2. Create their login account
+    const authRes = await fetch(API_BASE + '/api/auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        full_name: fullName,
+        email: email,
+        password: password,
+        role: 'employee',
+        setupSecret: SETUP_SECRET
+      })
+    });
+    const authData = await authRes.json();
+    if (!authRes.ok) {
+      showToast('⚠️ Employee created, but login setup failed: ' + (authData.error || 'unknown error'));
+      closeAddModal();
+      loadEmployees();
+      return;
+    }
+
+    closeAddModal();
+    await loadEmployees();
+    showToast('✅ Employee added — they can now sign in with ' + email);
+  } catch (err) {
+    console.error(err);
+    showToast('⚠️ Something went wrong saving this employee');
+  }
 }
-
 // ── Profile Drawer
 function openProfile(id) {
   const e = employees.find(x => x.id === id);
