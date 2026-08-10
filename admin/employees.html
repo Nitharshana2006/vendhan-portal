@@ -492,7 +492,8 @@ async function loadEmployees(){
     });
     filtered = [...employees];
     currentPage = 1;
-    renderTable();
+  // ── Init
+loadEmployees();
   }catch(err){
     console.error(err);
     showToast('⚠️ Could not load employees');
@@ -762,13 +763,23 @@ function closeDrawer() {
 function editEmployee(id) {
   showToast('✏️ Edit mode — feature in settings page');
 }
-function deleteEmployee(id) {
+async function deleteEmployee(id) {
   if (!confirm('Are you sure you want to remove this employee?')) return;
-  employees = employees.filter(e => e.id !== id);
-  filtered  = filtered.filter(e => e.id !== id);
-  if ((currentPage - 1) * perPage >= filtered.length && currentPage > 1) currentPage--;
-  renderTable();
-  showToast('🗑 Employee removed successfully');
+  const emp = employees.find(e => e.id === id);
+  if (!emp) return;
+  try {
+    const session = getSession();
+    const res = await fetch(API_BASE + '/api/employees/' + emp.dbId, {
+      method: 'DELETE',
+      headers: { 'Authorization': 'Bearer ' + session.token }
+    });
+    if (!res.ok) { showToast('⚠️ Could not delete employee'); return; }
+    await loadEmployees();
+    showToast('🗑 Employee removed successfully');
+  } catch (err) {
+    console.error(err);
+    showToast('⚠️ Could not delete employee');
+  }
 }
 
 // ── Export CSV
