@@ -490,7 +490,7 @@ async function loadEmployees(){
         color: c.color, textColor: c.textColor
       };
     });
-    filtered = [...employees];
+   filtered = [...employees];
     currentPage = 1;
     renderTable();
   }catch(err){
@@ -809,7 +809,6 @@ function toggleSidebar() {
   document.getElementById('mainContent').classList.toggle('collapsed');
 }
 
-// ── Init
 // ── Init
 loadEmployees();
 </script>
