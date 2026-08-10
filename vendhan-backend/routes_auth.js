@@ -66,20 +66,25 @@ router.post('/register', async (req, res) => {
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
-
     if (!email || !password) {
       return res.status(400).json({ error: 'Email and password are required.' });
     }
-
     const [rows] = await pool.query('SELECT * FROM users WHERE email = ?', [email]);
     if (rows.length === 0) {
       return res.status(401).json({ error: 'Invalid email or password.' });
     }
-
     const user = rows[0];
     const passwordMatches = await bcrypt.compare(password, user.password);
     if (!passwordMatches) {
       return res.status(401).json({ error: 'Invalid email or password.' });
+    }
+
+    // Look up this person's real employees.id by matching email,
+    // instead of using users.id (which is a separate, unrelated sequence).
+    let employeeId = null;
+    const [empRows] = await pool.query('SELECT id FROM employees WHERE email = ?', [email]);
+    if (empRows.length > 0) {
+      employeeId = empRows[0].id;
     }
 
     const token = jwt.sign(
@@ -87,12 +92,16 @@ router.post('/login', async (req, res) => {
       process.env.JWT_SECRET,
       { expiresIn: '7d' }
     );
-
     res.json({
       message: 'Login successful!',
       token,
-      user: { id: user.id, full_name: user.full_name, email: user.email, role: user.role }
+      user: { id: user.id, full_name: user.full_name, email: user.email, role: user.role, employeeId }
     });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error during login.' });
+  }
+});
 
   } catch (err) {
     console.error(err);
