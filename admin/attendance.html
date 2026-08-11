@@ -51,7 +51,7 @@
   .page-title{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:17px;}
   .page-breadcrumb{font-size:12px;color:var(--text-muted);}
   .topbar-actions{margin-left:auto;display:flex;align-items:center;gap:8px;}
-  .icon-btn{width:38px;height:38px;border-radius:9px;background:none;border:1px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-secondary);font-size:18px;transition:all 0.15s;}
+  .icon-btn{width:38px;height:38px;border-radius:9px;background:none;border:1px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-secondary);font-size:18px;}
   .topbar-avatar{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:white;cursor:pointer;}
 
   /* MAIN */
@@ -224,33 +224,33 @@
 <main class="main" id="mainContent">
 
   <!-- Stat Cards -->
-<div class="stats-grid">
-  <div class="stat-card blue">
-    <div class="stat-icon" style="background:#eef2ff;color:#6366f1;">👥</div>
-    <div class="stat-value" id="totalEmpStat">—</div>
-    <div class="stat-label">Total Employees</div>
+  <div class="stats-grid">
+    <div class="stat-card blue">
+      <div class="stat-icon" style="background:#eef2ff;color:#6366f1;">👥</div>
+      <div class="stat-value" id="totalEmpStat">—</div>
+      <div class="stat-label">Total Employees</div>
+    </div>
+    <div class="stat-card green">
+      <div class="stat-icon" style="background:#ecfdf5;color:#059669;">✅</div>
+      <div class="stat-value" id="presentCount">—</div>
+      <div class="stat-label">Present Today</div>
+    </div>
+    <div class="stat-card red">
+      <div class="stat-icon" style="background:#fef2f2;color:#dc2626;">❌</div>
+      <div class="stat-value" id="absentCount">—</div>
+      <div class="stat-label">Absent Today</div>
+    </div>
+    <div class="stat-card amber">
+      <div class="stat-icon" style="background:#fffbeb;color:#d97706;">⏰</div>
+      <div class="stat-value" id="lateCount">—</div>
+      <div class="stat-label">Late Arrivals</div>
+    </div>
+    <div class="stat-card purple">
+      <div class="stat-icon" style="background:#f5f3ff;color:#7c3aed;">🌙</div>
+      <div class="stat-value" id="otCount">—</div>
+      <div class="stat-label">Overtime Hours</div>
+    </div>
   </div>
-  <div class="stat-card green">
-    <div class="stat-icon" style="background:#ecfdf5;color:#059669;">✅</div>
-    <div class="stat-value" id="presentCount">—</div>
-    <div class="stat-label">Present Today</div>
-  </div>
-  <div class="stat-card red">
-    <div class="stat-icon" style="background:#fef2f2;color:#dc2626;">❌</div>
-    <div class="stat-value" id="absentCount">—</div>
-    <div class="stat-label">Absent Today</div>
-  </div>
-  <div class="stat-card amber">
-    <div class="stat-icon" style="background:#fffbeb;color:#d97706;">⏰</div>
-    <div class="stat-value" id="lateCount">—</div>
-    <div class="stat-label">Late Arrivals</div>
-  </div>
-  <div class="stat-card purple">
-    <div class="stat-icon" style="background:#f5f3ff;color:#7c3aed;">🌙</div>
-    <div class="stat-value" id="otCount">—</div>
-    <div class="stat-label">Overtime Hours</div>
-  </div>
-</div> 
 
   <!-- Tabs -->
   <div class="tab-bar">
@@ -361,36 +361,12 @@
       </div>
       <div class="chart-card" style="height:fit-content;">
         <div class="chart-title">Monthly Summary</div>
-        <div class="chart-sub">June 2025</div>
-        <div style="display:flex;flex-direction:column;gap:12px;margin-top:4px;">
-          <div>
-            <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px;"><span>Present Days</span><span style="font-weight:700;color:#059669;">18</span></div>
-            <div style="height:6px;background:#f3f4f6;border-radius:10px;overflow:hidden;"><div style="width:72%;height:100%;background:#059669;border-radius:10px;"></div></div>
-          </div>
-          <div>
-            <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px;"><span>Absent Days</span><span style="font-weight:700;color:#dc2626;">3</span></div>
-            <div style="height:6px;background:#f3f4f6;border-radius:10px;overflow:hidden;"><div style="width:12%;height:100%;background:#dc2626;border-radius:10px;"></div></div>
-          </div>
-          <div>
-            <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px;"><span>Late Arrivals</span><span style="font-weight:700;color:#2563eb;">4</span></div>
-            <div style="height:6px;background:#f3f4f6;border-radius:10px;overflow:hidden;"><div style="width:16%;height:100%;background:#2563eb;border-radius:10px;"></div></div>
-          </div>
-          <div>
-            <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px;"><span>On Leave</span><span style="font-weight:700;color:#d97706;">2</span></div>
-            <div style="height:6px;background:#f3f4f6;border-radius:10px;overflow:hidden;"><div style="width:8%;height:100%;background:#d97706;border-radius:10px;"></div></div>
-          </div>
-        </div>
+        <div class="chart-sub" id="calSummaryMonth"></div>
+        <div style="display:flex;flex-direction:column;gap:12px;margin-top:4px;" id="calSummaryBars"></div>
         <div style="margin-top:20px;padding:14px;background:var(--bg);border-radius:10px;">
           <div style="font-size:12px;color:var(--text-muted);margin-bottom:4px;">Attendance Rate</div>
-          <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:28px;font-weight:700;color:#059669;">79.2%</div>
+          <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:28px;font-weight:700;color:#059669;" id="calAttendanceRate">—</div>
           <div style="font-size:12px;color:var(--text-muted);">This month</div>
-        </div>
-        <div style="margin-top:12px;">
-          <select class="filter-select" style="width:100%;" onchange="showToast('📅 Showing attendance for selected employee')">
-            <option>All Employees</option>
-            <option>Arjun Kumar</option><option>Priya Sharma</option>
-            <option>Rahul Verma</option><option>Kavya Reddy</option>
-          </select>
         </div>
       </div>
     </div>
@@ -398,40 +374,10 @@
 
   <!-- TAB 4: Analytics -->
   <div class="tab-content" id="tab-analytics">
-    <div class="charts-row">
-      <div class="chart-card">
-        <div class="chart-title">Weekly Attendance Trend</div>
-        <div class="chart-sub">Present vs Absent — last 4 weeks</div>
-        <canvas id="weeklyChart" height="140"></canvas>
-      </div>
-      <div class="chart-card">
-        <div class="chart-title">Department Attendance %</div>
-        <div class="chart-sub">This month comparison</div>
-        <canvas id="deptChart" height="140"></canvas>
-      </div>
-    </div>
-    <div class="charts-row">
-      <div class="chart-card">
-        <div class="chart-title">Check-In Time Distribution</div>
-        <div class="chart-sub">Employee arrival times today</div>
-        <canvas id="checkinChart" height="140"></canvas>
-      </div>
-      <div class="chart-card">
-        <div class="chart-title">Attendance Heatmap</div>
-        <div class="chart-sub">Last 12 months overview</div>
-        <div id="heatmapContainer"></div>
-        <div style="display:flex;align-items:center;gap:6px;margin-top:10px;font-size:12px;color:var(--text-muted);">
-          <span>Low</span>
-          <div style="display:flex;gap:3px;">
-            <div style="width:12px;height:12px;border-radius:3px;background:#ecfdf5;"></div>
-            <div style="width:12px;height:12px;border-radius:3px;background:#6ee7b7;"></div>
-            <div style="width:12px;height:12px;border-radius:3px;background:#34d399;"></div>
-            <div style="width:12px;height:12px;border-radius:3px;background:#059669;"></div>
-            <div style="width:12px;height:12px;border-radius:3px;background:#065f46;"></div>
-          </div>
-          <span>High</span>
-        </div>
-      </div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:24px;text-align:center;color:var(--text-muted);">
+      <div style="font-size:32px;margin-bottom:10px;">📊</div>
+      <div style="font-weight:600;font-size:15px;color:var(--text-primary);margin-bottom:6px;">Analytics coming soon</div>
+      <div style="font-size:13px;max-width:420px;margin:0 auto;">Trend charts, department comparisons, and heatmaps need per-day aggregation endpoints that aren't built yet — this section will connect to real data once those are added.</div>
     </div>
   </div>
 
@@ -452,9 +398,6 @@
         <label class="form-label">Employee *</label>
         <select class="form-select" id="corrEmp">
           <option value="">Select Employee</option>
-          <option>Arjun Kumar (E001)</option><option>Priya Sharma (E002)</option>
-          <option>Rahul Verma (E003)</option><option>Kavya Reddy (E004)</option>
-          <option>Vikram Nair (E005)</option><option>Nisha Menon (E006)</option>
         </select>
       </div>
       <div class="form-group">
@@ -493,32 +436,78 @@
 <div class="toast" id="toast"></div>
 
 <script>
-// ── DATA
-const employees = [
-  { id:'E001', name:'Arjun Kumar',    dept:'Engineering',     color:'#eef2ff', tc:'#6366f1', checkin:'08:52', checkout:'18:10', hours:'9h 18m', ot:'1h 10m', status:'Present' },
-  { id:'E002', name:'Priya Sharma',   dept:'Human Resources', color:'#ecfdf5', tc:'#059669', checkin:'09:05', checkout:'18:00', hours:'8h 55m', ot:'0',     status:'Present' },
-  { id:'E003', name:'Rahul Verma',    dept:'Finance',         color:'#fffbeb', tc:'#d97706', checkin:'—',     checkout:'—',     hours:'—',      ot:'—',     status:'On Leave' },
-  { id:'E004', name:'Kavya Reddy',    dept:'Design',          color:'#fef2f2', tc:'#dc2626', checkin:'09:42', checkout:'18:00', hours:'8h 18m', ot:'0',     status:'Late' },
-  { id:'E005', name:'Vikram Nair',    dept:'Engineering',     color:'#eff6ff', tc:'#2563eb', checkin:'08:45', checkout:'19:30', hours:'10h 45m',ot:'2h 30m',status:'Present' },
-  { id:'E006', name:'Nisha Menon',    dept:'Marketing',       color:'#f5f3ff', tc:'#7c3aed', checkin:'09:00', checkout:'18:00', hours:'9h 00m', ot:'0',     status:'Present' },
-  { id:'E007', name:'Suresh Babu',    dept:'Operations',      color:'#ecfdf5', tc:'#059669', checkin:'—',     checkout:'—',     hours:'—',      ot:'—',     status:'Absent' },
-  { id:'E008', name:'Deepa Thomas',   dept:'Finance',         color:'#fffbeb', tc:'#d97706', checkin:'09:15', checkout:'18:05', hours:'8h 50m', ot:'0',     status:'Present' },
-  { id:'E009', name:'Karthik Raj',    dept:'Engineering',     color:'#eef2ff', tc:'#6366f1', checkin:'08:30', checkout:'20:00', hours:'11h 30m',ot:'3h 0m', status:'Present' },
-  { id:'E010', name:'Ananya Krishnan',dept:'Design',          color:'#fef2f2', tc:'#dc2626', checkin:'—',     checkout:'—',     hours:'—',      ot:'—',     status:'Absent' },
-];
+// ── SESSION GUARD
+const session = JSON.parse(sessionStorage.getItem('vendhan_session') || 'null');
+if (!session || !session.token) { window.location.href = '../index.html'; }
+const API_BASE = 'https://vendhan-backend.onrender.com';
+const authHeaders = { 'Authorization': `Bearer ${session ? session.token : ''}` };
 
-const history = [
-  { name:'Arjun Kumar',    dept:'Engineering', date:'2025-06-10', checkin:'08:52', checkout:'18:10', hours:'9h 18m', status:'Present' },
-  { name:'Priya Sharma',   dept:'HR',          date:'2025-06-10', checkin:'09:05', checkout:'18:00', hours:'8h 55m', status:'Present' },
-  { name:'Rahul Verma',    dept:'Finance',     date:'2025-06-10', checkin:'—',     checkout:'—',     hours:'—',      status:'On Leave' },
-  { name:'Kavya Reddy',    dept:'Design',      date:'2025-06-09', checkin:'09:42', checkout:'18:00', hours:'8h 18m', status:'Late' },
-  { name:'Vikram Nair',    dept:'Engineering', date:'2025-06-09', checkin:'08:45', checkout:'19:30', hours:'10h 45m',status:'Present' },
-  { name:'Nisha Menon',    dept:'Marketing',   date:'2025-06-08', checkin:'09:00', checkout:'18:00', hours:'9h 00m', status:'Present' },
-  { name:'Suresh Babu',    dept:'Operations',  date:'2025-06-08', checkin:'—',     checkout:'—',     hours:'—',      status:'Absent' },
-  { name:'Deepa Thomas',   dept:'Finance',     date:'2025-06-07', checkin:'09:15', checkout:'18:05', hours:'8h 50m', status:'Present' },
-  { name:'Karthik Raj',    dept:'Engineering', date:'2025-06-07', checkin:'08:30', checkout:'20:00', hours:'11h 30m',status:'Present' },
-  { name:'Ananya Krishnan',dept:'Design',      date:'2025-06-06', checkin:'—',     checkout:'—',     hours:'—',      status:'Absent' },
-];
+let employeesList = [];
+let todayData = [];
+let historyData = [];
+
+function todayISO(){ return new Date().toISOString().split('T')[0]; }
+function timeStr(t){ return t ? String(t).slice(0,5) : '—'; }
+
+function calcHours(checkin, checkout){
+  if(!checkin || !checkout || checkin==='—' || checkout==='—') return { hoursStr:'—', ot:'—' };
+  const [ih,im] = checkin.split(':').map(Number);
+  const [oh,om] = checkout.split(':').map(Number);
+  let mins = (oh*60+om) - (ih*60+im);
+  if (mins < 0) mins += 24*60;
+  const hoursStr = `${Math.floor(mins/60)}h ${mins%60}m`;
+  const otMins = Math.max(0, mins - 8*60);
+  const ot = otMins > 0 ? `${Math.floor(otMins/60)}h ${otMins%60}m` : '0';
+  return { hoursStr, ot };
+}
+
+function mapRow(r){
+  const { hoursStr, ot } = calcHours(timeStr(r.check_in), timeStr(r.check_out));
+  return {
+    id: r.id, empId: r.employee_id, code: r.employee_code || '',
+    name: r.full_name, dept: r.department, date: r.date,
+    checkin: timeStr(r.check_in), checkout: timeStr(r.check_out),
+    hours: hoursStr, ot, status: r.status
+  };
+}
+
+async function apiGet(path){
+  const res = await fetch(API_BASE + path, { headers: authHeaders, cache: 'no-store' });
+  if (res.status === 401 || res.status === 403) {
+    sessionStorage.removeItem('vendhan_session');
+    window.location.href = '../index.html';
+    return [];
+  }
+  return res.json();
+}
+
+async function loadEmployeesList(){
+  employeesList = await apiGet('/api/employees');
+  document.getElementById('totalEmpStat').textContent = employeesList.length;
+  const sel = document.getElementById('corrEmp');
+  sel.innerHTML = '<option value="">Select Employee</option>' +
+    employeesList.map(e => `<option value="${e.id}">${e.full_name} (${e.employee_code||'—'})</option>`).join('');
+}
+
+async function loadToday(){
+  const rows = await apiGet('/api/attendance?date=' + todayISO());
+  todayData = (rows || []).map(mapRow);
+  const present = todayData.filter(e=>e.status==='Present'||e.status==='Late').length;
+  const absent  = todayData.filter(e=>e.status==='Absent').length;
+  const late    = todayData.filter(e=>e.status==='Late').length;
+  const otTotal = todayData.reduce((s,e)=>{ const m=e.ot.match(/(\d+)h/); return s+(m?Number(m[1]):0); },0);
+  document.getElementById('presentCount').textContent = present;
+  document.getElementById('absentCount').textContent = absent;
+  document.getElementById('lateCount').textContent = late;
+  document.getElementById('otCount').textContent = otTotal;
+  renderToday(todayData);
+}
+
+async function loadHistory(){
+  const rows = await apiGet('/api/attendance');
+  historyData = (rows || []).map(mapRow);
+  renderHistory(historyData);
+}
 
 // ── Today Tab
 function renderToday(data) {
@@ -526,21 +515,19 @@ function renderToday(data) {
   document.getElementById('todayDateLabel').textContent = now.toLocaleDateString('en-IN',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
   document.getElementById('todayCountLabel').textContent = `${data.length} records`;
   const tbody = document.getElementById('todayTableBody');
-  if (!data.length) { tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:32px;color:var(--text-muted);">No records found</td></tr>`; return; }
-  const avatarColors = {'Engineering':['#eef2ff','#6366f1'],'Human Resources':['#ecfdf5','#059669'],'Finance':['#fffbeb','#d97706'],'Design':['#fef2f2','#dc2626'],'Marketing':['#f5f3ff','#7c3aed'],'Operations':['#eff6ff','#2563eb']};
+  if (!data.length) { tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:32px;color:var(--text-muted);">No attendance marked for today yet</td></tr>`; return; }
   tbody.innerHTML = data.map(e => {
-    const ac = avatarColors[e.dept] || ['#f3f4f6','#6b7280'];
-    const initials = e.name.split(' ').map(n=>n[0]).join('');
-    const sb = e.status==='Present' ? 'badge-success' : e.status==='Late' ? 'badge-info' : e.status==='Absent' ? 'badge-danger' : 'badge-warning';
+    const initials = (e.name||'').split(' ').filter(Boolean).map(n=>n[0]).join('');
+    const sb = e.status==='Present'?'badge-success':e.status==='Late'?'badge-info':e.status==='Absent'?'badge-danger':'badge-warning';
     return `<tr>
-      <td><div class="emp-info"><div class="emp-avatar" style="background:${ac[0]};color:${ac[1]};">${initials}</div><div><div class="emp-name">${e.name}</div><div class="emp-dept">${e.id}</div></div></div></td>
-      <td style="font-size:13px;color:var(--text-secondary);">${e.dept}</td>
+      <td><div class="emp-info"><div class="emp-avatar" style="background:#eef2ff;color:#6366f1;">${initials}</div><div><div class="emp-name">${e.name}</div><div class="emp-dept">${e.code}</div></div></div></td>
+      <td style="font-size:13px;color:var(--text-secondary);">${e.dept||'—'}</td>
       <td style="font-size:13px;font-weight:600;color:${e.checkin==='—'?'var(--text-muted)':'#059669'};">${e.checkin}</td>
       <td style="font-size:13px;font-weight:600;color:${e.checkout==='—'?'var(--text-muted)':'#dc2626'};">${e.checkout}</td>
       <td style="font-size:13px;color:var(--text-secondary);">${e.hours}</td>
       <td style="font-size:13px;color:${e.ot==='0'||e.ot==='—'?'var(--text-muted)':'#7c3aed'};font-weight:${e.ot==='0'||e.ot==='—'?'400':'600'};">${e.ot==='0'?'—':e.ot}</td>
       <td><span class="badge ${sb}">● ${e.status}</span></td>
-      <td style="text-align:center;"><button style="font-size:12px;padding:4px 10px;border-radius:7px;border:1px solid var(--border);background:none;cursor:pointer;" onclick="openCorrectionModal()">Edit</button></td>
+      <td style="text-align:center;"><button style="font-size:12px;padding:4px 10px;border-radius:7px;border:1px solid var(--border);background:none;cursor:pointer;" onclick="openCorrectionModal(${e.id})">Edit</button></td>
     </tr>`;
   }).join('');
 }
@@ -549,121 +536,144 @@ function filterToday() {
   const s = document.getElementById('todaySearch').value.toLowerCase();
   const d = document.getElementById('todayDept').value;
   const st = document.getElementById('todayStatus').value;
-  const filtered = employees.filter(e =>
-    (!s || e.name.toLowerCase().includes(s) || e.id.toLowerCase().includes(s)) &&
+  renderToday(todayData.filter(e =>
+    (!s || e.name.toLowerCase().includes(s) || e.code.toLowerCase().includes(s)) &&
     (!d || e.dept === d) && (!st || e.status === st)
-  );
-  renderToday(filtered);
+  ));
 }
 
 // ── History Tab
 function renderHistory(data) {
   const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-  document.getElementById('historyTableBody').innerHTML = data.map(e => {
+  const tbody = document.getElementById('historyTableBody');
+  if (!data.length) { tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:32px;color:var(--text-muted);">No attendance history yet</td></tr>`; return; }
+  tbody.innerHTML = data.map(e => {
     const d = new Date(e.date);
     const sb = e.status==='Present'?'badge-success':e.status==='Late'?'badge-info':e.status==='Absent'?'badge-danger':'badge-warning';
     return `<tr>
-      <td><div class="emp-info"><div class="emp-avatar" style="background:#eef2ff;color:#6366f1;">${e.name.split(' ').map(n=>n[0]).join('')}</div><div><div class="emp-name">${e.name}</div><div class="emp-dept">${e.dept}</div></div></div></td>
+      <td><div class="emp-info"><div class="emp-avatar" style="background:#eef2ff;color:#6366f1;">${(e.name||'').split(' ').filter(Boolean).map(n=>n[0]).join('')}</div><div><div class="emp-name">${e.name}</div><div class="emp-dept">${e.dept||'—'}</div></div></div></td>
       <td style="font-size:13px;">${d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})}</td>
       <td style="font-size:13px;color:var(--text-muted);">${days[d.getDay()]}</td>
       <td style="font-size:13px;font-weight:600;color:${e.checkin==='—'?'var(--text-muted)':'#059669'};">${e.checkin}</td>
       <td style="font-size:13px;font-weight:600;color:${e.checkout==='—'?'var(--text-muted)':'#dc2626'};">${e.checkout}</td>
       <td style="font-size:13px;color:var(--text-secondary);">${e.hours}</td>
       <td><span class="badge ${sb}">● ${e.status}</span></td>
-      <td style="text-align:center;"><button style="font-size:12px;padding:4px 10px;border-radius:7px;border:1px solid var(--border);background:none;cursor:pointer;" onclick="openCorrectionModal()">Correct</button></td>
+      <td style="text-align:center;"><button style="font-size:12px;padding:4px 10px;border-radius:7px;border:1px solid var(--border);background:none;cursor:pointer;" onclick="openCorrectionModal(${e.id})">Correct</button></td>
     </tr>`;
   }).join('');
 }
 
 function filterHistory(s) {
-  const search = s.toLowerCase();
+  const search = (s||'').toLowerCase();
   const st = document.getElementById('historyStatus').value;
-  const filtered = history.filter(e =>
-    (!search || e.name.toLowerCase().includes(search)) &&
-    (!st || e.status === st)
-  );
-  renderHistory(filtered);
+  renderHistory(historyData.filter(e =>
+    (!search || e.name.toLowerCase().includes(search)) && (!st || e.status === st)
+  ));
 }
 
-// ── Calendar
-let calDate = new Date(2025, 5, 1);
-const calData = {
-  1:'weekend', 2:'present', 3:'present', 4:'late', 5:'present',
-  6:'present', 7:'weekend', 8:'weekend', 9:'present', 10:'present',
-  11:'absent', 12:'present', 13:'present', 14:'weekend', 15:'weekend',
-  16:'leave', 17:'present', 18:'present', 19:'late', 20:'present',
-  21:'weekend', 22:'weekend', 23:'present', 24:'present', 25:'present',
-  26:'absent', 27:'present', 28:'weekend', 29:'weekend', 30:'present'
-};
+// ── Modal — real POST for new records, PUT for edits
+let editingId = null;
+function openCorrectionModal(id) {
+  editingId = id || null;
+  document.getElementById('corrDate').value = new Date().toISOString().split('T')[0];
+  document.getElementById('corrEmp').value = '';
+  document.getElementById('corrIn').value = '09:00';
+  document.getElementById('corrOut').value = '18:00';
+  document.getElementById('corrStatus').value = 'Present';
+  document.getElementById('corrNote').value = '';
+
+  if (editingId) {
+    const existing = todayData.find(e=>e.id===editingId) || historyData.find(e=>e.id===editingId);
+    if (existing) {
+      document.getElementById('corrEmp').value = existing.empId;
+      document.getElementById('corrDate').value = existing.date ? new Date(existing.date).toISOString().split('T')[0] : document.getElementById('corrDate').value;
+      if (existing.checkin !== '—') document.getElementById('corrIn').value = existing.checkin;
+      if (existing.checkout !== '—') document.getElementById('corrOut').value = existing.checkout;
+      document.getElementById('corrStatus').value = existing.status;
+    }
+  }
+  document.getElementById('correctionModal').classList.add('open');
+}
+function closeCorrectionModal() { document.getElementById('correctionModal').classList.remove('open'); editingId = null; }
+
+async function saveCorrection() {
+  const employee_id = document.getElementById('corrEmp').value;
+  const date = document.getElementById('corrDate').value;
+  const check_in = document.getElementById('corrIn').value;
+  const check_out = document.getElementById('corrOut').value;
+  const status = document.getElementById('corrStatus').value;
+  const note = document.getElementById('corrNote').value;
+  if (!employee_id) { showToast('⚠️ Please select an employee'); return; }
+
+  try {
+    const url = editingId ? `${API_BASE}/api/attendance/${editingId}` : `${API_BASE}/api/attendance`;
+    const method = editingId ? 'PUT' : 'POST';
+    const res = await fetch(url, {
+      method,
+      headers: { ...authHeaders, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ employee_id, date, check_in, check_out, status, note })
+    });
+    if (!res.ok) throw new Error('Save failed');
+    closeCorrectionModal();
+    showToast(`✅ Attendance saved as "${status}"`);
+    loadToday();
+    loadHistory();
+  } catch (err) {
+    console.error(err);
+    showToast('⚠️ Could not save attendance');
+  }
+}
+
+// ── Calendar (built from real history data)
+let calDate = new Date();
 function renderCalendar() {
   const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
   document.getElementById('calMonthLabel').textContent = `${months[calDate.getMonth()]} ${calDate.getFullYear()}`;
+  document.getElementById('calSummaryMonth').textContent = `${months[calDate.getMonth()]} ${calDate.getFullYear()}`;
   const grid = document.getElementById('calGrid');
   const labels = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
   const firstDay = new Date(calDate.getFullYear(), calDate.getMonth(), 1).getDay();
   const daysInMonth = new Date(calDate.getFullYear(), calDate.getMonth()+1, 0).getDate();
   const today = new Date();
+
+  const byDate = {};
+  historyData.forEach(e => {
+    const d = new Date(e.date);
+    if (d.getMonth()===calDate.getMonth() && d.getFullYear()===calDate.getFullYear()) {
+      byDate[d.getDate()] = e.status;
+    }
+  });
+
   let html = labels.map(l=>`<div class="cal-day-label">${l}</div>`).join('');
   for (let i=0;i<firstDay;i++) html+=`<div class="cal-day empty"></div>`;
-  for (let d=1;d<=daysInMonth;d++) {
+  const counts = { Present:0, Absent:0, Late:0, 'On Leave':0 };
+  for (let d=1; d<=daysInMonth; d++) {
     const isToday = today.getDate()===d && today.getMonth()===calDate.getMonth() && today.getFullYear()===calDate.getFullYear();
-    const cls = calData[d] || '';
-    html+=`<div class="cal-day ${cls} ${isToday?'today':''}" title="Day ${d}: ${cls||'No data'}" onclick="showToast('📅 Day ${d}: ${cls||'No record'}')">
-      ${d}<div class="cal-dot" style="background:${cls==='present'?'#059669':cls==='absent'?'#dc2626':cls==='late'?'#2563eb':cls==='leave'?'#d97706':'transparent'};"></div>
-    </div>`;
+    const status = byDate[d];
+    if (status && counts.hasOwnProperty(status)) counts[status]++;
+    const cls = status==='Present'?'present':status==='Absent'?'absent':status==='Late'?'late':status==='On Leave'?'leave':'';
+    html+=`<div class="cal-day ${cls} ${isToday?'today':''}" title="Day ${d}: ${status||'No data'}" onclick="showToast('📅 Day ${d}: ${status||'No record'}')">${d}<div class="cal-dot" style="background:${cls==='present'?'#059669':cls==='absent'?'#dc2626':cls==='late'?'#2563eb':cls==='leave'?'#d97706':'transparent'};"></div></div>`;
   }
   grid.innerHTML = html;
+
+  const totalMarked = counts.Present + counts.Absent + counts.Late + counts['On Leave'];
+  const rate = totalMarked ? Math.round(((counts.Present+counts.Late) / totalMarked) * 100) : 0;
+  document.getElementById('calAttendanceRate').textContent = totalMarked ? rate + '%' : '—';
+
+  const bars = [
+    { label:'Present Days', val: counts.Present, color:'#059669' },
+    { label:'Absent Days', val: counts.Absent, color:'#dc2626' },
+    { label:'Late Arrivals', val: counts.Late, color:'#2563eb' },
+    { label:'On Leave', val: counts['On Leave'], color:'#d97706' }
+  ];
+  const maxVal = Math.max(1, ...bars.map(b=>b.val));
+  document.getElementById('calSummaryBars').innerHTML = bars.map(b => `
+    <div>
+      <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px;"><span>${b.label}</span><span style="font-weight:700;color:${b.color};">${b.val}</span></div>
+      <div style="height:6px;background:#f3f4f6;border-radius:10px;overflow:hidden;"><div style="width:${(b.val/maxVal)*100}%;height:100%;background:${b.color};border-radius:10px;"></div></div>
+    </div>`).join('');
 }
 function changeMonth(dir) { calDate.setMonth(calDate.getMonth()+dir); renderCalendar(); }
-
-// ── Charts
-function initCharts() {
-  new Chart(document.getElementById('weeklyChart'), {
-    type:'bar',
-    data:{
-      labels:['Week 1','Week 2','Week 3','Week 4'],
-      datasets:[
-        {label:'Present',data:[88,92,87,95],backgroundColor:'rgba(5,150,105,0.15)',borderColor:'#059669',borderWidth:2,borderRadius:6},
-        {label:'Absent', data:[8,5,9,3],  backgroundColor:'rgba(220,38,38,0.1)',  borderColor:'#dc2626',borderWidth:2,borderRadius:6}
-      ]
-    },
-    options:{responsive:true,plugins:{legend:{labels:{font:{size:12},color:'#6b7280',usePointStyle:true}}},scales:{x:{grid:{display:false},ticks:{color:'#9ca3af',font:{size:12}}},y:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{color:'#9ca3af',font:{size:12}}}}}
-  });
-  new Chart(document.getElementById('deptChart'), {
-    type:'bar',
-    data:{
-      labels:['Engineering','HR','Finance','Marketing','Design'],
-      datasets:[{label:'Attendance %',data:[94,88,82,91,79],backgroundColor:['rgba(99,102,241,0.15)','rgba(5,150,105,0.15)','rgba(217,119,6,0.15)','rgba(124,58,237,0.15)','rgba(220,38,38,0.15)'],borderColor:['#6366f1','#059669','#d97706','#7c3aed','#dc2626'],borderWidth:2,borderRadius:6}]
-    },
-    options:{responsive:true,indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{min:60,max:100,grid:{color:'rgba(0,0,0,0.04)'},ticks:{color:'#9ca3af',font:{size:12},callback:v=>v+'%'}},y:{grid:{display:false},ticks:{color:'#6b7280',font:{size:12}}}}}
-  });
-  new Chart(document.getElementById('checkinChart'), {
-    type:'line',
-    data:{
-      labels:['8:00','8:30','9:00','9:15','9:30','9:45','10:00'],
-      datasets:[{label:'Employees',data:[5,18,42,20,8,4,3],fill:true,backgroundColor:'rgba(99,102,241,0.08)',borderColor:'#6366f1',borderWidth:2,tension:0.4,pointBackgroundColor:'#6366f1',pointRadius:4}]
-    },
-    options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:'#9ca3af',font:{size:12}}},y:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{color:'#9ca3af',font:{size:12}}}}}
-  });
-  // Heatmap
-  const colors = ['#f3f4f6','#ecfdf5','#6ee7b7','#34d399','#059669','#065f46'];
-  const vals = Array.from({length:144},()=>Math.floor(Math.random()*6));
-  document.getElementById('heatmapContainer').innerHTML = `<div class="heatmap-grid">${vals.map((v,i)=>`<div class="heatmap-cell" style="background:${colors[v]};" title="Day ${i+1}: ${[0,60,75,85,92,98][v]}% attendance" onclick="showToast('Attendance: ${[0,60,75,85,92,98][v]}%')"></div>`).join('')}</div>`;
-}
-
-// ── Modal
-function openCorrectionModal() {
-  document.getElementById('corrDate').value = new Date().toISOString().split('T')[0];
-  document.getElementById('correctionModal').classList.add('open');
-}
-function closeCorrectionModal() { document.getElementById('correctionModal').classList.remove('open'); }
-function saveCorrection() {
-  const emp = document.getElementById('corrEmp').value;
-  const status = document.getElementById('corrStatus').value;
-  if (!emp) { showToast('⚠️ Please select an employee'); return; }
-  closeCorrectionModal();
-  showToast(`✅ Attendance marked as "${status}" for ${emp.split(' (')[0]}`);
-}
 
 // ── Tab Switch
 function switchTab(id, btn) {
@@ -671,7 +681,7 @@ function switchTab(id, btn) {
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('tab-'+id).classList.add('active');
   btn.classList.add('active');
-  if (id==='analytics') initCharts();
+  if (id==='calendar') renderCalendar();
 }
 
 // ── Sidebar Toggle
@@ -683,7 +693,7 @@ function toggleSidebar() {
 
 // ── Export CSV
 function exportCSV() {
-  const rows = ['Employee,Department,Date,Check In,Check Out,Hours,Status',...history.map(e=>`${e.name},${e.dept},${e.date},${e.checkin},${e.checkout},${e.hours},${e.status}`)].join('\n');
+  const rows = ['Employee,Department,Date,Check In,Check Out,Hours,Status',...historyData.map(e=>`${e.name},${e.dept},${e.date},${e.checkin},${e.checkout},${e.hours},${e.status}`)].join('\n');
   const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([rows],{type:'text/csv'}));
   a.download='vendhan_attendance.csv'; a.click();
   showToast('📥 Attendance report exported!');
@@ -696,9 +706,7 @@ function showToast(msg) {
 }
 
 // ── INIT
-renderToday(employees);
-renderHistory(history);
-renderCalendar();
+loadEmployeesList().then(() => { loadToday(); loadHistory(); });
 </script>
 </body>
 </html>
