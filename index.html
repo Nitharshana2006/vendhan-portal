@@ -171,10 +171,11 @@ async function handleLogin(event) {
       return;
     }
 
-  sessionStorage.setItem(SESSION_KEY, JSON.stringify({
+    sessionStorage.setItem(SESSION_KEY, JSON.stringify({
       role: data.user.role,
       email: data.user.email,
-      employeeId: data.user.id,
+      employeeId: data.user.employeeId,
+      userId: data.user.id,
       name: data.user.full_name,
       token: data.token,
       loggedInAt: Date.now()
