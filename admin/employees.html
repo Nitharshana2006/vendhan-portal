@@ -207,7 +207,9 @@
     <div class="nav-section-label">System</div>
     <a href="settings.html" class="nav-item"><span class="nav-icon">⚙️</span> Settings</a>
     <a href="security.html" class="nav-item"><span class="nav-icon">🔒</span> Security</a>
-  <a href="logs.html" class="nav-item"><span class="nav-icon">📋</span> Activity Logs</a>
+    <a href="logs.html" class="nav-item"><span class="nav-icon">📋</span> Activity Logs</a>
+    <a href="admin_profile.html" class="nav-item"><span class="nav-icon">👤</span> My Profile</a>
+    <a href="../index.html" class="nav-item"><span class="nav-icon">🚪</span> Logout</a>
   </nav>
   <div class="sidebar-footer">
     <div class="user-card">
@@ -355,10 +357,6 @@
           <input class="form-input" id="empPhone" placeholder="9876543210">
         </div>
         <div class="form-group">
-          <label class="form-label">Login Password *</label>
-          <input class="form-input" id="empPassword" type="text" placeholder="Set a password for their login (min 6 chars)">
-        </div>
-        <div class="form-group">
           <label class="form-label">Date of Birth</label>
           <input class="form-input" id="empDob" type="date">
         </div>
@@ -440,62 +438,26 @@
 
 <script>
 // ── Data
-// ── Data (loaded from real backend)
-const API_BASE = 'https://vendhan-backend.onrender.com';
-const SETUP_SECRET = 'vendhan_setup_9f3k2_change_this_too';
-
-function getSession(){
-  const s = sessionStorage.getItem('vendhan_session');
-  return s ? JSON.parse(s) : null;
-}
-
-let employees = [];
-let filtered = [];
-let currentPage = 1;
-const perPage = 8;
-
-const avatarColors = [
-  { color:'#eef2ff', textColor:'#6366f1' },
-  { color:'#ecfdf5', textColor:'#059669' },
-  { color:'#fffbeb', textColor:'#d97706' },
-  { color:'#fef2f2', textColor:'#dc2626' },
-  { color:'#eff6ff', textColor:'#2563eb' },
-  { color:'#f5f3ff', textColor:'#7c3aed' },
+let employees = [
+  { id:'E001', first:'Arjun',   last:'Kumar',   dept:'Engineering',     role:'Senior Developer',  email:'arjun@vendhan.com',   phone:'9876543210', joined:'2024-01-15', status:'Active',   type:'Full Time',  salary:75000, color:'#eef2ff', textColor:'#6366f1' },
+  { id:'E002', first:'Priya',   last:'Sharma',  dept:'Human Resources', role:'HR Manager',        email:'priya@vendhan.com',   phone:'9123456780', joined:'2023-06-01', status:'Active',   type:'Full Time',  salary:60000, color:'#ecfdf5', textColor:'#059669' },
+  { id:'E003', first:'Rahul',   last:'Verma',   dept:'Finance',         role:'Accountant',        email:'rahul@vendhan.com',   phone:'9012345678', joined:'2023-03-20', status:'On Leave', type:'Full Time',  salary:55000, color:'#fffbeb', textColor:'#d97706' },
+  { id:'E004', first:'Kavya',   last:'Reddy',   dept:'Design',          role:'UI/UX Designer',    email:'kavya@vendhan.com',   phone:'9988776655', joined:'2024-05-10', status:'Active',   type:'Full Time',  salary:58000, color:'#fef2f2', textColor:'#dc2626' },
+  { id:'E005', first:'Vikram',  last:'Nair',    dept:'Engineering',     role:'Backend Developer', email:'vikram@vendhan.com',  phone:'9776655443', joined:'2023-09-01', status:'Active',   type:'Full Time',  salary:70000, color:'#eff6ff', textColor:'#2563eb' },
+  { id:'E006', first:'Nisha',   last:'Menon',   dept:'Marketing',       role:'Marketing Manager', email:'nisha@vendhan.com',   phone:'9654321087', joined:'2022-11-15', status:'Active',   type:'Full Time',  salary:62000, color:'#f5f3ff', textColor:'#7c3aed' },
+  { id:'E007', first:'Suresh',  last:'Babu',    dept:'Operations',      role:'Operations Lead',   email:'suresh@vendhan.com',  phone:'9543210876', joined:'2022-04-01', status:'Active',   type:'Full Time',  salary:65000, color:'#ecfdf5', textColor:'#059669' },
+  { id:'E008', first:'Deepa',   last:'Thomas',  dept:'Finance',         role:'Finance Analyst',   email:'deepa@vendhan.com',   phone:'9432109765', joined:'2023-12-01', status:'Active',   type:'Full Time',  salary:52000, color:'#fffbeb', textColor:'#d97706' },
+  { id:'E009', first:'Karthik', last:'Raj',     dept:'Engineering',     role:'DevOps Engineer',   email:'karthik@vendhan.com', phone:'9321098654', joined:'2024-02-14', status:'Active',   type:'Full Time',  salary:80000, color:'#eef2ff', textColor:'#6366f1' },
+  { id:'E010', first:'Ananya',  last:'Krishnan',dept:'Design',          role:'Graphic Designer',  email:'ananya@vendhan.com',  phone:'9210987543', joined:'2024-03-22', status:'Inactive', type:'Contract',   salary:40000, color:'#fef2f2', textColor:'#dc2626' },
+  { id:'E011', first:'Mohan',   last:'Das',     dept:'Marketing',       role:'SEO Specialist',    email:'mohan@vendhan.com',   phone:'9109876432', joined:'2023-07-11', status:'Active',   type:'Full Time',  salary:48000, color:'#f5f3ff', textColor:'#7c3aed' },
+  { id:'E012', first:'Sruthi',  last:'Pillai',  dept:'Human Resources', role:'HR Executive',      email:'sruthi@vendhan.com',  phone:'9098765321', joined:'2023-10-05', status:'On Leave', type:'Full Time',  salary:45000, color:'#ecfdf5', textColor:'#059669' },
 ];
 
-async function loadEmployees(){
-  try{
-    const session = getSession();
-    const res = await fetch(API_BASE+'/api/employees', { headers:{ 'Authorization':'Bearer '+session.token } });
-    const data = await res.json();
+let filtered = [...employees];
+let currentPage = 1;
+const perPage = 8;
+let nextId = 13;
 
-    employees = data.map((e, i) => {
-      const nameParts = (e.full_name || '').split(' ');
-      const c = avatarColors[i % avatarColors.length];
-      return {
-        dbId: e.id,
-        id: e.employee_code || ('E' + String(e.id).padStart(3,'0')),
-        first: nameParts[0] || e.full_name || '',
-        last: nameParts.slice(1).join(' ') || '',
-        dept: e.department || '',
-        role: e.designation || '',
-        email: e.email || '',
-        phone: e.phone || '',
-        joined: e.joined_date ? e.joined_date.split('T')[0] : '',
-        status: e.status || 'Active',
-        type: 'Full Time',
-        salary: Number(e.basic_salary) || 0,
-        color: c.color, textColor: c.textColor
-      };
-    });
-   filtered = [...employees];
-    currentPage = 1;
-    renderTable();
-  }catch(err){
-    console.error(err);
-    showToast('⚠️ Could not load employees');
-  }
-}
 // ── Render Table
 function renderTable() {
   const start = (currentPage - 1) * perPage;
@@ -634,77 +596,48 @@ function clearForm() {
   ['fName','lName','empEmail','empPhone','empDob','empGender','empDept','empRole','empJoin','empType','empSalary','empLocation']
     .forEach(id => { const el = document.getElementById(id); if (el) el.value = el.tagName === 'SELECT' ? '' : ''; });
 }
-async function saveEmployee() {
+function saveEmployee() {
   const first = document.getElementById('fName').value.trim();
   const last  = document.getElementById('lName').value.trim();
   const email = document.getElementById('empEmail').value.trim();
   const phone = document.getElementById('empPhone').value.trim();
-  const password = document.getElementById('empPassword').value;
   const dept  = document.getElementById('empDept').value;
   const role  = document.getElementById('empRole').value.trim();
   const join  = document.getElementById('empJoin').value;
-  const salary = parseInt(document.getElementById('empSalary').value) || 0;
 
-  if (!first || !last || !email || !phone || !dept || !role || !join || !password) {
-    showToast('⚠️ Please fill all required fields, including a login password');
-    return;
-  }
-  if (password.length < 6) {
-    showToast('⚠️ Password must be at least 6 characters');
+  if (!first || !last || !email || !phone || !dept || !role || !join) {
+    showToast('⚠️ Please fill all required fields');
     return;
   }
 
-  const session = getSession();
-  const fullName = first + ' ' + last;
+  const colors = [
+    { color:'#eef2ff', textColor:'#6366f1' },
+    { color:'#ecfdf5', textColor:'#059669' },
+    { color:'#fffbeb', textColor:'#d97706' },
+    { color:'#fef2f2', textColor:'#dc2626' },
+    { color:'#eff6ff', textColor:'#2563eb' },
+  ];
+  const c = colors[nextId % colors.length];
 
-  try {
-    // 1. Create the employee record
-    const empRes = await fetch(API_BASE + '/api/employees', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.token },
-      body: JSON.stringify({
-        employee_code: 'E' + String(employees.length + 1).padStart(3, '0'),
-        full_name: fullName,
-        department: dept,
-        designation: role,
-        email: email,
-        phone: phone,
-        joined_date: join,
-        status: 'Active',
-        basic_salary: salary
-      })
-    });
-    const empData = await empRes.json();
-    if (!empRes.ok) { showToast('⚠️ ' + (empData.error || 'Could not create employee')); return; }
+  const newEmp = {
+    id: 'E' + String(nextId).padStart(3,'0'),
+    first, last, dept, role, email, phone,
+    joined: join,
+    status: 'Active',
+    type: document.getElementById('empType').value,
+    salary: parseInt(document.getElementById('empSalary').value) || 0,
+    ...c
+  };
 
-    // 2. Create their login account
-    const authRes = await fetch(API_BASE + '/api/auth/register', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        full_name: fullName,
-        email: email,
-        password: password,
-        role: 'employee',
-        setupSecret: SETUP_SECRET
-      })
-    });
-    const authData = await authRes.json();
-    if (!authRes.ok) {
-      showToast('⚠️ Employee created, but login setup failed: ' + (authData.error || 'unknown error'));
-      closeAddModal();
-      loadEmployees();
-      return;
-    }
-
-    closeAddModal();
-    await loadEmployees();
-    showToast('✅ Employee added — they can now sign in with ' + email);
-  } catch (err) {
-    console.error(err);
-    showToast('⚠️ Something went wrong saving this employee');
-  }
+  employees.unshift(newEmp);
+  filtered = [...employees];
+  nextId++;
+  currentPage = 1;
+  renderTable();
+  closeAddModal();
+  showToast('✅ Employee added successfully!');
 }
+
 // ── Profile Drawer
 function openProfile(id) {
   const e = employees.find(x => x.id === id);
@@ -798,7 +731,7 @@ function toggleSidebar() {
 }
 
 // ── Init
-loadEmployees();
+renderTable();
 </script>
 </body>
 </html>
