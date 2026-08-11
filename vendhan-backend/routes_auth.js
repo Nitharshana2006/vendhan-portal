@@ -10,35 +10,42 @@ require('dotenv').config();
 
 // ─── REGISTER ───────────────────────────────────────────────
 // POST /api/auth/register
-// body: { full_name, email, password, role }
-router.post('/login', async (req, res) => {
+// body: { full_name, email, password, role, setupSecret }
+router.post('/register', async (req, res) => {
   try {
-    const { email, password } = req.body;
-    if (!email || !password) {
-      return res.status(400).json({ error: 'Email and password are required.' });
+    const { full_name, email, password, role, setupSecret } = req.body;
+    if (setupSecret !== process.env.SETUP_SECRET) {
+      return res.status(403).json({ error: 'Not authorized to register.' });
     }
-    const [rows] = await pool.query('SELECT * FROM users WHERE email = ?', [email]);
-    if (rows.length === 0) {
-      return res.status(401).json({ error: 'Invalid email or password.' });
+    if (!full_name || !email || !password) {
+      return res.status(400).json({ error: 'Full name, email and password are required.' });
     }
-    const user = rows[0];
-    const passwordMatches = await bcrypt.compare(password, user.password);
-    if (!passwordMatches) {
-      return res.status(401).json({ error: 'Invalid email or password.' });
+    if (password.length < 6) {
+      return res.status(400).json({ error: 'Password must be at least 6 characters.' });
     }
+    const [existing] = await pool.query('SELECT id FROM users WHERE email = ?', [email]);
+    if (existing.length > 0) {
+      return res.status(409).json({ error: 'An account with this email already exists.' });
+    }
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const finalRole = role === 'admin' ? 'admin' : 'employee';
+    const [result] = await pool.query(
+      'INSERT INTO users (full_name, email, password, role) VALUES (?, ?, ?, ?)',
+      [full_name, email, hashedPassword, finalRole]
+    );
     const token = jwt.sign(
-      { id: user.id, email: user.email, role: user.role, full_name: user.full_name },
+      { id: result.insertId, email, role: finalRole, full_name },
       process.env.JWT_SECRET,
       { expiresIn: '7d' }
     );
-    res.json({
-      message: 'Login successful!',
+    res.status(201).json({
+      message: 'Registered successfully!',
       token,
-      user: { id: user.id, full_name: user.full_name, email: user.email, role: user.role }
+      user: { id: result.insertId, full_name, email, role: finalRole }
     });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Server error during login.' });
+    res.status(500).json({ error: 'Server error during registration.' });
   }
 });
 
@@ -79,12 +86,6 @@ router.post('/login', async (req, res) => {
       token,
       user: { id: user.id, full_name: user.full_name, email: user.email, role: user.role, employeeId }
     });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Server error during login.' });
-  }
-});
-
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Server error during login.' });
