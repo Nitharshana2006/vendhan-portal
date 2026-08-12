@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -83,6 +82,7 @@
   .checkin-btn.check-in:hover{background:#e0e7ff;}
   .checkin-btn.check-out{background:#dc2626;color:#fff;}
   .checkin-btn.check-out:hover{background:#b91c1c;}
+  .checkin-btn:disabled{opacity:.6;cursor:not-allowed;}
 
   /* QUICK STATS */
   .quick-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px;}
@@ -244,7 +244,7 @@
           📅 <span id="liveDateBanner"></span>
         </div>
         <div style="background:rgba(255,255,255,.12);border-radius:8px;padding:8px 14px;font-size:12.5px;" id="checkInStatus">
-          🟢 Not checked in yet
+          Loading...
         </div>
       </div>
     </div>
@@ -409,7 +409,7 @@
       <div class="card-sub">Your latest actions & updates</div>
       <div class="act-item">
         <div class="act-dot" style="background:var(--success-bg);color:var(--success);">✅</div>
-        <div><div class="act-text">Checked in at <strong>08:52 AM</strong> today</div><div class="act-time">Today, 08:52 AM</div></div>
+        <div><div class="act-text" id="lastCheckinActivity">No check-in recorded today yet</div><div class="act-time"></div></div>
       </div>
       <div class="act-item">
         <div class="act-dot" style="background:var(--accent-light);color:var(--accent);">📋</div>
@@ -476,6 +476,20 @@
 <div class="toast" id="toast"></div>
 
 <script>
+const API_BASE = 'https://vendhan-backend.onrender.com';
+
+function getSession(){
+  const s = sessionStorage.getItem('vendhan_session');
+  return s ? JSON.parse(s) : null;
+}
+const session = getSession();
+if (!session || !session.token) { window.location.href = '../index.html'; }
+const authHeaders = { 'Authorization': 'Bearer ' + (session ? session.token : '') };
+
+function todayISO(){ return new Date().toISOString().split('T')[0]; }
+function timeStr(t){ return t ? String(t).slice(0,5) : null; }
+function dateOnly(d){ return d ? String(d).split('T')[0] : ''; }
+
 // ── LIVE CLOCK
 function updateClock(){
   const now = new Date();
@@ -484,29 +498,105 @@ function updateClock(){
 }
 setInterval(updateClock,1000); updateClock();
 
-// ── CHECK IN / OUT
+// ── CHECK IN / OUT — real state, persisted to backend
+let todayRecord = null;
 let checkedIn = false;
 let checkInTime = null;
-function toggleCheckin(){
+
+async function loadTodayAttendance(){
+  try{
+    const res = await fetch(API_BASE + '/api/attendance?date=' + todayISO(), { headers: authHeaders, cache: 'no-store' });
+    if (res.status === 401 || res.status === 403) {
+      sessionStorage.removeItem('vendhan_session');
+      window.location.href = '../index.html';
+      return;
+    }
+    const rows = await res.json();
+    todayRecord = (rows || []).find(r => r.employee_id === session.employeeId) || null;
+    initCheckinState();
+  }catch(err){
+    console.error(err);
+    initCheckinState(); // fall back to "not checked in" UI rather than leaving it stuck on "Loading..."
+  }
+}
+
+function initCheckinState(){
+  const btn = document.getElementById('checkinBtn');
+  const status = document.getElementById('checkInStatus');
+  const activity = document.getElementById('lastCheckinActivity');
+  btn.disabled = false;
+
+  if (todayRecord && todayRecord.check_in && !todayRecord.check_out) {
+    checkedIn = true;
+    checkInTime = new Date(`${todayISO()}T${timeStr(todayRecord.check_in)}:00`);
+    btn.className = 'checkin-btn check-out';
+    btn.innerHTML = '✗ Check Out';
+    status.innerHTML = `🟢 Checked in at <strong>${timeStr(todayRecord.check_in)}</strong>`;
+    activity.innerHTML = `Checked in at <strong>${timeStr(todayRecord.check_in)}</strong> today`;
+  } else if (todayRecord && todayRecord.check_in && todayRecord.check_out) {
+    checkedIn = false;
+    btn.className = 'checkin-btn check-in';
+    btn.innerHTML = '✔ Check In';
+    btn.disabled = true;
+    status.innerHTML = `⚫ Checked out — ${timeStr(todayRecord.check_in)} to ${timeStr(todayRecord.check_out)}`;
+    activity.innerHTML = `Checked in at <strong>${timeStr(todayRecord.check_in)}</strong>, out at <strong>${timeStr(todayRecord.check_out)}</strong> today`;
+  } else {
+    checkedIn = false;
+    btn.className = 'checkin-btn check-in';
+    btn.innerHTML = '✔ Check In';
+    status.innerHTML = '🔘 Not checked in yet';
+  }
+}
+
+async function toggleCheckin(){
   const btn = document.getElementById('checkinBtn');
   const status = document.getElementById('checkInStatus');
   const now = new Date();
-  if(!checkedIn){
-    checkedIn = true;
-    checkInTime = now;
-    btn.className='checkin-btn check-out';
-    btn.innerHTML='✗ Check Out';
-    status.innerHTML=`🟢 Checked in at <strong>${now.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',hour12:true})}</strong>`;
-    showToast('✅ Checked in successfully at '+now.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',hour12:true}));
+  const nowTime = now.toTimeString().slice(0,5);
+
+  if (!checkedIn) {
+    try {
+      const res = await fetch(API_BASE + '/api/attendance', {
+        method: 'POST',
+        headers: { ...authHeaders, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ employee_id: session.employeeId, date: todayISO(), check_in: nowTime, status: 'Present' })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Check-in failed');
+
+      todayRecord = { id: data.id, check_in: nowTime, check_out: null };
+      checkedIn = true; checkInTime = now;
+      btn.className = 'checkin-btn check-out';
+      btn.innerHTML = '✗ Check Out';
+      status.innerHTML = `🟢 Checked in at <strong>${now.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',hour12:true})}</strong>`;
+      document.getElementById('lastCheckinActivity').innerHTML = `Checked in at <strong>${now.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',hour12:true})}</strong> today`;
+      showToast('✅ Checked in successfully at ' + now.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',hour12:true}));
+    } catch (err) {
+      console.error(err);
+      showToast('⚠️ Could not check in — please try again');
+    }
   } else {
-    checkedIn = false;
-    const mins = Math.floor((now - checkInTime)/60000);
-    const hrs  = Math.floor(mins/60);
-    const rem  = mins%60;
-    btn.className='checkin-btn check-in';
-    btn.innerHTML='✔ Check In';
-    status.innerHTML=`⚫ Checked out — worked <strong>${hrs}h ${rem}m</strong>`;
-    showToast(`👋 Checked out. Total: ${hrs}h ${rem}m`);
+    if (!todayRecord || !todayRecord.id) { showToast('⚠️ No active check-in found'); return; }
+    try {
+      const res = await fetch(API_BASE + '/api/attendance/' + todayRecord.id, {
+        method: 'PUT',
+        headers: { ...authHeaders, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ check_in: timeStr(todayRecord.check_in), check_out: nowTime, status: 'Present' })
+      });
+      if (!res.ok) throw new Error('Check-out failed');
+
+      checkedIn = false;
+      const mins = Math.floor((now - checkInTime)/60000);
+      const hrs = Math.floor(mins/60), rem = mins%60;
+      btn.className = 'checkin-btn check-in';
+      btn.innerHTML = '✔ Check In';
+      btn.disabled = true;
+      status.innerHTML = `⚫ Checked out — worked <strong>${hrs}h ${rem}m</strong>`;
+      showToast(`👋 Checked out. Total: ${hrs}h ${rem}m`);
+    } catch (err) {
+      console.error(err);
+      showToast('⚠️ Could not check out — please try again');
+    }
   }
 }
 
@@ -562,12 +652,6 @@ function openLeaveModal(){
   calcLeaveDays();
 }
 function closeLeaveModal(){document.getElementById('leaveModal').classList.remove('open');}
-const API_BASE = 'https://vendhan-backend.onrender.com';
-
-function getSession(){
-  const s = sessionStorage.getItem('vendhan_session');
-  return s ? JSON.parse(s) : null;
-}
 
 async function submitLeave(){
   const type=document.getElementById('leaveType').value;
@@ -576,7 +660,6 @@ async function submitLeave(){
   const reason=document.getElementById('leaveReason').value.trim();
   if(!type||!from||!to||!reason){showToast('⚠️ Please fill all required fields');return;}
 
-  const session = getSession();
   if(!session){ showToast('⚠️ Session expired, please log in again'); return; }
 
   const d1=new Date(from), d2=new Date(to);
@@ -585,7 +668,7 @@ async function submitLeave(){
   try{
     const res = await fetch(API_BASE+'/api/leave', {
       method:'POST',
-      headers:{ 'Content-Type':'application/json', 'Authorization':'Bearer '+session.token },
+      headers:{ ...authHeaders, 'Content-Type':'application/json' },
       body: JSON.stringify({
         employee_id: session.employeeId,
         leave_type: type,
@@ -615,6 +698,9 @@ function toggleSidebar(){
 
 // ── TOAST
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3500);}
+
+// ── INIT
+loadTodayAttendance();
 </script>
 </body>
 </html>
