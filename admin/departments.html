@@ -45,11 +45,10 @@
   .dept-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
   .dept-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:22px;transition:all .2s;position:relative;overflow:hidden;}
   .dept-card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.08);}
-  .dept-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;border-radius:16px 16px 0 0;}
   .dept-icon{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:14px;}
   .dept-name{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:17px;margin-bottom:4px;}
   .dept-head{font-size:13px;color:var(--text-secondary);margin-bottom:14px;}
-  .dept-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px;}
+  .dept-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;}
   .dept-stat-box{background:var(--bg);border-radius:9px;padding:9px 10px;text-align:center;}
   .dept-stat-val{font-family:'Plus Jakarta Sans',sans-serif;font-size:18px;font-weight:700;}
   .dept-stat-label{font-size:11px;color:var(--text-muted);margin-top:2px;}
@@ -75,6 +74,7 @@
   .form-select{height:40px;border:1px solid var(--border);border-radius:9px;padding:0 14px;font-size:13.5px;font-family:'DM Sans',sans-serif;outline:none;background:#fff;}
   .toast{position:fixed;bottom:28px;right:28px;background:#0f172a;color:#fff;padding:13px 20px;border-radius:12px;font-size:13.5px;font-weight:500;z-index:600;display:flex;align-items:center;gap:10px;box-shadow:0 8px 24px rgba(0,0,0,.2);transform:translateY(80px);opacity:0;transition:all .3s ease;}
   .toast.show{transform:translateY(0);opacity:1;}
+  .empty-state{grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--text-muted);}
   ::-webkit-scrollbar{width:5px;}
   ::-webkit-scrollbar-thumb{background:var(--border);border-radius:10px;}
 </style>
@@ -92,7 +92,7 @@
     <div class="nav-section-label">Analytics</div>
     <a href="reports.html" class="nav-item"><span class="nav-icon">📊</span> Reports &amp; Analytics</a>
     <a href="projects.html" class="nav-item"><span class="nav-icon">📁</span> Projects &amp; Tasks</a>
-    <a href="departments.html" class="nav-item  active"><span class="nav-icon">🏢</span> Departments</a>
+    <a href="departments.html" class="nav-item active"><span class="nav-icon">🏢</span> Departments</a>
     <div class="nav-section-label">Automation</div>
     <a href="data_entry.html" class="nav-item"><span class="nav-icon">🤖</span> Data Entry Automation</a>
     <div class="nav-section-label">Communication</div>
@@ -124,8 +124,8 @@
     <div class="modal-header"><div class="modal-title">Add Department</div><button class="modal-close" onclick="document.getElementById('modal').classList.remove('open')">✕</button></div>
     <div class="modal-body">
       <div class="form-group"><label class="form-label">Department Name *</label><input class="form-input" id="dName" placeholder="e.g. Operations"></div>
-      <div class="form-group"><label class="form-label">Department Head *</label><select class="form-select" id="dHead"><option value="">Select Head</option><option>Arjun Kumar</option><option>Priya Sharma</option><option>Vikram Nair</option><option>Nisha Menon</option></select></div>
-      <div class="form-group"><label class="form-label">Description</label><input class="form-input" id="dDesc" placeholder="Brief department description"></div>
+      <div class="form-group"><label class="form-label">Department Head</label><input class="form-input" id="dHead" placeholder="e.g. Arjun Kumar (optional)"></div>
+      <div style="font-size:12px;color:var(--text-muted);margin-top:-6px;">Note: this creates a placeholder card only — it isn't saved to the database, since departments aren't a stored entity yet. Employees get grouped into a department by editing their record's Department field.</div>
     </div>
     <div class="modal-footer">
       <button class="btn-outline" onclick="document.getElementById('modal').classList.remove('open')">Cancel</button>
@@ -135,47 +135,119 @@
 </div>
 <div class="toast" id="toast"></div>
 <script>
-const depts=[
-  {name:'Engineering',head:'Vikram Nair',icon:'💻',color:'#6366f1',bg:'#eef2ff',employees:48,attendance:94,tasks:18,fill:'#6366f1'},
-  {name:'Human Resources',head:'Priya Sharma',icon:'👥',color:'#059669',bg:'#ecfdf5',employees:16,attendance:92,tasks:8,fill:'#059669'},
-  {name:'Finance',head:'Deepa Thomas',icon:'💰',color:'#d97706',bg:'#fffbeb',employees:20,attendance:88,tasks:10,fill:'#d97706'},
-  {name:'Marketing',head:'Nisha Menon',icon:'📣',color:'#7c3aed',bg:'#f5f3ff',employees:26,attendance:91,tasks:12,fill:'#7c3aed'},
-  {name:'Design',head:'Kavya Reddy',icon:'🎨',color:'#dc2626',bg:'#fef2f2',employees:14,attendance:89,tasks:7,fill:'#dc2626'},
-  {name:'Operations',head:'Suresh Babu',icon:'⚙️',color:'#2563eb',bg:'#eff6ff',employees:0,attendance:0,tasks:2,fill:'#2563eb'},
+const session = JSON.parse(sessionStorage.getItem('vendhan_session') || 'null');
+if (!session || !session.token) { window.location.href = '../index.html'; }
+const API_BASE = 'https://vendhan-backend.onrender.com';
+const authHeaders = { 'Authorization': `Bearer ${session ? session.token : ''}` };
+
+const palette = [
+  { icon:'💻', color:'#6366f1', bg:'#eef2ff' },
+  { icon:'👥', color:'#059669', bg:'#ecfdf5' },
+  { icon:'💰', color:'#d97706', bg:'#fffbeb' },
+  { icon:'📣', color:'#7c3aed', bg:'#f5f3ff' },
+  { icon:'🎨', color:'#dc2626', bg:'#fef2f2' },
+  { icon:'⚙️', color:'#2563eb', bg:'#eff6ff' },
 ];
+
+let depts = [];
+let manualDepts = []; // client-side-only placeholder cards added via the modal
+
+function todayISO(){ return new Date().toISOString().split('T')[0]; }
+
+async function apiGet(path){
+  const res = await fetch(API_BASE + path, { headers: authHeaders, cache: 'no-store' });
+  if (res.status === 401 || res.status === 403) {
+    sessionStorage.removeItem('vendhan_session');
+    window.location.href = '../index.html';
+    return [];
+  }
+  return res.json();
+}
+
+async function loadDepartments(){
+  const [employees, attendance] = await Promise.all([
+    apiGet('/api/employees'),
+    apiGet('/api/attendance?date=' + todayISO())
+  ]);
+
+  const byDept = {};
+  (employees || []).forEach(e => {
+    const dept = e.department || 'Unassigned';
+    if (!byDept[dept]) byDept[dept] = { employees: [], present: 0 };
+    byDept[dept].employees.push(e);
+  });
+
+  (attendance || []).forEach(a => {
+    const dept = a.department || 'Unassigned';
+    if (byDept[dept] && (a.status === 'Present' || a.status === 'Late')) {
+      byDept[dept].present++;
+    }
+  });
+
+  const names = Object.keys(byDept);
+  depts = names.map((name, i) => {
+    const p = palette[i % palette.length];
+    const count = byDept[name].employees.length;
+    const present = byDept[name].present;
+    const attendancePct = count > 0 ? Math.round((present / count) * 100) : 0;
+    return {
+      name, head: 'Not assigned', icon: p.icon, color: p.color, bg: p.bg, fill: p.color,
+      employees: count, attendance: attendancePct, hasAttendanceData: attendance && attendance.length > 0
+    };
+  });
+
+  renderDepts([...depts, ...manualDepts]);
+}
+
 function renderDepts(list){
-  document.getElementById('deptGrid').innerHTML=list.map(d=>`
+  const grid = document.getElementById('deptGrid');
+  if (!list.length) {
+    grid.innerHTML = `<div class="empty-state">
+      <div style="font-size:32px;margin-bottom:10px;">🏢</div>
+      <div style="font-weight:600;font-size:15px;color:var(--text-primary);margin-bottom:4px;">No departments yet</div>
+      <div style="font-size:13px;">Departments appear automatically once employees have a department assigned.</div>
+    </div>`;
+    return;
+  }
+  grid.innerHTML = list.map(d => `
     <div class="dept-card">
-      <div class="dept-card" style="display:none;"></div>
       <div style="position:absolute;top:0;left:0;right:0;height:4px;background:${d.fill};border-radius:16px 16px 0 0;"></div>
       <div class="dept-icon" style="background:${d.bg};color:${d.color};">${d.icon}</div>
       <div class="dept-name">${d.name}</div>
       <div class="dept-head">👤 Head: <strong>${d.head}</strong></div>
       <div class="dept-stats">
         <div class="dept-stat-box"><div class="dept-stat-val" style="color:${d.color};">${d.employees}</div><div class="dept-stat-label">Employees</div></div>
-        <div class="dept-stat-box"><div class="dept-stat-val" style="color:${d.color};">${d.attendance}%</div><div class="dept-stat-label">Attendance</div></div>
-        <div class="dept-stat-box"><div class="dept-stat-val" style="color:${d.color};">${d.tasks}</div><div class="dept-stat-label">Tasks</div></div>
+        <div class="dept-stat-box"><div class="dept-stat-val" style="color:${d.color};">${d.hasAttendanceData === false ? '—' : d.attendance + '%'}</div><div class="dept-stat-label">Present Today</div></div>
       </div>
-      <div class="dept-bar"><div class="dept-bar-fill" style="width:${d.attendance}%;background:${d.fill};"></div></div>
+      <div class="dept-bar"><div class="dept-bar-fill" style="width:${d.hasAttendanceData === false ? 0 : d.attendance}%;background:${d.fill};"></div></div>
       <div class="dept-actions">
-        <button class="action-btn-sm" onclick="showToast('👥 Viewing ${d.name} employees')">View Team</button>
-        <button class="action-btn-sm" onclick="showToast('✏️ Editing ${d.name}')">Edit</button>
-        <button class="action-btn-sm" style="color:var(--danger);" onclick="showToast('🗑 Confirm delete in settings')">Delete</button>
+        <button class="action-btn-sm" onclick="window.location.href='employees.html'">View Team</button>
+        <button class="action-btn-sm" onclick="showToast('✏️ Edit employees individually in Employee Management')">Edit</button>
+        <button class="action-btn-sm" style="color:var(--danger);" onclick="showToast('🗑 Departments are derived from employee records — reassign employees to remove one')">Delete</button>
       </div>
     </div>`).join('');
 }
+
 function addDept(){
-  const name=document.getElementById('dName').value.trim();
-  const head=document.getElementById('dHead').value;
-  if(!name||!head){showToast('⚠️ Please fill all required fields');return;}
-  depts.push({name,head,icon:'🏢',color:'#6366f1',bg:'#eef2ff',employees:0,attendance:0,tasks:0,fill:'#6366f1'});
-  renderDepts(depts);
+  const name = document.getElementById('dName').value.trim();
+  const head = document.getElementById('dHead').value.trim();
+  if (!name) { showToast('⚠️ Please enter a department name'); return; }
+  const p = palette[(depts.length + manualDepts.length) % palette.length];
+  manualDepts.push({
+    name, head: head || 'Not assigned', icon: '🏢', color: p.color, bg: p.bg, fill: p.color,
+    employees: 0, attendance: 0, hasAttendanceData: true
+  });
+  renderDepts([...depts, ...manualDepts]);
   document.getElementById('modal').classList.remove('open');
-  showToast('✅ Department "'+name+'" added!');
+  document.getElementById('dName').value = '';
+  document.getElementById('dHead').value = '';
+  showToast('✅ "' + name + '" added as a placeholder card (not saved to database)');
 }
+
 function toggleSidebar(){document.getElementById('sidebar').classList.toggle('collapsed');document.getElementById('topbar').classList.toggle('collapsed');document.getElementById('mainContent').classList.toggle('collapsed');}
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3500);}
-renderDepts(depts);
+
+loadDepartments();
 </script>
 </body>
 </html>
