@@ -208,19 +208,19 @@
   <div class="stats-grid">
     <div class="stat-card">
       <div class="stat-icon" style="background:#eef2ff;color:#6366f1;">👥</div>
-      <div><div class="stat-value">124</div><div class="stat-label">Total Employees</div></div>
+      <div><div class="stat-value" id="statTotal">—</div><div class="stat-label">Total Employees</div></div>
     </div>
     <div class="stat-card">
       <div class="stat-icon" style="background:#ecfdf5;color:#059669;">✅</div>
-      <div><div class="stat-value">112</div><div class="stat-label">Active Employees</div></div>
+      <div><div class="stat-value" id="statActive">—</div><div class="stat-label">Active Employees</div></div>
     </div>
     <div class="stat-card">
       <div class="stat-icon" style="background:#fffbeb;color:#d97706;">📅</div>
-      <div><div class="stat-value">8</div><div class="stat-label">On Leave Today</div></div>
+      <div><div class="stat-value" id="statOnLeave">—</div><div class="stat-label">On Leave Today</div></div>
     </div>
     <div class="stat-card">
       <div class="stat-icon" style="background:#fef2f2;color:#dc2626;">⛔</div>
-      <div><div class="stat-value">4</div><div class="stat-label">Inactive / Resigned</div></div>
+      <div><div class="stat-value" id="statInactive">—</div><div class="stat-label">Inactive / Resigned</div></div>
     </div>
   </div>
 
@@ -425,6 +425,17 @@ const avatarColors = [
   { color:'#f5f3ff', textColor:'#7c3aed' },
 ];
 
+function renderStatCards() {
+  const total = employees.length;
+  const active = employees.filter(e => e.status === 'Active').length;
+  const onLeave = employees.filter(e => e.status === 'On Leave').length;
+  const inactive = employees.filter(e => e.status !== 'Active' && e.status !== 'On Leave').length;
+  document.getElementById('statTotal').textContent = total;
+  document.getElementById('statActive').textContent = active;
+  document.getElementById('statOnLeave').textContent = onLeave;
+  document.getElementById('statInactive').textContent = inactive;
+}
+
 async function loadEmployees(){
   try{
     const session = getSession();
@@ -459,6 +470,7 @@ async function loadEmployees(){
     });
     filtered = [...employees];
     currentPage = 1;
+    renderStatCards();
     renderTable();
   }catch(err){
     console.error(err);
