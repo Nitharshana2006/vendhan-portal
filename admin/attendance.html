@@ -109,8 +109,15 @@ body {
 .sidebar-nav {
     flex: 1;
     padding: 12px 10px;
-    overflow-y: auto;
-    overflow-x: hidden;
+   .nav-section-label {
+    white-space: nowrap;
+    transition: opacity 0.2s;
+}
+
+.nav-badge {
+    flex-shrink: 0;
+}
+    
 }
 
 .nav-section-label {
