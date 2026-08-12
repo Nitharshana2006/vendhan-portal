@@ -3,710 +3,3214 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Attendance Management — Vendhan InfoTech</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+
 <style>
-  :root {
-    --sidebar-w:260px; --topbar-h:64px;
-    --accent:#4f46e5; --accent-light:#eef2ff;
-    --surface:#ffffff; --bg:#f4f6fb; --border:#e5e7eb;
-    --text-primary:#111827; --text-secondary:#6b7280; --text-muted:#9ca3af;
-    --success:#059669; --success-bg:#ecfdf5;
-    --warning:#d97706; --warning-bg:#fffbeb;
-    --danger:#dc2626; --danger-bg:#fef2f2;
-    --info:#2563eb; --info-bg:#eff6ff;
-  }
-  *{margin:0;padding:0;box-sizing:border-box;}
-  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text-primary);display:flex;min-height:100vh;}
+:root {
+    --sidebar-w: 260px;
+    --topbar-h: 64px;
 
- 
-  /* SIDEBAR */
-  .sidebar { width:var(--sidebar-w); background:#0f172a; position:fixed; top:0; left:0; height:100vh; display:flex; flex-direction:column; z-index:100; transition:width 0.3s; overflow:hidden; }
-  .sidebar.collapsed { width:68px; }
-  .sidebar-logo { padding:20px 20px 16px; display:flex; align-items:center; gap:12px; border-bottom:1px solid rgba(255,255,255,0.06); min-height:var(--topbar-h); }
-  .logo-icon { width:36px; height:36px; background:linear-gradient(135deg,#6366f1,#4f46e5); border-radius:10px; display:flex; align-items:center; justify-content:center; font-family:'Plus Jakarta Sans',sans-serif; font-weight:700; font-size:16px; color:white; flex-shrink:0; }
-  .logo-text { font-family:'Plus Jakarta Sans',sans-serif; font-weight:700; font-size:15px; color:white; white-space:nowrap; }
-  .logo-sub { font-size:11px; color:rgba(255,255,255,0.4); }
-  .sidebar-nav { flex:1; padding:12px 10px; overflow-y:auto; overflow-x:hidden; }
-  .nav-section-label { font-size:10px; font-weight:600; letter-spacing:0.08em; color:rgba(255,255,255,0.25); text-transform:uppercase; padding:12px 10px 6px; white-space:nowrap; transition:opacity 0.2s; }
-  .sidebar.collapsed .nav-section-label { opacity:0; }
-  .nav-item { display:flex; align-items:center; gap:12px; padding:10px 10px; border-radius:8px; cursor:pointer; color:rgba(255,255,255,0.55); font-size:13.5px; font-weight:500; transition:all 0.15s; white-space:nowrap; text-decoration:none; margin-bottom:2px; }
-  .nav-item:hover { background:rgba(255,255,255,0.07); color:rgba(255,255,255,0.9); }
-  .nav-item.active { background:rgba(99,102,241,0.18); color:#a5b4fc; }
-  .nav-icon { font-size:18px; flex-shrink:0; width:20px; text-align:center; }
-  .nav-badge { margin-left:auto; background:#dc2626; color:white; font-size:10px; font-weight:700; padding:2px 6px; border-radius:10px; flex-shrink:0; }
-  .sidebar-footer { padding:12px 10px; border-top:1px solid rgba(255,255,255,0.06); }
-  .user-card { display:flex; align-items:center; gap:10px; padding:10px; border-radius:8px; background:rgba(255,255,255,0.05); cursor:pointer; overflow:hidden; }
-  .user-avatar { width:32px; height:32px; border-radius:50%; background:linear-gradient(135deg,#6366f1,#8b5cf6); display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; color:white; flex-shrink:0; }
-  .user-name { font-size:13px; font-weight:600; color:white; white-space:nowrap; }
-  .user-role { font-size:11px; color:rgba(255,255,255,0.4); }
+    --accent: #4f46e5;
+    --accent-light: #eef2ff;
 
-  /* TOPBAR */
-  .topbar{position:fixed;top:0;left:var(--sidebar-w);right:0;height:var(--topbar-h);background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:16px;z-index:90;transition:left 0.3s;}
-  .topbar.collapsed{left:68px;}
-  .toggle-btn{width:36px;height:36px;border-radius:8px;background:none;border:1px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-secondary);font-size:18px;flex-shrink:0;transition:all 0.15s;}
-  .toggle-btn:hover{background:var(--bg);}
-  .page-title{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:17px;}
-  .page-breadcrumb{font-size:12px;color:var(--text-muted);}
-  .topbar-actions{margin-left:auto;display:flex;align-items:center;gap:8px;}
-  .icon-btn{width:38px;height:38px;border-radius:9px;background:none;border:1px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-secondary);font-size:18px;}
-  .topbar-avatar{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:white;cursor:pointer;}
+    --surface: #ffffff;
+    --bg: #f4f6fb;
+    --border: #e5e7eb;
 
-  /* MAIN */
-  .main{margin-left:var(--sidebar-w);margin-top:var(--topbar-h);padding:28px;transition:margin-left 0.3s;min-height:calc(100vh - var(--topbar-h));}
-  .main.collapsed{margin-left:68px;}
+    --text-primary: #111827;
+    --text-secondary: #6b7280;
+    --text-muted: #9ca3af;
 
-  /* BUTTONS */
-  .btn-primary{background:var(--accent);color:white;border:none;border-radius:9px;padding:9px 18px;font-size:13.5px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:7px;font-family:'DM Sans',sans-serif;transition:all 0.15s;}
-  .btn-primary:hover{background:#4338ca;transform:translateY(-1px);}
-  .btn-outline{background:white;color:var(--text-secondary);border:1px solid var(--border);border-radius:9px;padding:9px 16px;font-size:13.5px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.15s;display:inline-flex;align-items:center;gap:7px;}
-  .btn-outline:hover{border-color:var(--accent);color:var(--accent);}
+    --success: #059669;
+    --success-bg: #ecfdf5;
 
-  /* STAT CARDS */
-  .stats-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:24px;}
-  .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px;transition:all 0.2s;position:relative;overflow:hidden;}
-  .stat-card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,0.07);}
-  .stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
-  .stat-card.blue::before{background:linear-gradient(90deg,#6366f1,#818cf8);}
-  .stat-card.green::before{background:linear-gradient(90deg,#059669,#34d399);}
-  .stat-card.amber::before{background:linear-gradient(90deg,#d97706,#fbbf24);}
-  .stat-card.red::before{background:linear-gradient(90deg,#dc2626,#f87171);}
-  .stat-card.purple::before{background:linear-gradient(90deg,#7c3aed,#a78bfa);}
-  .stat-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:12px;}
-  .stat-value{font-family:'Plus Jakarta Sans',sans-serif;font-size:26px;font-weight:700;}
-  .stat-label{font-size:12.5px;color:var(--text-secondary);margin-top:3px;}
+    --warning: #d97706;
+    --warning-bg: #fffbeb;
 
-  /* TABS */
-  .tab-bar{display:flex;gap:4px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:5px;margin-bottom:20px;width:fit-content;}
-  .tab-btn{padding:8px 20px;border-radius:8px;border:none;background:none;font-size:13.5px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--text-secondary);transition:all 0.15s;}
-  .tab-btn.active{background:var(--accent);color:white;font-weight:600;}
-  .tab-btn:hover:not(.active){background:var(--bg);}
-  .tab-content{display:none;}
-  .tab-content.active{display:block;}
+    --danger: #dc2626;
+    --danger-bg: #fef2f2;
 
-  /* TOOLBAR */
-  .toolbar{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px 18px;display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap;}
-  .search-input{display:flex;align-items:center;gap:8px;background:var(--bg);border:1px solid var(--border);border-radius:9px;padding:0 14px;height:38px;flex:1;min-width:200px;}
-  .search-input input{border:none;background:none;outline:none;font-size:13.5px;color:var(--text-primary);width:100%;font-family:'DM Sans',sans-serif;}
-  .search-input input::placeholder{color:var(--text-muted);}
-  .filter-select{height:38px;border:1px solid var(--border);border-radius:9px;padding:0 12px;font-size:13px;color:var(--text-secondary);background:white;cursor:pointer;font-family:'DM Sans',sans-serif;outline:none;}
+    --info: #2563eb;
+    --info-bg: #eff6ff;
+}
 
-  /* TABLE */
-  .table-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;}
-  .table-header-row{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
-  .table-title{font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;font-size:15px;}
-  .data-table{width:100%;border-collapse:collapse;font-size:13.5px;}
-  .data-table th{text-align:left;font-size:11.5px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);padding:12px 16px;border-bottom:1px solid var(--border);background:var(--bg);white-space:nowrap;}
-  .data-table td{padding:13px 16px;border-bottom:1px solid var(--bg);vertical-align:middle;}
-  .data-table tbody tr:last-child td{border-bottom:none;}
-  .data-table tbody tr:hover td{background:#fafbff;}
-  .emp-info{display:flex;align-items:center;gap:10px;}
-  .emp-avatar{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;}
-  .emp-name{font-size:13.5px;font-weight:600;}
-  .emp-dept{font-size:12px;color:var(--text-muted);}
-  .badge{display:inline-flex;align-items:center;font-size:11.5px;font-weight:600;padding:3px 10px;border-radius:6px;white-space:nowrap;}
-  .badge-success{background:var(--success-bg);color:var(--success);}
-  .badge-warning{background:var(--warning-bg);color:var(--warning);}
-  .badge-danger{background:var(--danger-bg);color:var(--danger);}
-  .badge-info{background:var(--info-bg);color:var(--info);}
-  .badge-gray{background:#f3f4f6;color:#6b7280;}
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
-  /* CALENDAR */
-  .calendar-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:24px;}
-  .cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
-  .cal-title{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:17px;}
-  .cal-nav{width:34px;height:34px;border-radius:8px;border:1px solid var(--border);background:none;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all 0.15s;}
-  .cal-nav:hover{background:var(--bg);border-color:var(--accent);}
-  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;}
-  .cal-day-label{text-align:center;font-size:12px;font-weight:600;color:var(--text-muted);padding:6px 0;text-transform:uppercase;}
-  .cal-day{aspect-ratio:1;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:13px;font-weight:500;cursor:pointer;transition:all 0.15s;position:relative;border:1.5px solid transparent;}
-  .cal-day:hover{background:var(--bg);border-color:var(--border);}
-  .cal-day.today{border-color:var(--accent);color:var(--accent);font-weight:700;}
-  .cal-day.present{background:var(--success-bg);color:var(--success);}
-  .cal-day.absent{background:var(--danger-bg);color:var(--danger);}
-  .cal-day.leave{background:var(--warning-bg);color:var(--warning);}
-  .cal-day.late{background:var(--info-bg);color:var(--info);}
-  .cal-day.weekend{background:#f9fafb;color:var(--text-muted);}
-  .cal-day.empty{background:none;cursor:default;}
-  .cal-dot{width:5px;height:5px;border-radius:50%;position:absolute;bottom:4px;}
-  .cal-legend{display:flex;gap:16px;margin-top:16px;flex-wrap:wrap;}
-  .legend-item{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-secondary);}
-  .legend-dot{width:10px;height:10px;border-radius:3px;}
+body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text-primary);
+    display: flex;
+    min-height: 100vh;
+}
 
-  /* CHARTS GRID */
-  .charts-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;}
-  .chart-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;}
-  .chart-title{font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;font-size:15px;margin-bottom:4px;}
-  .chart-sub{font-size:12px;color:var(--text-muted);margin-bottom:16px;}
+/* ================= SIDEBAR ================= */
 
-  /* CORRECTION MODAL */
-  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:500;display:none;align-items:center;justify-content:center;}
-  .modal-overlay.open{display:flex;}
-  .modal{background:white;border-radius:18px;width:520px;max-width:95vw;box-shadow:0 24px 64px rgba(0,0,0,0.18);animation:modalIn 0.25s ease;}
-  @keyframes modalIn{from{opacity:0;transform:scale(0.95) translateY(10px);}to{opacity:1;transform:scale(1) translateY(0);}}
-  .modal-header{padding:22px 24px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
-  .modal-title{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:18px;}
-  .modal-sub{font-size:13px;color:var(--text-muted);margin-top:3px;}
-  .modal-close{width:34px;height:34px;border-radius:8px;border:1px solid var(--border);background:none;cursor:pointer;font-size:18px;color:var(--text-secondary);display:flex;align-items:center;justify-content:center;transition:all 0.15s;}
-  .modal-close:hover{background:var(--danger-bg);color:var(--danger);border-color:var(--danger);}
-  .modal-body{padding:24px;}
-  .modal-footer{padding:16px 24px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px;}
-  .form-group{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;}
-  .form-label{font-size:13px;font-weight:600;color:var(--text-primary);}
-  .form-input{height:40px;border:1px solid var(--border);border-radius:9px;padding:0 14px;font-size:13.5px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color 0.15s;}
-  .form-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(99,102,241,0.12);}
-  .form-select{height:40px;border:1px solid var(--border);border-radius:9px;padding:0 14px;font-size:13.5px;font-family:'DM Sans',sans-serif;outline:none;background:white;cursor:pointer;}
-  .form-select:focus{border-color:var(--accent);}
-  .form-textarea{border:1px solid var(--border);border-radius:9px;padding:10px 14px;font-size:13.5px;font-family:'DM Sans',sans-serif;outline:none;resize:vertical;min-height:80px;width:100%;}
-  .form-textarea:focus{border-color:var(--accent);}
+.sidebar {
+    width: var(--sidebar-w);
+    background: #0f172a;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    z-index: 100;
+    transition: width 0.3s;
+    overflow: hidden;
+}
 
-  /* TOAST */
-  .toast{position:fixed;bottom:28px;right:28px;background:#0f172a;color:white;padding:13px 20px;border-radius:12px;font-size:13.5px;font-weight:500;z-index:600;display:flex;align-items:center;gap:10px;box-shadow:0 8px 24px rgba(0,0,0,0.2);transform:translateY(80px);opacity:0;transition:all 0.3s ease;}
-  .toast.show{transform:translateY(0);opacity:1;}
+.sidebar.collapsed {
+    width: 68px;
+}
 
-  /* HEATMAP */
-  .heatmap-grid{display:grid;grid-template-columns:repeat(12,1fr);gap:4px;margin-top:12px;}
-  .heatmap-cell{aspect-ratio:1;border-radius:4px;cursor:pointer;transition:transform 0.1s;}
-  .heatmap-cell:hover{transform:scale(1.2);}
+.sidebar-logo {
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    min-height: var(--topbar-h);
+}
 
-  ::-webkit-scrollbar{width:5px;}
-  ::-webkit-scrollbar-thumb{background:var(--border);border-radius:10px;}
+.logo-icon {
+    width: 36px;
+    height: 36px;
+    background: linear-gradient(135deg,#6366f1,#4f46e5);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 16px;
+    color: white;
+    flex-shrink: 0;
+}
+
+.logo-text {
+    font-weight: 700;
+    font-size: 15px;
+    color: white;
+    white-space: nowrap;
+}
+
+.logo-sub {
+    font-size: 11px;
+    color: rgba(255,255,255,0.4);
+}
+
+.sidebar-nav {
+    flex: 1;
+    padding: 12px 10px;
+    overflow-y: auto;
+}
+
+.nav-section-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    color: rgba(255,255,255,0.25);
+    text-transform: uppercase;
+    padding: 12px 10px 6px;
+}
+
+.sidebar.collapsed .nav-section-label {
+    opacity: 0;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    color: rgba(255,255,255,0.55);
+    font-size: 13.5px;
+    font-weight: 500;
+    transition: all 0.15s;
+    white-space: nowrap;
+    text-decoration: none;
+    margin-bottom: 2px;
+}
+
+.nav-item:hover {
+    background: rgba(255,255,255,0.07);
+    color: white;
+}
+
+.nav-item.active {
+    background: rgba(99,102,241,0.18);
+    color: #a5b4fc;
+}
+
+.nav-icon {
+    font-size: 18px;
+    width: 20px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.nav-badge {
+    margin-left: auto;
+    background: #dc2626;
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 10px;
+}
+
+.sidebar-footer {
+    padding: 12px 10px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+}
+
+.user-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.05);
+}
+
+.user-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg,#6366f1,#8b5cf6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    color: white;
+    flex-shrink: 0;
+}
+
+.user-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: white;
+}
+
+.user-role {
+    font-size: 11px;
+    color: rgba(255,255,255,0.4);
+}
+
+/* ================= TOPBAR ================= */
+
+.topbar {
+    position: fixed;
+    top: 0;
+    left: var(--sidebar-w);
+    right: 0;
+    height: var(--topbar-h);
+    background: white;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+    gap: 16px;
+    z-index: 90;
+    transition: left 0.3s;
+}
+
+.topbar.collapsed {
+    left: 68px;
+}
+
+.toggle-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: none;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+    font-size: 18px;
+}
+
+.page-title {
+    font-weight: 700;
+    font-size: 17px;
+}
+
+.page-breadcrumb {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.topbar-actions {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* ================= MAIN ================= */
+
+.main {
+    margin-left: var(--sidebar-w);
+    margin-top: var(--topbar-h);
+    padding: 28px;
+    transition: margin-left 0.3s;
+    min-height: calc(100vh - var(--topbar-h));
+}
+
+.main.collapsed {
+    margin-left: 68px;
+}
+
+/* ================= BUTTONS ================= */
+
+.btn-primary {
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 9px;
+    padding: 9px 18px;
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-primary:hover {
+    background: #4338ca;
+}
+
+.btn-outline {
+    background: white;
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    padding: 9px 16px;
+    font-size: 13.5px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.btn-outline:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+/* ================= STAT CARDS ================= */
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 14px;
+    margin-bottom: 24px;
+}
+
+.stat-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 18px;
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+}
+
+.stat-card.blue::before {
+    background: #6366f1;
+}
+
+.stat-card.green::before {
+    background: #059669;
+}
+
+.stat-card.red::before {
+    background: #dc2626;
+}
+
+.stat-card.amber::before {
+    background: #d97706;
+}
+
+.stat-card.purple::before {
+    background: #7c3aed;
+}
+
+.stat-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    margin-bottom: 12px;
+}
+
+.stat-value {
+    font-size: 26px;
+    font-weight: 700;
+}
+
+.stat-label {
+    font-size: 12.5px;
+    color: var(--text-secondary);
+    margin-top: 3px;
+}
+
+/* ================= TABS ================= */
+
+.tab-bar {
+    display: flex;
+    gap: 4px;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 5px;
+    margin-bottom: 20px;
+    width: fit-content;
+}
+
+.tab-btn {
+    padding: 8px 20px;
+    border-radius: 8px;
+    border: none;
+    background: none;
+    font-size: 13.5px;
+    font-weight: 500;
+    cursor: pointer;
+    color: var(--text-secondary);
+}
+
+.tab-btn.active {
+    background: var(--accent);
+    color: white;
+    font-weight: 600;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* ================= TOOLBAR ================= */
+
+.toolbar {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+}
+
+.search-input {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    padding: 0 14px;
+    height: 38px;
+    flex: 1;
+    min-width: 200px;
+}
+
+.search-input input {
+    border: none;
+    background: none;
+    outline: none;
+    font-size: 13.5px;
+    width: 100%;
+}
+
+.filter-select {
+    height: 38px;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    padding: 0 12px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    background: white;
+}
+
+/* ================= TABLE ================= */
+
+.table-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+}
+
+.table-header-row {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.table-title {
+    font-weight: 600;
+    font-size: 15px;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+}
+
+.data-table th {
+    text-align: left;
+    font-size: 11.5px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+    white-space: nowrap;
+}
+
+.data-table td {
+    padding: 13px 16px;
+    border-bottom: 1px solid var(--bg);
+    vertical-align: middle;
+}
+
+.data-table tbody tr:hover td {
+    background: #fafbff;
+}
+
+.emp-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.emp-avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    background: #eef2ff;
+    color: #6366f1;
+}
+
+.emp-name {
+    font-size: 13.5px;
+    font-weight: 600;
+}
+
+.emp-dept {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+/* ================= BADGES ================= */
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    font-size: 11.5px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 6px;
+    white-space: nowrap;
+}
+
+.badge-success {
+    background: var(--success-bg);
+    color: var(--success);
+}
+
+.badge-warning {
+    background: var(--warning-bg);
+    color: var(--warning);
+}
+
+.badge-danger {
+    background: var(--danger-bg);
+    color: var(--danger);
+}
+
+.badge-info {
+    background: var(--info-bg);
+    color: var(--info);
+}
+
+/* ================= ACTION BUTTON ================= */
+
+.action-btn {
+    border: 1px solid var(--border);
+    background: white;
+    border-radius: 7px;
+    padding: 5px 8px;
+    cursor: pointer;
+    margin: 0 2px;
+    font-size: 13px;
+}
+
+.action-btn:hover {
+    background: var(--bg);
+}
+
+/* ================= CALENDAR ================= */
+
+.calendar-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px;
+}
+
+.cal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.cal-title {
+    font-weight: 700;
+    font-size: 17px;
+}
+
+.cal-nav {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: none;
+    cursor: pointer;
+    font-size: 18px;
+}
+
+.cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7,1fr);
+    gap: 6px;
+}
+
+.cal-day-label {
+    text-align: center;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    padding: 6px 0;
+}
+
+.cal-day {
+    aspect-ratio: 1;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    position: relative;
+}
+
+.cal-day.today {
+    border: 1.5px solid var(--accent);
+    color: var(--accent);
+    font-weight: 700;
+}
+
+.cal-day.present {
+    background: var(--success-bg);
+    color: var(--success);
+}
+
+.cal-day.absent {
+    background: var(--danger-bg);
+    color: var(--danger);
+}
+
+.cal-day.late {
+    background: var(--info-bg);
+    color: var(--info);
+}
+
+.cal-day.weekend {
+    background: #f9fafb;
+    color: var(--text-muted);
+}
+
+.cal-day.empty {
+    background: none;
+}
+
+.cal-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    position: absolute;
+    bottom: 4px;
+}
+
+/* ================= MODAL ================= */
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    z-index: 500;
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-overlay.open {
+    display: flex;
+}
+
+.modal {
+    background: white;
+    border-radius: 18px;
+    width: 520px;
+    max-width: 95vw;
+}
+
+.modal-header {
+    padding: 22px 24px 18px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.modal-title {
+    font-weight: 700;
+    font-size: 18px;
+}
+
+.modal-sub {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-top: 3px;
+}
+
+.modal-close {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: none;
+    cursor: pointer;
+}
+
+.modal-body {
+    padding: 24px;
+}
+
+.modal-footer {
+    padding: 16px 24px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 14px;
+}
+
+.form-label {
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.form-input,
+.form-select,
+.form-textarea {
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    padding: 10px 14px;
+    font-size: 13.5px;
+    font-family: 'DM Sans',sans-serif;
+    outline: none;
+}
+
+.form-input,
+.form-select {
+    height: 40px;
+}
+
+.form-textarea {
+    min-height: 80px;
+    resize: vertical;
+}
+
+/* ================= TOAST ================= */
+
+.toast {
+    position: fixed;
+    bottom: 28px;
+    right: 28px;
+    background: #0f172a;
+    color: white;
+    padding: 13px 20px;
+    border-radius: 12px;
+    font-size: 13.5px;
+    z-index: 600;
+    transform: translateY(80px);
+    opacity: 0;
+    transition: 0.3s;
+}
+
+.toast.show {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media(max-width:1100px) {
+
+    .stats-grid {
+        grid-template-columns: repeat(2,1fr);
+    }
+
+    .sidebar {
+        width: 68px;
+    }
+
+    .topbar {
+        left: 68px;
+    }
+
+    .main {
+        margin-left: 68px;
+    }
+
+    .logo-text,
+    .logo-sub,
+    .user-card > div:not(.user-avatar),
+    .nav-item {
+        overflow: hidden;
+    }
+}
+
+@media(max-width:700px) {
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .main {
+        padding: 15px;
+    }
+
+    .topbar {
+        padding: 0 12px;
+    }
+
+    .topbar-actions .btn-outline {
+        display: none;
+    }
+
+    .tab-bar {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .tab-btn {
+        white-space: nowrap;
+    }
+}
 </style>
 </head>
+
 <body>
+
+<!-- ================= SIDEBAR ================= -->
+
 <aside class="sidebar" id="sidebar">
-  <div class="sidebar-logo"><div class="logo-icon">V</div><div><div class="logo-text">Vendhan InfoTech</div><div class="logo-sub">Admin Portal</div></div></div>
-  <nav class="sidebar-nav">
-    <div class="nav-section-label">Main</div>
-    <a href="dashboard.html" class="nav-item"><span class="nav-icon">⊞</span> Dashboard</a>
-    <a href="employees.html" class="nav-item"><span class="nav-icon">👥</span> Employee Management</a>
-    <a href="attendance.html" class="nav-item active"><span class="nav-icon">🕐</span> Attendance</a>
-    <a href="leave.html" class="nav-item"><span class="nav-icon">📅</span> Leave Management<span class="nav-badge">7</span></a>
-    <a href="payroll.html" class="nav-item"><span class="nav-icon">💰</span> Payroll</a>
-    <div class="nav-section-label">Analytics</div>
-    <a href="reports.html" class="nav-item"><span class="nav-icon">📊</span> Reports &amp; Analytics</a>
-    <a href="projects.html" class="nav-item"><span class="nav-icon">📁</span> Projects &amp; Tasks</a>
-    <a href="departments.html" class="nav-item"><span class="nav-icon">🏢</span> Departments</a>
-    <div class="nav-section-label">Automation</div>
-    <a href="data_entry.html" class="nav-item"><span class="nav-icon">🤖</span> Data Entry Automation</a>
-    <div class="nav-section-label">Communication</div>
-    <a href="chat.html" class="nav-item"><span class="nav-icon">💬</span> Chat System<span class="nav-badge">3</span></a>
-    <a href="notifications.html" class="nav-item"><span class="nav-icon">🔔</span> Notifications</a>
-    <div class="nav-section-label">System</div>
-    <a href="settings.html" class="nav-item"><span class="nav-icon">⚙️</span> Settings</a>
-    <a href="security.html" class="nav-item"><span class="nav-icon">🔒</span> Security</a>
-    <a href="logs.html" class="nav-item"><span class="nav-icon">📋</span> Activity Logs</a>
-    <a href="admin_profile.html" class="nav-item"><span class="nav-icon">👤</span> My Profile</a>
-    <a href="../index.html" class="nav-item"><span class="nav-icon">🚪</span> Logout</a>
-  </nav>
-  <div class="sidebar-footer"><div class="user-card" onclick="window.location.href='admin_profile.html'"><div class="user-avatar">A</div><div><div class="user-name">Admin User</div><div class="user-role">Super Administrator</div></div></div></div>
+
+    <div class="sidebar-logo">
+        <div class="logo-icon">V</div>
+
+        <div>
+            <div class="logo-text">Vendhan InfoTech</div>
+            <div class="logo-sub">Admin Portal</div>
+        </div>
+    </div>
+
+    <nav class="sidebar-nav">
+
+        <div class="nav-section-label">Main</div>
+
+        <a href="#" class="nav-item">
+            <span class="nav-icon">⊞</span>
+            Dashboard
+        </a>
+
+        <a href="#" class="nav-item">
+            <span class="nav-icon">👥</span>
+            Employee Management
+        </a>
+
+        <a href="#" class="nav-item active">
+            <span class="nav-icon">🕐</span>
+            Attendance
+        </a>
+
+        <a href="#" class="nav-item">
+            <span class="nav-icon">📅</span>
+            Leave Management
+            <span class="nav-badge">7</span>
+        </a>
+
+        <a href="#" class="nav-item">
+            <span class="nav-icon">💰</span>
+            Payroll
+        </a>
+
+        <div class="nav-section-label">Analytics</div>
+
+        <a href="#" class="nav-item">
+            <span class="nav-icon">📊</span>
+            Reports & Analytics
+        </a>
+
+        <a href="#" class="nav-item">
+            <span class="nav-icon">📁</span>
+            Projects & Tasks
+        </a>
+
+        <a href="#" class="nav-item">
+            <span class="nav-icon">🏢</span>
+            Departments
+        </a>
+
+        <div class="nav-section-label">Automation</div>
+
+        <a href="#" class="nav-item">
+            <span class="nav-icon">🤖</span>
+            Data Entry Automation
+        </a>
+
+        <div class="nav-section-label">Communication</div>
+
+        <a href="#" class="nav-item">
+            <span class="nav-icon">💬</span>
+            Chat System
+            <span class="nav-badge">3</span>
+        </a>
+
+        <a href="#" class="nav-item">
+            <span class="nav-icon">🔔</span>
+            Notifications
+        </a>
+
+        <div class="nav-section-label">System</div>
+
+        <a href="#" class="nav-item">
+            <span class="nav-icon">⚙️</span>
+            Settings
+        </a>
+
+        <a href="#" class="nav-item">
+            <span class="nav-icon">🔒</span>
+            Security
+        </a>
+
+        <a href="#" class="nav-item">
+            <span class="nav-icon">📋</span>
+            Activity Logs
+        </a>
+
+        <a href="#" class="nav-item">
+            <span class="nav-icon">👤</span>
+            My Profile
+        </a>
+
+        <a href="#" class="nav-item">
+            <span class="nav-icon">🚪</span>
+            Logout
+        </a>
+
+    </nav>
+
+    <div class="sidebar-footer">
+
+        <div class="user-card">
+
+            <div class="user-avatar">A</div>
+
+            <div>
+                <div class="user-name">Admin User</div>
+                <div class="user-role">Super Administrator</div>
+            </div>
+
+        </div>
+
+    </div>
+
 </aside>
 
 
-<!-- TOPBAR -->
+<!-- ================= TOPBAR ================= -->
+
 <header class="topbar" id="topbar">
-  <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
-  <div>
-    <div class="page-title">Attendance Management</div>
-    <div class="page-breadcrumb">Admin Portal › Attendance</div>
-  </div>
-  <div class="topbar-actions">
-    <button class="btn-outline" onclick="exportCSV()">📥 Export Report</button>
-    <button class="btn-primary" onclick="openCorrectionModal()">✚ Mark Attendance</button>
-    <button class="icon-btn">🔔</button>
-    <div class="topbar-avatar">A</div>
-  </div>
+
+    <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
+
+    <div>
+
+        <div class="page-title">
+            Attendance Management
+        </div>
+
+        <div class="page-breadcrumb">
+            Admin Portal › Attendance
+        </div>
+
+    </div>
+
+    <div class="topbar-actions">
+
+        <button class="btn-outline" onclick="exportCSV()">
+            📥 Export Report
+        </button>
+
+        <button class="btn-primary" onclick="openCorrectionModal()">
+            ✚ Mark Attendance
+        </button>
+
+        <button class="btn-outline">
+            🔔
+        </button>
+
+        <div class="topbar-avatar user-avatar">
+            A
+        </div>
+
+    </div>
+
 </header>
 
-<!-- MAIN -->
+
+<!-- ================= MAIN ================= -->
+
 <main class="main" id="mainContent">
 
-  <!-- Stat Cards -->
-  <div class="stats-grid">
+
+<!-- ================= STATISTICS ================= -->
+
+<div class="stats-grid">
+
     <div class="stat-card blue">
-      <div class="stat-icon" style="background:#eef2ff;color:#6366f1;">👥</div>
-      <div class="stat-value" id="totalEmpStat">—</div>
-      <div class="stat-label">Total Employees</div>
+
+        <div class="stat-icon"
+             style="background:#eef2ff;color:#6366f1;">
+            👥
+        </div>
+
+        <div class="stat-value" id="totalEmpStat">
+            5
+        </div>
+
+        <div class="stat-label">
+            Total Employees
+        </div>
+
     </div>
+
+
     <div class="stat-card green">
-      <div class="stat-icon" style="background:#ecfdf5;color:#059669;">✅</div>
-      <div class="stat-value" id="presentCount">—</div>
-      <div class="stat-label">Present Today</div>
+
+        <div class="stat-icon"
+             style="background:#ecfdf5;color:#059669;">
+            ✅
+        </div>
+
+        <div class="stat-value" id="presentCount">
+            5
+        </div>
+
+        <div class="stat-label">
+            Present Today
+        </div>
+
     </div>
+
+
     <div class="stat-card red">
-      <div class="stat-icon" style="background:#fef2f2;color:#dc2626;">❌</div>
-      <div class="stat-value" id="absentCount">—</div>
-      <div class="stat-label">Absent Today</div>
+
+        <div class="stat-icon"
+             style="background:#fef2f2;color:#dc2626;">
+            ❌
+        </div>
+
+        <div class="stat-value" id="absentCount">
+            0
+        </div>
+
+        <div class="stat-label">
+            Absent Today
+        </div>
+
     </div>
+
+
     <div class="stat-card amber">
-      <div class="stat-icon" style="background:#fffbeb;color:#d97706;">⏰</div>
-      <div class="stat-value" id="lateCount">—</div>
-      <div class="stat-label">Late Arrivals</div>
+
+        <div class="stat-icon"
+             style="background:#fffbeb;color:#d97706;">
+            ⏰
+        </div>
+
+        <div class="stat-value" id="lateCount">
+            0
+        </div>
+
+        <div class="stat-label">
+            Late Arrivals
+        </div>
+
     </div>
+
+
     <div class="stat-card purple">
-      <div class="stat-icon" style="background:#f5f3ff;color:#7c3aed;">🌙</div>
-      <div class="stat-value" id="otCount">—</div>
-      <div class="stat-label">Overtime Hours</div>
+
+        <div class="stat-icon"
+             style="background:#f5f3ff;color:#7c3aed;">
+            🌙
+        </div>
+
+        <div class="stat-value" id="otCount">
+            2h 18m
+        </div>
+
+        <div class="stat-label">
+            Overtime Hours
+        </div>
+
     </div>
-  </div>
 
-  <!-- Tabs -->
-  <div class="tab-bar">
-    <button class="tab-btn active" onclick="switchTab('today',this)">📋 Today's Attendance</button>
-    <button class="tab-btn" onclick="switchTab('history',this)">📂 History</button>
-    <button class="tab-btn" onclick="switchTab('calendar',this)">📅 Calendar View</button>
-    <button class="tab-btn" onclick="switchTab('analytics',this)">📊 Analytics</button>
-  </div>
+</div>
 
-  <!-- TAB 1: Today -->
-  <div class="tab-content active" id="tab-today">
+
+<!-- ================= TABS ================= -->
+
+<div class="tab-bar">
+
+    <button class="tab-btn active"
+            onclick="switchTab('today',this)">
+        📋 Today's Attendance
+    </button>
+
+    <button class="tab-btn"
+            onclick="switchTab('history',this)">
+        📂 History
+    </button>
+
+    <button class="tab-btn"
+            onclick="switchTab('calendar',this)">
+        📅 Calendar View
+    </button>
+
+    <button class="tab-btn"
+            onclick="switchTab('analytics',this)">
+        📊 Analytics
+    </button>
+
+</div>
+
+
+<!-- ================= TODAY ================= -->
+
+<div class="tab-content active" id="tab-today">
+
     <div class="toolbar">
-      <div class="search-input">
-        <span style="color:#9ca3af;font-size:15px;">🔍</span>
-        <input type="text" id="todaySearch" placeholder="Search employee..." oninput="filterToday()">
-      </div>
-      <select class="filter-select" id="todayDept" onchange="filterToday()">
-        <option value="">All Departments</option>
-        <option>Engineering</option><option>Human Resources</option>
-        <option>Finance</option><option>Marketing</option><option>Design</option>
-      </select>
-      <select class="filter-select" id="todayStatus" onchange="filterToday()">
-        <option value="">All Status</option>
-        <option>Present</option><option>Absent</option><option>Late</option><option>On Leave</option>
-      </select>
-    </div>
-    <div class="table-card">
-      <div class="table-header-row">
-        <div class="table-title">Today's Attendance — <span id="todayDateLabel"></span></div>
-        <div style="font-size:13px;color:var(--text-muted);" id="todayCountLabel"></div>
-      </div>
-      <div style="overflow-x:auto;">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>Employee</th>
-              <th>Department</th>
-              <th>Check In</th>
-              <th>Check Out</th>
-              <th>Working Hrs</th>
-              <th>Overtime</th>
-              <th>Status</th>
-              <th style="text-align:center;">Action</th>
-            </tr>
-          </thead>
-          <tbody id="todayTableBody"></tbody>
-        </table>
-      </div>
-    </div>
-  </div>
 
-  <!-- TAB 2: History -->
-  <div class="tab-content" id="tab-history">
+        <div class="search-input">
+
+            <span>🔍</span>
+
+            <input
+                type="text"
+                id="todaySearch"
+                placeholder="Search employee..."
+                oninput="filterToday()">
+
+        </div>
+
+
+        <select
+            class="filter-select"
+            id="todayDept"
+            onchange="filterToday()">
+
+            <option value="">
+                All Departments
+            </option>
+
+            <option>
+                Engineering
+            </option>
+
+            <option>
+                Human Resources
+            </option>
+
+            <option>
+                Finance
+            </option>
+
+            <option>
+                Marketing
+            </option>
+
+            <option>
+                Design
+            </option>
+
+        </select>
+
+
+        <select
+            class="filter-select"
+            id="todayStatus"
+            onchange="filterToday()">
+
+            <option value="">
+                All Status
+            </option>
+
+            <option>
+                Present
+            </option>
+
+            <option>
+                Absent
+            </option>
+
+            <option>
+                Late
+            </option>
+
+            <option>
+                On Leave
+            </option>
+
+        </select>
+
+    </div>
+
+
+    <div class="table-card">
+
+        <div class="table-header-row">
+
+            <div class="table-title">
+                Today's Attendance —
+                <span id="todayDateLabel"></span>
+            </div>
+
+            <div
+                style="font-size:13px;color:var(--text-muted);"
+                id="todayCountLabel">
+                5 records
+            </div>
+
+        </div>
+
+
+        <div style="overflow-x:auto;">
+
+            <table class="data-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Employee
+                        </th>
+
+                        <th>
+                            Department
+                        </th>
+
+                        <th>
+                            Check In
+                        </th>
+
+                        <th>
+                            Check Out
+                        </th>
+
+                        <th>
+                            Working Hrs
+                        </th>
+
+                        <th>
+                            Overtime
+                        </th>
+
+                        <th>
+                            Status
+                        </th>
+
+                        <th style="text-align:center;">
+                            Action
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody id="todayTableBody">
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ================= HISTORY ================= -->
+
+<div class="tab-content" id="tab-history">
+
     <div class="toolbar">
-      <div class="search-input">
-        <span style="color:#9ca3af;font-size:15px;">🔍</span>
-        <input type="text" placeholder="Search employee..." oninput="filterHistory(this.value)">
-      </div>
-      <input type="date" class="filter-select" id="historyDate">
-      <select class="filter-select" id="historyStatus" onchange="filterHistory('')">
-        <option value="">All Status</option>
-        <option>Present</option><option>Absent</option><option>Late</option><option>On Leave</option>
-      </select>
-      <button class="btn-outline" onclick="filterHistory('')">🔍 Filter</button>
+
+        <div class="search-input">
+
+            <span>🔍</span>
+
+            <input
+                type="text"
+                id="historySearch"
+                placeholder="Search employee..."
+                oninput="filterHistory()">
+
+        </div>
+
+        <input
+            type="date"
+            class="filter-select"
+            id="historyDate">
+
+        <select
+            class="filter-select"
+            id="historyStatus"
+            onchange="filterHistory()">
+
+            <option value="">
+                All Status
+            </option>
+
+            <option>
+                Present
+            </option>
+
+            <option>
+                Absent
+            </option>
+
+            <option>
+                Late
+            </option>
+
+            <option>
+                On Leave
+            </option>
+
+        </select>
+
     </div>
+
+
     <div class="table-card">
-      <div class="table-header-row">
-        <div class="table-title">Attendance History</div>
-        <button class="btn-outline" style="font-size:12px;padding:6px 12px;" onclick="exportCSV()">📥 Export</button>
-      </div>
-      <div style="overflow-x:auto;">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>Employee</th>
-              <th>Date</th>
-              <th>Day</th>
-              <th>Check In</th>
-              <th>Check Out</th>
-              <th>Hours</th>
-              <th>Status</th>
-              <th style="text-align:center;">Correction</th>
-            </tr>
-          </thead>
-          <tbody id="historyTableBody"></tbody>
-        </table>
-      </div>
-    </div>
-  </div>
 
-  <!-- TAB 3: Calendar -->
-  <div class="tab-content" id="tab-calendar">
-    <div style="display:grid;grid-template-columns:1fr 320px;gap:16px;">
-      <div class="calendar-card">
-        <div class="cal-header">
-          <button class="cal-nav" onclick="changeMonth(-1)">‹</button>
-          <div class="cal-title" id="calMonthLabel"></div>
-          <button class="cal-nav" onclick="changeMonth(1)">›</button>
-        </div>
-        <div class="cal-grid" id="calGrid"></div>
-        <div class="cal-legend">
-          <div class="legend-item"><div class="legend-dot" style="background:#ecfdf5;border:1px solid #059669;"></div> Present</div>
-          <div class="legend-item"><div class="legend-dot" style="background:#fef2f2;border:1px solid #dc2626;"></div> Absent</div>
-          <div class="legend-item"><div class="legend-dot" style="background:#eff6ff;border:1px solid #2563eb;"></div> Late</div>
-          <div class="legend-item"><div class="legend-dot" style="background:#fffbeb;border:1px solid #d97706;"></div> Leave</div>
-          <div class="legend-item"><div class="legend-dot" style="background:#f3f4f6;border:1px solid #d1d5db;"></div> Weekend</div>
-        </div>
-      </div>
-      <div class="chart-card" style="height:fit-content;">
-        <div class="chart-title">Monthly Summary</div>
-        <div class="chart-sub" id="calSummaryMonth"></div>
-        <div style="display:flex;flex-direction:column;gap:12px;margin-top:4px;" id="calSummaryBars"></div>
-        <div style="margin-top:20px;padding:14px;background:var(--bg);border-radius:10px;">
-          <div style="font-size:12px;color:var(--text-muted);margin-bottom:4px;">Attendance Rate</div>
-          <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:28px;font-weight:700;color:#059669;" id="calAttendanceRate">—</div>
-          <div style="font-size:12px;color:var(--text-muted);">This month</div>
-        </div>
-      </div>
-    </div>
-  </div>
+        <div class="table-header-row">
 
-  <!-- TAB 4: Analytics -->
-  <div class="tab-content" id="tab-analytics">
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:24px;text-align:center;color:var(--text-muted);">
-      <div style="font-size:32px;margin-bottom:10px;">📊</div>
-      <div style="font-weight:600;font-size:15px;color:var(--text-primary);margin-bottom:6px;">Analytics coming soon</div>
-      <div style="font-size:13px;max-width:420px;margin:0 auto;">Trend charts, department comparisons, and heatmaps need per-day aggregation endpoints that aren't built yet — this section will connect to real data once those are added.</div>
+            <div class="table-title">
+                Attendance History
+            </div>
+
+            <button
+                class="btn-outline"
+                onclick="exportCSV()">
+                📥 Export
+            </button>
+
+        </div>
+
+
+        <div style="overflow-x:auto;">
+
+            <table class="data-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Employee
+                        </th>
+
+                        <th>
+                            Department
+                        </th>
+
+                        <th>
+                            Date
+                        </th>
+
+                        <th>
+                            Check In
+                        </th>
+
+                        <th>
+                            Check Out
+                        </th>
+
+                        <th>
+                            Hours
+                        </th>
+
+                        <th>
+                            Status
+                        </th>
+
+                        <th>
+                            Action
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody id="historyTableBody">
+
+                </tbody>
+
+            </table>
+
+        </div>
+
     </div>
-  </div>
+
+</div>
+
+
+<!-- ================= CALENDAR ================= -->
+
+<div class="tab-content" id="tab-calendar">
+
+    <div style="
+        display:grid;
+        grid-template-columns:1fr 320px;
+        gap:16px;
+    ">
+
+        <div class="calendar-card">
+
+            <div class="cal-header">
+
+                <button
+                    class="cal-nav"
+                    onclick="changeMonth(-1)">
+                    ‹
+                </button>
+
+                <div
+                    class="cal-title"
+                    id="calMonthLabel">
+                </div>
+
+                <button
+                    class="cal-nav"
+                    onclick="changeMonth(1)">
+                    ›
+                </button>
+
+            </div>
+
+
+            <div
+                class="cal-grid"
+                id="calGrid">
+            </div>
+
+        </div>
+
+
+        <div class="calendar-card">
+
+            <h3 style="margin-bottom:15px;">
+                Monthly Summary
+            </h3>
+
+            <p style="
+                color:var(--text-muted);
+                font-size:13px;
+                margin-bottom:20px;">
+                Attendance summary
+            </p>
+
+
+            <div style="
+                display:flex;
+                flex-direction:column;
+                gap:15px;">
+
+                <div>
+
+                    <div style="
+                        display:flex;
+                        justify-content:space-between;
+                        margin-bottom:5px;">
+
+                        <span>
+                            Present
+                        </span>
+
+                        <strong style="color:#059669;">
+                            5
+                        </strong>
+
+                    </div>
+
+                    <div style="
+                        height:7px;
+                        background:#ecfdf5;
+                        border-radius:10px;">
+
+                        <div style="
+                            width:85%;
+                            height:100%;
+                            background:#059669;
+                            border-radius:10px;">
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div>
+
+                    <div style="
+                        display:flex;
+                        justify-content:space-between;
+                        margin-bottom:5px;">
+
+                        <span>
+                            Absent
+                        </span>
+
+                        <strong style="color:#dc2626;">
+                            0
+                        </strong>
+
+                    </div>
+
+                    <div style="
+                        height:7px;
+                        background:#fef2f2;
+                        border-radius:10px;">
+
+                    </div>
+
+                </div>
+
+
+                <div>
+
+                    <div style="
+                        display:flex;
+                        justify-content:space-between;
+                        margin-bottom:5px;">
+
+                        <span>
+                            Late
+                        </span>
+
+                        <strong style="color:#2563eb;">
+                            0
+                        </strong>
+
+                    </div>
+
+                    <div style="
+                        height:7px;
+                        background:#eff6ff;
+                        border-radius:10px;">
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div style="
+                margin-top:25px;
+                padding:15px;
+                background:var(--bg);
+                border-radius:10px;">
+
+                <div style="
+                    font-size:12px;
+                    color:var(--text-muted);">
+                    Attendance Rate
+                </div>
+
+                <div style="
+                    font-size:28px;
+                    font-weight:700;
+                    color:#059669;
+                    margin-top:5px;">
+                    100%
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ================= ANALYTICS ================= -->
+
+<div class="tab-content" id="tab-analytics">
+
+    <div class="table-card">
+
+        <div style="
+            padding:50px;
+            text-align:center;">
+
+            <div style="
+                font-size:40px;
+                margin-bottom:15px;">
+                📊
+            </div>
+
+            <div style="
+                font-size:17px;
+                font-weight:700;
+                margin-bottom:8px;">
+                Attendance Analytics
+            </div>
+
+            <div style="
+                color:var(--text-muted);
+                font-size:13px;">
+                Attendance trend and department analytics
+                will be available here.
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
 
 </main>
 
-<!-- MARK ATTENDANCE MODAL -->
-<div class="modal-overlay" id="correctionModal">
-  <div class="modal">
-    <div class="modal-header">
-      <div>
-        <div class="modal-title">Mark / Correct Attendance</div>
-        <div class="modal-sub">Manually update employee attendance record</div>
-      </div>
-      <button class="modal-close" onclick="closeCorrectionModal()">✕</button>
-    </div>
-    <div class="modal-body">
-      <div class="form-group">
-        <label class="form-label">Employee *</label>
-        <select class="form-select" id="corrEmp">
-          <option value="">Select Employee</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Date *</label>
-        <input class="form-input" type="date" id="corrDate">
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-        <div class="form-group">
-          <label class="form-label">Check In Time</label>
-          <input class="form-input" type="time" id="corrIn" value="09:00">
+
+<!-- ================= MODAL ================= -->
+
+<div
+    class="modal-overlay"
+    id="correctionModal">
+
+    <div class="modal">
+
+        <div class="modal-header">
+
+            <div>
+
+                <div class="modal-title">
+                    Mark / Correct Attendance
+                </div>
+
+                <div class="modal-sub">
+                    Manually update employee attendance record
+                </div>
+
+            </div>
+
+            <button
+                class="modal-close"
+                onclick="closeCorrectionModal()">
+                ✕
+            </button>
+
         </div>
-        <div class="form-group">
-          <label class="form-label">Check Out Time</label>
-          <input class="form-input" type="time" id="corrOut" value="18:00">
+
+
+        <div class="modal-body">
+
+            <div class="form-group">
+
+                <label class="form-label">
+                    Employee *
+                </label>
+
+                <select
+                    class="form-select"
+                    id="corrEmp">
+
+                    <option value="">
+                        Select Employee
+                    </option>
+
+                    <option value="E005">
+                        Pavithra A (E005)
+                    </option>
+
+                    <option value="E001">
+                        Arjun Kumar (E001)
+                    </option>
+
+                    <option value="EMP001">
+                        Arjun Kumar (EMP001)
+                    </option>
+
+                    <option value="EMP002">
+                        Priya Sharma (EMP002)
+                    </option>
+
+                    <option value="EMP003">
+                        Rahul Verma (EMP003)
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label class="form-label">
+                    Date *
+                </label>
+
+                <input
+                    class="form-input"
+                    type="date"
+                    id="corrDate">
+
+            </div>
+
+
+            <div style="
+                display:grid;
+                grid-template-columns:1fr 1fr;
+                gap:12px;">
+
+                <div class="form-group">
+
+                    <label class="form-label">
+                        Check In Time
+                    </label>
+
+                    <input
+                        class="form-input"
+                        type="time"
+                        id="corrIn"
+                        value="09:00">
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label class="form-label">
+                        Check Out Time
+                    </label>
+
+                    <input
+                        class="form-input"
+                        type="time"
+                        id="corrOut"
+                        value="18:00">
+
+                </div>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label class="form-label">
+                    Status *
+                </label>
+
+                <select
+                    class="form-select"
+                    id="corrStatus">
+
+                    <option>
+                        Present
+                    </option>
+
+                    <option>
+                        Absent
+                    </option>
+
+                    <option>
+                        Late
+                    </option>
+
+                    <option>
+                        On Leave
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label class="form-label">
+                    Reason / Note
+                </label>
+
+                <textarea
+                    class="form-textarea"
+                    id="corrNote"
+                    placeholder="Enter note...">
+                </textarea>
+
+            </div>
+
         </div>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Status *</label>
-        <select class="form-select" id="corrStatus">
-          <option>Present</option><option>Absent</option><option>Late</option><option>On Leave</option><option>Half Day</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Reason / Note</label>
-        <textarea class="form-textarea" id="corrNote" placeholder="e.g. Medical appointment, system error correction..."></textarea>
-      </div>
+
+
+        <div class="modal-footer">
+
+            <button
+                class="btn-outline"
+                onclick="closeCorrectionModal()">
+                Cancel
+            </button>
+
+            <button
+                class="btn-primary"
+                onclick="saveCorrection()">
+                ✓ Save Attendance
+            </button>
+
+        </div>
+
     </div>
-    <div class="modal-footer">
-      <button class="btn-outline" onclick="closeCorrectionModal()">Cancel</button>
-      <button class="btn-primary" onclick="saveCorrection()">✓ Save Attendance</button>
-    </div>
-  </div>
+
 </div>
 
-<!-- TOAST -->
-<div class="toast" id="toast"></div>
+
+<!-- ================= TOAST ================= -->
+
+<div
+    class="toast"
+    id="toast">
+</div>
+
 
 <script>
-// ── SESSION GUARD
-const session = JSON.parse(sessionStorage.getItem('vendhan_session') || 'null');
-if (!session || !session.token) { window.location.href = '../index.html'; }
-const API_BASE = 'https://vendhan-backend.onrender.com';
-const authHeaders = { 'Authorization': `Bearer ${session ? session.token : ''}` };
 
-let employeesList = [];
-let todayData = [];
-let historyData = [];
+/* =====================================================
+   ATTENDANCE DATA
+   ===================================================== */
 
-function todayISO(){ return new Date().toISOString().split('T')[0]; }
-function timeStr(t){ return t ? String(t).slice(0,5) : '—'; }
+let todayData = [
 
-function calcHours(checkin, checkout){
-  if(!checkin || !checkout || checkin==='—' || checkout==='—') return { hoursStr:'—', ot:'—' };
-  const [ih,im] = checkin.split(':').map(Number);
-  const [oh,om] = checkout.split(':').map(Number);
-  let mins = (oh*60+om) - (ih*60+im);
-  if (mins < 0) mins += 24*60;
-  const hoursStr = `${Math.floor(mins/60)}h ${mins%60}m`;
-  const otMins = Math.max(0, mins - 8*60);
-  const ot = otMins > 0 ? `${Math.floor(otMins/60)}h ${otMins%60}m` : '0';
-  return { hoursStr, ot };
+    {
+        id: 1,
+        code: "E005",
+        name: "Pavithra A",
+        dept: "Human Resources",
+        date: "2026-08-12",
+        checkin: "09:02 AM",
+        checkout: "05:35 PM",
+        hours: "8h 33m",
+        ot: "0h 33m",
+        status: "Present"
+    },
+
+    {
+        id: 2,
+        code: "E001",
+        name: "Arjun Kumar",
+        dept: "Engineering",
+        date: "2026-08-12",
+        checkin: "09:15 AM",
+        checkout: "06:10 PM",
+        hours: "8h 55m",
+        ot: "0h 55m",
+        status: "Present"
+    },
+
+    {
+        id: 3,
+        code: "EMP001",
+        name: "Arjun Kumar",
+        dept: "Engineering",
+        date: "2026-08-12",
+        checkin: "09:05 AM",
+        checkout: "05:45 PM",
+        hours: "8h 40m",
+        ot: "0h 40m",
+        status: "Present"
+    },
+
+    {
+        id: 4,
+        code: "EMP002",
+        name: "Priya Sharma",
+        dept: "Human Resources",
+        date: "2026-08-12",
+        checkin: "09:30 AM",
+        checkout: "05:30 PM",
+        hours: "8h 00m",
+        ot: "0h",
+        status: "Present"
+    },
+
+    {
+        id: 5,
+        code: "EMP003",
+        name: "Rahul Verma",
+        dept: "Engineering",
+        date: "2026-08-12",
+        checkin: "09:10 AM",
+        checkout: "05:20 PM",
+        hours: "8h 10m",
+        ot: "0h 10m",
+        status: "Present"
+    }
+
+];
+
+
+/* =====================================================
+   INITIALIZATION
+   ===================================================== */
+
+document.addEventListener("DOMContentLoaded", function() {
+
+    setTodayDate();
+
+    updateStatistics();
+
+    renderToday(todayData);
+
+    renderHistory(todayData);
+
+    renderCalendar();
+
+    document.getElementById("corrDate").value =
+        "2026-08-12";
+
+});
+
+
+/* =====================================================
+   TODAY DATE
+   ===================================================== */
+
+function setTodayDate() {
+
+    const date = new Date();
+
+    document.getElementById("todayDateLabel").textContent =
+        date.toLocaleDateString("en-IN", {
+            weekday: "long",
+            year: "numeric",
+            month: "long",
+            day: "numeric"
+        });
+
 }
 
-function mapRow(r){
-  const { hoursStr, ot } = calcHours(timeStr(r.check_in), timeStr(r.check_out));
-  return {
-    id: r.id, empId: r.employee_id, code: r.employee_code || '',
-    name: r.full_name, dept: r.department, date: r.date,
-    checkin: timeStr(r.check_in), checkout: timeStr(r.check_out),
-    hours: hoursStr, ot, status: r.status
-  };
+
+/* =====================================================
+   STATISTICS
+   ===================================================== */
+
+function updateStatistics() {
+
+    const present =
+        todayData.filter(
+            e => e.status === "Present"
+        ).length;
+
+    const absent =
+        todayData.filter(
+            e => e.status === "Absent"
+        ).length;
+
+    const late =
+        todayData.filter(
+            e => e.status === "Late"
+        ).length;
+
+    let overtimeMinutes = 0;
+
+    todayData.forEach(function(employee) {
+
+        const match =
+            employee.ot.match(/(\d+)h\s*(\d*)m?/);
+
+        if (match) {
+
+            const hours =
+                parseInt(match[1]) || 0;
+
+            const minutes =
+                parseInt(match[2]) || 0;
+
+            overtimeMinutes +=
+                hours * 60 + minutes;
+        }
+
+    });
+
+
+    const overtimeHours =
+        Math.floor(overtimeMinutes / 60);
+
+    const overtimeMins =
+        overtimeMinutes % 60;
+
+
+    document.getElementById("totalEmpStat")
+        .textContent = todayData.length;
+
+    document.getElementById("presentCount")
+        .textContent = present;
+
+    document.getElementById("absentCount")
+        .textContent = absent;
+
+    document.getElementById("lateCount")
+        .textContent = late;
+
+    document.getElementById("otCount")
+        .textContent =
+        overtimeHours + "h " +
+        overtimeMins + "m";
+
 }
 
-async function apiGet(path){
-  const res = await fetch(API_BASE + path, { headers: authHeaders, cache: 'no-store' });
-  if (res.status === 401 || res.status === 403) {
-    sessionStorage.removeItem('vendhan_session');
-    window.location.href = '../index.html';
-    return [];
-  }
-  return res.json();
-}
 
-async function loadEmployeesList(){
-  employeesList = await apiGet('/api/employees');
-  document.getElementById('totalEmpStat').textContent = employeesList.length;
-  const sel = document.getElementById('corrEmp');
-  sel.innerHTML = '<option value="">Select Employee</option>' +
-    employeesList.map(e => `<option value="${e.id}">${e.full_name} (${e.employee_code||'—'})</option>`).join('');
-}
+/* =====================================================
+   RENDER TODAY ATTENDANCE
+   ===================================================== */
 
-async function loadToday(){
-  const rows = await apiGet('/api/attendance?date=' + todayISO());
-  todayData = (rows || []).map(mapRow);
-  const present = todayData.filter(e=>e.status==='Present'||e.status==='Late').length;
-  const absent  = todayData.filter(e=>e.status==='Absent').length;
-  const late    = todayData.filter(e=>e.status==='Late').length;
-  const otTotal = todayData.reduce((s,e)=>{ const m=e.ot.match(/(\d+)h/); return s+(m?Number(m[1]):0); },0);
-  document.getElementById('presentCount').textContent = present;
-  document.getElementById('absentCount').textContent = absent;
-  document.getElementById('lateCount').textContent = late;
-  document.getElementById('otCount').textContent = otTotal;
-  renderToday(todayData);
-}
-
-async function loadHistory(){
-  const rows = await apiGet('/api/attendance');
-  historyData = (rows || []).map(mapRow);
-  renderHistory(historyData);
-}
-
-// ── Today Tab
 function renderToday(data) {
-  const now = new Date();
-  document.getElementById('todayDateLabel').textContent = now.toLocaleDateString('en-IN',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
-  document.getElementById('todayCountLabel').textContent = `${data.length} records`;
-  const tbody = document.getElementById('todayTableBody');
-  if (!data.length) { tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:32px;color:var(--text-muted);">No attendance marked for today yet</td></tr>`; return; }
-  tbody.innerHTML = data.map(e => {
-    const initials = (e.name||'').split(' ').filter(Boolean).map(n=>n[0]).join('');
-    const sb = e.status==='Present'?'badge-success':e.status==='Late'?'badge-info':e.status==='Absent'?'badge-danger':'badge-warning';
-    return `<tr>
-      <td><div class="emp-info"><div class="emp-avatar" style="background:#eef2ff;color:#6366f1;">${initials}</div><div><div class="emp-name">${e.name}</div><div class="emp-dept">${e.code}</div></div></div></td>
-      <td style="font-size:13px;color:var(--text-secondary);">${e.dept||'—'}</td>
-      <td style="font-size:13px;font-weight:600;color:${e.checkin==='—'?'var(--text-muted)':'#059669'};">${e.checkin}</td>
-      <td style="font-size:13px;font-weight:600;color:${e.checkout==='—'?'var(--text-muted)':'#dc2626'};">${e.checkout}</td>
-      <td style="font-size:13px;color:var(--text-secondary);">${e.hours}</td>
-      <td style="font-size:13px;color:${e.ot==='0'||e.ot==='—'?'var(--text-muted)':'#7c3aed'};font-weight:${e.ot==='0'||e.ot==='—'?'400':'600'};">${e.ot==='0'?'—':e.ot}</td>
-      <td><span class="badge ${sb}">● ${e.status}</span></td>
-      <td style="text-align:center;"><button style="font-size:12px;padding:4px 10px;border-radius:7px;border:1px solid var(--border);background:none;cursor:pointer;" onclick="openCorrectionModal(${e.id})">Edit</button></td>
-    </tr>`;
-  }).join('');
+
+    const tbody =
+        document.getElementById(
+            "todayTableBody"
+        );
+
+    document.getElementById(
+        "todayCountLabel"
+    ).textContent =
+        data.length + " records";
+
+
+    if (data.length === 0) {
+
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="8"
+                    style="
+                    text-align:center;
+                    padding:35px;
+                    color:var(--text-muted);">
+
+                    No attendance records found.
+
+                </td>
+            </tr>
+        `;
+
+        return;
+    }
+
+
+    tbody.innerHTML =
+        data.map(function(employee) {
+
+            const initials =
+                employee.name
+                .split(" ")
+                .map(word => word[0])
+                .join("");
+
+
+            let badgeClass =
+                "badge-success";
+
+            if (employee.status === "Late") {
+                badgeClass = "badge-info";
+            }
+
+            if (employee.status === "Absent") {
+                badgeClass = "badge-danger";
+            }
+
+            if (employee.status === "On Leave") {
+                badgeClass = "badge-warning";
+            }
+
+
+            return `
+
+            <tr>
+
+                <td>
+
+                    <div class="emp-info">
+
+                        <div class="emp-avatar">
+                            ${initials}
+                        </div>
+
+                        <div>
+
+                            <div class="emp-name">
+                                ${employee.name}
+                            </div>
+
+                            <div class="emp-dept">
+                                ${employee.code}
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </td>
+
+
+                <td style="
+                    color:var(--text-secondary);">
+
+                    ${employee.dept}
+
+                </td>
+
+
+                <td style="
+                    font-weight:600;
+                    color:#059669;">
+
+                    ${employee.checkin}
+
+                </td>
+
+
+                <td style="
+                    font-weight:600;
+                    color:#dc2626;">
+
+                    ${employee.checkout}
+
+                </td>
+
+
+                <td style="
+                    color:var(--text-secondary);">
+
+                    ${employee.hours}
+
+                </td>
+
+
+                <td style="
+                    color:#7c3aed;
+                    font-weight:600;">
+
+                    ${employee.ot === "0"
+                        ? "—"
+                        : employee.ot}
+
+                </td>
+
+
+                <td>
+
+                    <span class="
+                        badge
+                        ${badgeClass}">
+
+                        ● ${employee.status}
+
+                    </span>
+
+                </td>
+
+
+                <td style="
+                    text-align:center;
+                    white-space:nowrap;">
+
+                    <button
+                        class="action-btn"
+                        onclick="viewEmployee(${employee.id})"
+                        title="View">
+
+                        👁
+
+                    </button>
+
+                    <button
+                        class="action-btn"
+                        onclick="editEmployee(${employee.id})"
+                        title="Edit">
+
+                        ✏️
+
+                    </button>
+
+                    <button
+                        class="action-btn"
+                        onclick="deleteEmployee(${employee.id})"
+                        title="Delete">
+
+                        🗑
+
+                    </button>
+
+                </td>
+
+            </tr>
+
+            `;
+
+        }).join("");
+
 }
+
+
+/* =====================================================
+   FILTER TODAY
+   ===================================================== */
 
 function filterToday() {
-  const s = document.getElementById('todaySearch').value.toLowerCase();
-  const d = document.getElementById('todayDept').value;
-  const st = document.getElementById('todayStatus').value;
-  renderToday(todayData.filter(e =>
-    (!s || e.name.toLowerCase().includes(s) || e.code.toLowerCase().includes(s)) &&
-    (!d || e.dept === d) && (!st || e.status === st)
-  ));
+
+    const search =
+        document.getElementById(
+            "todaySearch"
+        ).value.toLowerCase();
+
+    const department =
+        document.getElementById(
+            "todayDept"
+        ).value;
+
+    const status =
+        document.getElementById(
+            "todayStatus"
+        ).value;
+
+
+    const filtered =
+        todayData.filter(function(employee) {
+
+            const matchesSearch =
+                employee.name
+                .toLowerCase()
+                .includes(search) ||
+
+                employee.code
+                .toLowerCase()
+                .includes(search);
+
+
+            const matchesDepartment =
+                !department ||
+                employee.dept === department;
+
+
+            const matchesStatus =
+                !status ||
+                employee.status === status;
+
+
+            return (
+                matchesSearch &&
+                matchesDepartment &&
+                matchesStatus
+            );
+
+        });
+
+
+    renderToday(filtered);
+
 }
 
-// ── History Tab
+
+/* =====================================================
+   HISTORY
+   ===================================================== */
+
 function renderHistory(data) {
-  const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-  const tbody = document.getElementById('historyTableBody');
-  if (!data.length) { tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:32px;color:var(--text-muted);">No attendance history yet</td></tr>`; return; }
-  tbody.innerHTML = data.map(e => {
-    const d = new Date(e.date);
-    const sb = e.status==='Present'?'badge-success':e.status==='Late'?'badge-info':e.status==='Absent'?'badge-danger':'badge-warning';
-    return `<tr>
-      <td><div class="emp-info"><div class="emp-avatar" style="background:#eef2ff;color:#6366f1;">${(e.name||'').split(' ').filter(Boolean).map(n=>n[0]).join('')}</div><div><div class="emp-name">${e.name}</div><div class="emp-dept">${e.dept||'—'}</div></div></div></td>
-      <td style="font-size:13px;">${d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})}</td>
-      <td style="font-size:13px;color:var(--text-muted);">${days[d.getDay()]}</td>
-      <td style="font-size:13px;font-weight:600;color:${e.checkin==='—'?'var(--text-muted)':'#059669'};">${e.checkin}</td>
-      <td style="font-size:13px;font-weight:600;color:${e.checkout==='—'?'var(--text-muted)':'#dc2626'};">${e.checkout}</td>
-      <td style="font-size:13px;color:var(--text-secondary);">${e.hours}</td>
-      <td><span class="badge ${sb}">● ${e.status}</span></td>
-      <td style="text-align:center;"><button style="font-size:12px;padding:4px 10px;border-radius:7px;border:1px solid var(--border);background:none;cursor:pointer;" onclick="openCorrectionModal(${e.id})">Correct</button></td>
-    </tr>`;
-  }).join('');
+
+    const tbody =
+        document.getElementById(
+            "historyTableBody"
+        );
+
+
+    tbody.innerHTML =
+        data.map(function(employee) {
+
+            const initials =
+                employee.name
+                .split(" ")
+                .map(word => word[0])
+                .join("");
+
+
+            return `
+
+            <tr>
+
+                <td>
+
+                    <div class="emp-info">
+
+                        <div class="emp-avatar">
+                            ${initials}
+                        </div>
+
+                        <div>
+
+                            <div class="emp-name">
+                                ${employee.name}
+                            </div>
+
+                            <div class="emp-dept">
+                                ${employee.code}
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </td>
+
+
+                <td>
+                    ${employee.dept}
+                </td>
+
+
+                <td>
+                    ${employee.date}
+                </td>
+
+
+                <td style="
+                    color:#059669;
+                    font-weight:600;">
+
+                    ${employee.checkin}
+
+                </td>
+
+
+                <td style="
+                    color:#dc2626;
+                    font-weight:600;">
+
+                    ${employee.checkout}
+
+                </td>
+
+
+                <td>
+                    ${employee.hours}
+                </td>
+
+
+                <td>
+
+                    <span class="
+                        badge
+                        badge-success">
+
+                        ● ${employee.status}
+
+                    </span>
+
+                </td>
+
+
+                <td>
+
+                    <button
+                        class="action-btn"
+                        onclick="editEmployee(${employee.id})">
+
+                        ✏️ Edit
+
+                    </button>
+
+                </td>
+
+            </tr>
+
+            `;
+
+        }).join("");
+
 }
 
-function filterHistory(s) {
-  const search = (s||'').toLowerCase();
-  const st = document.getElementById('historyStatus').value;
-  renderHistory(historyData.filter(e =>
-    (!search || e.name.toLowerCase().includes(search)) && (!st || e.status === st)
-  ));
+
+/* =====================================================
+   FILTER HISTORY
+   ===================================================== */
+
+function filterHistory() {
+
+    const search =
+        document.getElementById(
+            "historySearch"
+        ).value.toLowerCase();
+
+
+    const status =
+        document.getElementById(
+            "historyStatus"
+        ).value;
+
+
+    const filtered =
+        todayData.filter(function(employee) {
+
+            const searchMatch =
+                employee.name
+                .toLowerCase()
+                .includes(search);
+
+
+            const statusMatch =
+                !status ||
+                employee.status === status;
+
+
+            return (
+                searchMatch &&
+                statusMatch
+            );
+
+        });
+
+
+    renderHistory(filtered);
+
 }
 
-// ── Modal — real POST for new records, PUT for edits
-let editingId = null;
-function openCorrectionModal(id) {
-  editingId = id || null;
-  document.getElementById('corrDate').value = new Date().toISOString().split('T')[0];
-  document.getElementById('corrEmp').value = '';
-  document.getElementById('corrIn').value = '09:00';
-  document.getElementById('corrOut').value = '18:00';
-  document.getElementById('corrStatus').value = 'Present';
-  document.getElementById('corrNote').value = '';
 
-  if (editingId) {
-    const existing = todayData.find(e=>e.id===editingId) || historyData.find(e=>e.id===editingId);
-    if (existing) {
-      document.getElementById('corrEmp').value = existing.empId;
-      document.getElementById('corrDate').value = existing.date ? new Date(existing.date).toISOString().split('T')[0] : document.getElementById('corrDate').value;
-      if (existing.checkin !== '—') document.getElementById('corrIn').value = existing.checkin;
-      if (existing.checkout !== '—') document.getElementById('corrOut').value = existing.checkout;
-      document.getElementById('corrStatus').value = existing.status;
+/* =====================================================
+   VIEW EMPLOYEE
+   ===================================================== */
+
+function viewEmployee(id) {
+
+    const employee =
+        todayData.find(
+            e => e.id === id
+        );
+
+
+    if (!employee) return;
+
+
+    showToast(
+        "👁 " +
+        employee.name +
+        " — " +
+        employee.status
+    );
+
+}
+
+
+/* =====================================================
+   EDIT EMPLOYEE
+   ===================================================== */
+
+function editEmployee(id) {
+
+    const employee =
+        todayData.find(
+            e => e.id === id
+        );
+
+
+    if (!employee) return;
+
+
+    document.getElementById(
+        "corrEmp"
+    ).value = employee.code;
+
+
+    document.getElementById(
+        "corrIn"
+    ).value =
+        convertTo24Hour(
+            employee.checkin
+        );
+
+
+    document.getElementById(
+        "corrOut"
+    ).value =
+        convertTo24Hour(
+            employee.checkout
+        );
+
+
+    document.getElementById(
+        "corrStatus"
+    ).value =
+        employee.status;
+
+
+    document.getElementById(
+        "corrDate"
+    ).value =
+        employee.date;
+
+
+    document.getElementById(
+        "correctionModal"
+    ).classList.add("open");
+
+}
+
+
+/* =====================================================
+   DELETE EMPLOYEE ATTENDANCE
+   ===================================================== */
+
+function deleteEmployee(id) {
+
+    const employee =
+        todayData.find(
+            e => e.id === id
+        );
+
+
+    if (!employee) return;
+
+
+    const confirmDelete =
+        confirm(
+            "Delete attendance for " +
+            employee.name +
+            "?"
+        );
+
+
+    if (!confirmDelete) return;
+
+
+    todayData =
+        todayData.filter(
+            e => e.id !== id
+        );
+
+
+    renderToday(todayData);
+
+    renderHistory(todayData);
+
+    updateStatistics();
+
+    showToast(
+        "🗑 Attendance deleted"
+    );
+
+}
+
+
+/* =====================================================
+   TIME CONVERSION
+   ===================================================== */
+
+function convertTo24Hour(time) {
+
+    if (!time) return "09:00";
+
+    const parts =
+        time.match(
+            /(\d+):(\d+)\s*(AM|PM)/i
+        );
+
+    if (!parts) return time;
+
+
+    let hour =
+        parseInt(parts[1]);
+
+    const minute =
+        parts[2];
+
+    const period =
+        parts[3].toUpperCase();
+
+
+    if (period === "PM" && hour !== 12) {
+        hour += 12;
     }
-  }
-  document.getElementById('correctionModal').classList.add('open');
+
+    if (period === "AM" && hour === 12) {
+        hour = 0;
+    }
+
+
+    return String(hour).padStart(2,"0")
+        + ":" +
+        minute;
+
 }
-function closeCorrectionModal() { document.getElementById('correctionModal').classList.remove('open'); editingId = null; }
 
-async function saveCorrection() {
-  const employee_id = document.getElementById('corrEmp').value;
-  const date = document.getElementById('corrDate').value;
-  const check_in = document.getElementById('corrIn').value;
-  const check_out = document.getElementById('corrOut').value;
-  const status = document.getElementById('corrStatus').value;
-  const note = document.getElementById('corrNote').value;
-  if (!employee_id) { showToast('⚠️ Please select an employee'); return; }
 
-  try {
-    const url = editingId ? `${API_BASE}/api/attendance/${editingId}` : `${API_BASE}/api/attendance`;
-    const method = editingId ? 'PUT' : 'POST';
-    const res = await fetch(url, {
-      method,
-      headers: { ...authHeaders, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ employee_id, date, check_in, check_out, status, note })
-    });
-    if (!res.ok) throw new Error('Save failed');
+/* =====================================================
+   MARK ATTENDANCE MODAL
+   ===================================================== */
+
+function openCorrectionModal() {
+
+    document.getElementById(
+        "corrDate"
+    ).value = "2026-08-12";
+
+
+    document.getElementById(
+        "corrEmp"
+    ).value = "";
+
+
+    document.getElementById(
+        "corrIn"
+    ).value = "09:00";
+
+
+    document.getElementById(
+        "corrOut"
+    ).value = "18:00";
+
+
+    document.getElementById(
+        "corrStatus"
+    ).value = "Present";
+
+
+    document.getElementById(
+        "correctionModal"
+    ).classList.add("open");
+
+}
+
+
+function closeCorrectionModal() {
+
+    document.getElementById(
+        "correctionModal"
+    ).classList.remove("open");
+
+}
+
+
+/* =====================================================
+   SAVE ATTENDANCE
+   ===================================================== */
+
+function saveCorrection() {
+
+    const employeeCode =
+        document.getElementById(
+            "corrEmp"
+        ).value;
+
+
+    const date =
+        document.getElementById(
+            "corrDate"
+        ).value;
+
+
+    const checkIn =
+        document.getElementById(
+            "corrIn"
+        ).value;
+
+
+    const checkOut =
+        document.getElementById(
+            "corrOut"
+        ).value;
+
+
+    const status =
+        document.getElementById(
+            "corrStatus"
+        ).value;
+
+
+    if (!employeeCode) {
+
+        showToast(
+            "⚠️ Please select an employee"
+        );
+
+        return;
+    }
+
+
+    const employee =
+        todayData.find(
+            e => e.code === employeeCode
+        );
+
+
+    if (employee) {
+
+        employee.date = date;
+
+        employee.checkin =
+            convert24To12(checkIn);
+
+        employee.checkout =
+            convert24To12(checkOut);
+
+        employee.status =
+            status;
+
+
+        const times =
+            calculateWorkingHours(
+                checkIn,
+                checkOut
+            );
+
+
+        employee.hours =
+            times.hours;
+
+        employee.ot =
+            times.ot;
+
+    }
+
+
+    renderToday(todayData);
+
+    renderHistory(todayData);
+
+    updateStatistics();
+
     closeCorrectionModal();
-    showToast(`✅ Attendance saved as "${status}"`);
-    loadToday();
-    loadHistory();
-  } catch (err) {
-    console.error(err);
-    showToast('⚠️ Could not save attendance');
-  }
+
+    showToast(
+        "✅ Attendance saved successfully"
+    );
+
 }
 
-// ── Calendar (built from real history data)
-let calDate = new Date();
-function renderCalendar() {
-  const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-  document.getElementById('calMonthLabel').textContent = `${months[calDate.getMonth()]} ${calDate.getFullYear()}`;
-  document.getElementById('calSummaryMonth').textContent = `${months[calDate.getMonth()]} ${calDate.getFullYear()}`;
-  const grid = document.getElementById('calGrid');
-  const labels = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-  const firstDay = new Date(calDate.getFullYear(), calDate.getMonth(), 1).getDay();
-  const daysInMonth = new Date(calDate.getFullYear(), calDate.getMonth()+1, 0).getDate();
-  const today = new Date();
 
-  const byDate = {};
-  historyData.forEach(e => {
-    const d = new Date(e.date);
-    if (d.getMonth()===calDate.getMonth() && d.getFullYear()===calDate.getFullYear()) {
-      byDate[d.getDate()] = e.status;
+/* =====================================================
+   CONVERT 24 HOUR TO 12 HOUR
+   ===================================================== */
+
+function convert24To12(time) {
+
+    const parts =
+        time.split(":");
+
+
+    let hour =
+        parseInt(parts[0]);
+
+    const minute =
+        parts[1];
+
+
+    const period =
+        hour >= 12
+            ? "PM"
+            : "AM";
+
+
+    if (hour === 0) {
+        hour = 12;
     }
-  });
+    else if (hour > 12) {
+        hour -= 12;
+    }
 
-  let html = labels.map(l=>`<div class="cal-day-label">${l}</div>`).join('');
-  for (let i=0;i<firstDay;i++) html+=`<div class="cal-day empty"></div>`;
-  const counts = { Present:0, Absent:0, Late:0, 'On Leave':0 };
-  for (let d=1; d<=daysInMonth; d++) {
-    const isToday = today.getDate()===d && today.getMonth()===calDate.getMonth() && today.getFullYear()===calDate.getFullYear();
-    const status = byDate[d];
-    if (status && counts.hasOwnProperty(status)) counts[status]++;
-    const cls = status==='Present'?'present':status==='Absent'?'absent':status==='Late'?'late':status==='On Leave'?'leave':'';
-    html+=`<div class="cal-day ${cls} ${isToday?'today':''}" title="Day ${d}: ${status||'No data'}" onclick="showToast('📅 Day ${d}: ${status||'No record'}')">${d}<div class="cal-dot" style="background:${cls==='present'?'#059669':cls==='absent'?'#dc2626':cls==='late'?'#2563eb':cls==='leave'?'#d97706':'transparent'};"></div></div>`;
-  }
-  grid.innerHTML = html;
 
-  const totalMarked = counts.Present + counts.Absent + counts.Late + counts['On Leave'];
-  const rate = totalMarked ? Math.round(((counts.Present+counts.Late) / totalMarked) * 100) : 0;
-  document.getElementById('calAttendanceRate').textContent = totalMarked ? rate + '%' : '—';
+    return (
+        String(hour).padStart(2,"0") +
+        ":" +
+        minute +
+        " " +
+        period
+    );
 
-  const bars = [
-    { label:'Present Days', val: counts.Present, color:'#059669' },
-    { label:'Absent Days', val: counts.Absent, color:'#dc2626' },
-    { label:'Late Arrivals', val: counts.Late, color:'#2563eb' },
-    { label:'On Leave', val: counts['On Leave'], color:'#d97706' }
-  ];
-  const maxVal = Math.max(1, ...bars.map(b=>b.val));
-  document.getElementById('calSummaryBars').innerHTML = bars.map(b => `
-    <div>
-      <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px;"><span>${b.label}</span><span style="font-weight:700;color:${b.color};">${b.val}</span></div>
-      <div style="height:6px;background:#f3f4f6;border-radius:10px;overflow:hidden;"><div style="width:${(b.val/maxVal)*100}%;height:100%;background:${b.color};border-radius:10px;"></div></div>
-    </div>`).join('');
-}
-function changeMonth(dir) { calDate.setMonth(calDate.getMonth()+dir); renderCalendar(); }
-
-// ── Tab Switch
-function switchTab(id, btn) {
-  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-  document.getElementById('tab-'+id).classList.add('active');
-  btn.classList.add('active');
-  if (id==='calendar') renderCalendar();
 }
 
-// ── Sidebar Toggle
+
+/* =====================================================
+   CALCULATE HOURS
+   ===================================================== */
+
+function calculateWorkingHours(
+    checkIn,
+    checkOut
+) {
+
+    const inParts =
+        checkIn.split(":").map(Number);
+
+    const outParts =
+        checkOut.split(":").map(Number);
+
+
+    let inMinutes =
+        inParts[0] * 60 +
+        inParts[1];
+
+
+    let outMinutes =
+        outParts[0] * 60 +
+        outParts[1];
+
+
+    let total =
+        outMinutes - inMinutes;
+
+
+    if (total < 0) {
+        total += 24 * 60;
+    }
+
+
+    const hours =
+        Math.floor(total / 60);
+
+    const minutes =
+        total % 60;
+
+
+    const overtime =
+        Math.max(
+            0,
+            total - 480
+        );
+
+
+    const otHours =
+        Math.floor(
+            overtime / 60
+        );
+
+    const otMinutes =
+        overtime % 60;
+
+
+    return {
+
+        hours:
+            hours +
+            "h " +
+            String(minutes).padStart(2,"0") +
+            "m",
+
+        ot:
+            overtime > 0
+                ? otHours +
+                  "h " +
+                  String(otMinutes).padStart(2,"0") +
+                  "m"
+                : "0"
+
+    };
+
+}
+
+
+/* =====================================================
+   TAB SWITCH
+   ===================================================== */
+
+function switchTab(
+    id,
+    button
+) {
+
+    document
+        .querySelectorAll(".tab-content")
+        .forEach(function(tab) {
+
+            tab.classList.remove("active");
+
+        });
+
+
+    document
+        .querySelectorAll(".tab-btn")
+        .forEach(function(btn) {
+
+            btn.classList.remove("active");
+
+        });
+
+
+    document
+        .getElementById(
+            "tab-" + id
+        )
+        .classList.add("active");
+
+
+    button.classList.add("active");
+
+
+    if (id === "calendar") {
+
+        renderCalendar();
+
+    }
+
+}
+
+
+/* =====================================================
+   SIDEBAR
+   ===================================================== */
+
 function toggleSidebar() {
-  document.getElementById('sidebar').classList.toggle('collapsed');
-  document.getElementById('topbar').classList.toggle('collapsed');
-  document.getElementById('mainContent').classList.toggle('collapsed');
+
+    document
+        .getElementById("sidebar")
+        .classList.toggle("collapsed");
+
+
+    document
+        .getElementById("topbar")
+        .classList.toggle("collapsed");
+
+
+    document
+        .getElementById("mainContent")
+        .classList.toggle("collapsed");
+
 }
 
-// ── Export CSV
+
+/* =====================================================
+   CALENDAR
+   ===================================================== */
+
+let calendarDate =
+    new Date(2026,7,12);
+
+
+function renderCalendar() {
+
+    const months = [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December"
+    ];
+
+
+    document.getElementById(
+        "calMonthLabel"
+    ).textContent =
+        months[
+            calendarDate.getMonth()
+        ] +
+        " " +
+        calendarDate.getFullYear();
+
+
+    const grid =
+        document.getElementById(
+            "calGrid"
+        );
+
+
+    const labels = [
+        "Sun",
+        "Mon",
+        "Tue",
+        "Wed",
+        "Thu",
+        "Fri",
+        "Sat"
+    ];
+
+
+    const firstDay =
+        new Date(
+            calendarDate.getFullYear(),
+            calendarDate.getMonth(),
+            1
+        ).getDay();
+
+
+    const daysInMonth =
+        new Date(
+            calendarDate.getFullYear(),
+            calendarDate.getMonth()+1,
+            0
+        ).getDate();
+
+
+    let html = "";
+
+
+    labels.forEach(function(day) {
+
+        html += `
+            <div class="cal-day-label">
+                ${day}
+            </div>
+        `;
+
+    });
+
+
+    for (
+        let i = 0;
+        i < firstDay;
+        i++
+    ) {
+
+        html += `
+            <div class="cal-day empty">
+            </div>
+        `;
+
+    }
+
+
+    for (
+        let day = 1;
+        day <= daysInMonth;
+        day++
+    ) {
+
+        const isToday =
+            day === 12 &&
+            calendarDate.getMonth() === 7 &&
+            calendarDate.getFullYear() === 2026;
+
+
+        const status =
+            day === 12
+                ? "present"
+                : "";
+
+
+        html += `
+
+            <div class="
+                cal-day
+                ${status}
+                ${isToday ? "today" : ""}
+            ">
+
+                ${day}
+
+                ${
+                    status
+                    ? `<div
+                        class="cal-dot"
+                        style="background:#059669;">
+                       </div>`
+                    : ""
+                }
+
+            </div>
+
+        `;
+
+    }
+
+
+    grid.innerHTML = html;
+
+}
+
+
+function changeMonth(direction) {
+
+    calendarDate.setMonth(
+        calendarDate.getMonth() +
+        direction
+    );
+
+    renderCalendar();
+
+}
+
+
+/* =====================================================
+   EXPORT CSV
+   ===================================================== */
+
 function exportCSV() {
-  const rows = ['Employee,Department,Date,Check In,Check Out,Hours,Status',...historyData.map(e=>`${e.name},${e.dept},${e.date},${e.checkin},${e.checkout},${e.hours},${e.status}`)].join('\n');
-  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([rows],{type:'text/csv'}));
-  a.download='vendhan_attendance.csv'; a.click();
-  showToast('📥 Attendance report exported!');
+
+    let csv =
+        "Employee,Department,Date,Check In,Check Out,Working Hrs,Overtime,Status\n";
+
+
+    todayData.forEach(function(employee) {
+
+        csv +=
+            `"${employee.name}",` +
+            `"${employee.dept}",` +
+            `"${employee.date}",` +
+            `"${employee.checkin}",` +
+            `"${employee.checkout}",` +
+            `"${employee.hours}",` +
+            `"${employee.ot}",` +
+            `"${employee.status}"\n`;
+
+    });
+
+
+    const blob =
+        new Blob(
+            [csv],
+            {
+                type:"text/csv"
+            }
+        );
+
+
+    const url =
+        URL.createObjectURL(blob);
+
+
+    const link =
+        document.createElement("a");
+
+
+    link.href = url;
+
+    link.download =
+        "vendhan_attendance.csv";
+
+
+    link.click();
+
+
+    URL.revokeObjectURL(url);
+
+
+    showToast(
+        "📥 Attendance report exported!"
+    );
+
 }
 
-// ── Toast
-function showToast(msg) {
-  const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),3000);
+
+/* =====================================================
+   TOAST
+   ===================================================== */
+
+function showToast(message) {
+
+    const toast =
+        document.getElementById(
+            "toast"
+        );
+
+
+    toast.textContent =
+        message;
+
+
+    toast.classList.add(
+        "show"
+    );
+
+
+    setTimeout(function() {
+
+        toast.classList.remove(
+            "show"
+        );
+
+    },3000);
+
 }
 
-// ── INIT
-loadEmployeesList().then(() => { loadToday(); loadHistory(); });
 </script>
+
 </body>
 </html>
