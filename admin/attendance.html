@@ -232,22 +232,22 @@
     </div>
     <div class="stat-card green">
       <div class="stat-icon" style="background:#ecfdf5;color:#059669;">✅</div>
-      <div class="stat-value" id="presentCount">5</div>
+      <div class="stat-value" id="presentCount">—</div>
       <div class="stat-label">Present Today</div>
     </div>
     <div class="stat-card red">
       <div class="stat-icon" style="background:#fef2f2;color:#dc2626;">❌</div>
-      <div class="stat-value" id="absentCount">0</div>
+      <div class="stat-value" id="absentCount">—</div>
       <div class="stat-label">Absent Today</div>
     </div>
     <div class="stat-card amber">
       <div class="stat-icon" style="background:#fffbeb;color:#d97706;">⏰</div>
-      <div class="stat-value" id="lateCount">1</div>
+      <div class="stat-value" id="lateCount">—</div>
       <div class="stat-label">Late Arrivals</div>
     </div>
     <div class="stat-card purple">
       <div class="stat-icon" style="background:#f5f3ff;color:#7c3aed;">🌙</div>
-      <div class="stat-value" id="otCount">1</div>
+      <div class="stat-value" id="otCount">—</div>
       <div class="stat-label">Overtime Hours</div>
     </div>
   </div>
@@ -277,99 +277,23 @@
         <option>Present</option><option>Absent</option><option>Late</option><option>On Leave</option>
       </select>
     </div>
-    
-        <div style="font-size:13px;color:var(--text--);" id="todayCountLabel"></div>
+    <div class="table-card">
+      <div class="table-header-row">
+        <div class="table-title">Today's Attendance — <span id="todayDateLabel"></span></div>
+        <div style="font-size:13px;color:var(--text-muted);" id="todayCountLabel"></div>
       </div>
-
-  <div class="table-responsive">
-    <table class="data-table">
-      <thead>
-        <tr>
-          <th>Employee</th>
-          <th>Department</th>
-          <th>Check In</th>
-          <th>Check Out</th>
-          <th>Working Hrs</th>
-          <th>Overtime</th>
-          <th>Status</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-
-      <tbody>
-        <tr>
-          <td>Pavithra A</td>
-          <td>Human Resources</td>
-          <td>09:02 AM</td>
-          <td>05:35 PM</td>
-          <td>8h 33m</td>
-          <td>0h 33m</td>
-          <td><span class="status-badge active">Present</span></td>
-          <td>
-            <button title="View">👁</button>
-            <button title="Edit">✏️</button>
-          </td>
-        </tr>
-
-        <tr>
-          <td>Arjun Kumar</td>
-          <td>Engineering</td>
-          <td>09:15 AM</td>
-          <td>06:10 PM</td>
-          <td>8h 55m</td>
-          <td>0h 55m</td>
-          <td><span class="status-badge active">Present</span></td>
-          <td>
-            <button title="View">👁</button>
-            <button title="Edit">✏️</button>
-          </td>
-        </tr>
-
-        <tr>
-          <td>Arjun Kumar</td>
-          <td>Engineering</td>
-          <td>09:05 AM</td>
-          <td>05:45 PM</td>
-          <td>8h 40m</td>
-          <td>0h 40m</td>
-          <td><span class="status-badge active">Present</span></td>
-          <td>
-            <button title="View">👁</button>
-            <button title="Edit">✏️</button>
-          </td>
-        </tr>
-
-        <tr>
-          <td>Priya Sharma</td>
-          <td>Human Resources</td>
-          <td>09:30 AM</td>
-          <td>05:30 PM</td>
-          <td>8h 00m</td>
-          <td>0h 00m</td>
-          <td><span class="status-badge active">Present</span></td>
-          <td>
-            <button title="View">👁</button>
-            <button title="Edit">✏️</button>
-          </td>
-        </tr>
-
-        <tr>
-          <td>Rahul Verma</td>
-          <td>—</td>
-          <td>09:10 AM</td>
-          <td>05:20 PM</td>
-          <td>8h 10m</td>
-          <td>0h 10m</td>
-          <td><span class="status-badge active">Present</span></td>
-          <td>
-            <button title="View">👁</button>
-            <button title="Edit">✏️</button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-</div>
+      <div style="overflow-x:auto;">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Employee</th>
+              <th>Department</th>
+              <th>Check In</th>
+              <th>Check Out</th>
+              <th>Working Hrs</th>
+              <th>Overtime</th>
+              <th>Status</th>
+              <th style="text-align:center;">Action</th>
             </tr>
           </thead>
           <tbody id="todayTableBody"></tbody>
